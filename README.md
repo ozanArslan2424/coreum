@@ -1,4 +1,4 @@
-# corum
+# coreum
 
 To install dependencies:
 

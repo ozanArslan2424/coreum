@@ -1,0 +1,16 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": null,
+	"categories": {},
+	"settings": {},
+	"rules": {
+		"typescript-eslint/no-redundant-type-constituents": "off",
+		"typescript-eslint/restrict-template-expressions": "off"
+	},
+	"env": {
+		"builtin": true
+	},
+	"globals": {},
+	"ignorePatterns": []
+}
+
