@@ -1,0 +1,32 @@
+{
+  "name": "corum",
+  "type": "module",
+  "module": "index.ts",
+  "version": "0.0.1",
+  "description": "Small Typescript backend framework with only core utilities",
+  "author": "Ozan Arslan",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/*.js",
+    "dist/*.d.ts"
+  ],
+  "scripts": {
+    "build": "bun build --target=node ./src/index.ts --outfile=dist/index.js && bun run build:declaration",
+    "build:declaration": "tsc --emitDeclarationOnly --project tsconfig.types.json",
+    "postbuild": "rimraf tsconfig.types.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "arktype": "^2.1.29",
+    "zod": "^4.3.6"
+  }
+}
