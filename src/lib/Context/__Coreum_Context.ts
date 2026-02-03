@@ -50,7 +50,7 @@ export class __Coreum_Context<
 		this.cookies = new __Coreum_Cookies();
 	}
 
-	parseRequestSearch(searchParams: URLSearchParams): S {
+	private parseRequestSearch(searchParams: URLSearchParams): S {
 		const data: Record<string, unknown> = {};
 
 		for (const [key, value] of searchParams.entries()) {
@@ -61,7 +61,7 @@ export class __Coreum_Context<
 		return this.parseWithSchema<S>("search", data);
 	}
 
-	parseRequestParams(requestPath: string, definedPath: string): P {
+	private parseRequestParams(requestPath: string, definedPath: string): P {
 		const definedPathSegments = definedPath.split("/");
 		const requestPathSegments = requestPath.split("/");
 
@@ -83,7 +83,7 @@ export class __Coreum_Context<
 		return this.parseWithSchema("params", paramsObject);
 	}
 
-	async parseRequestBody(req: __Coreum_Request): Promise<B> {
+	private async parseRequestBody(req: __Coreum_Request): Promise<B> {
 		let data;
 		const empty = {} as B;
 
