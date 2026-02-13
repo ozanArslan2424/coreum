@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { reqMaker } from "../utils/reqMaker";
 import { pathMaker } from "../utils/pathMaker";
-import { Route } from "@/internal/modules/Route/Route";
+import { Route } from "@/modules/Route/Route";
 import { testServer } from "test/utils/testServer";
 
 const prefix = "/response-body";

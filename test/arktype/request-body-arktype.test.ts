@@ -2,9 +2,9 @@ import { describe, expect, it } from "bun:test";
 import { reqMaker } from "../utils/reqMaker";
 import { type } from "arktype";
 import { pathMaker } from "../utils/pathMaker";
-import { Status } from "@/internal/enums/Status";
-import { CommonHeaders } from "@/internal/enums/CommonHeaders";
-import { Route } from "@/internal/modules/Route/Route";
+import { Status } from "@/modules/HttpResponse/enums/Status";
+import { CommonHeaders } from "@/modules/HttpHeaders/enums/CommonHeaders";
+import { Route } from "@/modules/Route/Route";
 import { testServer } from "test/utils/testServer";
 
 const prefix = "/request-body/arktype";

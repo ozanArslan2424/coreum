@@ -1,6 +1,6 @@
 import { CommonHeaders, Cookies, Method } from "@/index";
-import { HttpHeaders } from "@/internal/modules/HttpHeaders/HttpHeaders";
-import { HttpRequest } from "@/internal/modules/HttpRequest/HttpRequest";
+import { HttpHeaders } from "@/modules/HttpHeaders/HttpHeaders";
+import { HttpRequest } from "@/modules/HttpRequest/HttpRequest";
 import { describe, expect, it } from "bun:test";
 import { TEST_URL } from "../utils/TEST_URL";
 

@@ -1,8 +1,8 @@
 import { reqMaker } from "../utils/reqMaker";
 import { pathMaker } from "../utils/pathMaker";
 import { testServer } from "../utils/testServer";
-import { Middleware } from "@/internal/modules/Middleware/Middleware";
-import { Route } from "@/internal/modules/Route/Route";
+import { Middleware } from "@/modules/Middleware/Middleware";
+import { Route } from "@/modules/Route/Route";
 import { describe, it, expect } from "bun:test";
 
 const prefix = "/middleware/use-on-route";

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "bun:test";
 import { reqMaker } from "../utils/reqMaker";
 import { pathMaker } from "../utils/pathMaker";
-import { CommonHeaders } from "@/internal/enums/CommonHeaders";
-import { Status } from "@/internal/enums/Status";
-import { Route } from "@/internal/modules/Route/Route";
+import { CommonHeaders } from "@/modules/HttpHeaders/enums/CommonHeaders";
+import { Status } from "@/modules/HttpResponse/enums/Status";
+import { Route } from "@/modules/Route/Route";
 import { testServer } from "test/utils/testServer";
 
 const prefix = "/response-headers";

@@ -1,39 +1,39 @@
-export * from "@/internal/enums/CommonHeaders";
-export * from "@/internal/enums/Method";
-export * from "@/internal/enums/Status";
+export * from "@/modules/HttpHeaders/enums/CommonHeaders";
+export * from "@/modules/HttpRequest/enums/Method";
+export * from "@/modules/HttpResponse/enums/Status";
 
-export * from "@/internal/modules/Config/Config";
+export * from "@/modules/Config/Config";
 
-export { ControllerAbstract as Controller } from "@/internal/modules/Controller/ControllerAbstract";
+export { ControllerAbstract as Controller } from "@/modules/Controller/ControllerAbstract";
 
-export { Cookies } from "@/internal/modules/Cookies/Cookies";
-export type { CookiesInterface } from "@/internal/modules/Cookies/CookiesInterface";
+export { Cookies } from "@/modules/Cookies/Cookies";
+export type { CookiesInterface } from "@/modules/Cookies/CookiesInterface";
 
-export { HttpError as Error } from "@/internal/modules/HttpError/HttpError";
+export { HttpError as Error } from "@/modules/HttpError/HttpError";
 
-export { HttpHeaders as Headers } from "@/internal/modules/HttpHeaders/HttpHeaders";
-export type { HttpHeadersInterface as HeadersInterface } from "@/internal/modules/HttpHeaders/HttpHeadersInterface";
+export { HttpHeaders as Headers } from "@/modules/HttpHeaders/HttpHeaders";
+export type { HttpHeadersInterface as HeadersInterface } from "@/modules/HttpHeaders/HttpHeadersInterface";
 
-export { HttpRequest as Request } from "@/internal/modules/HttpRequest/HttpRequest";
-export type { HttpRequestInterface as RequestInterface } from "@/internal/modules/HttpRequest/HttpRequestInterface";
+export { HttpRequest as Request } from "@/modules/HttpRequest/HttpRequest";
+export type { HttpRequestInterface as RequestInterface } from "@/modules/HttpRequest/HttpRequestInterface";
 
-export { HttpResponse as Response } from "@/internal/modules/HttpResponse/HttpResponse";
-export type { HttpResponseInterface as ResponseInterface } from "@/internal/modules/HttpResponse/HttpResponseInterface";
+export { HttpResponse as Response } from "@/modules/HttpResponse/HttpResponse";
+export type { HttpResponseInterface as ResponseInterface } from "@/modules/HttpResponse/HttpResponseInterface";
 
-export * from "@/internal/modules/Cors/Cors";
+export * from "@/modules/Cors/Cors";
 
-export * from "@/internal/modules/Logger/Logger";
+export * from "@/modules/Logger/Logger";
 
-export { setLogger } from "@/internal/modules/Logger/LoggerClass";
+export { setLogger } from "@/modules/Logger/LoggerClass";
 
-export * from "@/internal/modules/Middleware/Middleware";
+export * from "@/modules/Middleware/Middleware";
 
-export { RepositoryAbstract as Repository } from "@/internal/modules/Repository/RepositoryAbstract";
+export { RepositoryAbstract as Repository } from "@/modules/Repository/RepositoryAbstract";
 
-export * from "@/internal/modules/Route/Route";
+export * from "@/modules/Route/Route";
 
-export * from "@/internal/modules/RouteContext/RouteContext";
+export * from "@/modules/RouteContext/RouteContext";
 
-export * from "@/internal/modules/Server/Server";
+export * from "@/modules/Server/Server";
 
-export { ServiceAbstract as Service } from "@/internal/modules/Service/ServiceAbstract";
+export { ServiceAbstract as Service } from "@/modules/Service/ServiceAbstract";

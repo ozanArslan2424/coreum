@@ -1,6 +1,6 @@
-import { EnvInterface as IEnv } from "@/internal/modules/Config/EnvInterface";
-import { DatabaseClientInterface as IDatabaseClient } from "@/internal/modules/DatabaseClient/DatabaseClientInterface";
-import { LoggerInterface as ILogger } from "@/internal/modules/Logger/LoggerInterface";
+import { EnvInterface as IEnv } from "@/modules/Config/EnvInterface";
+import { DatabaseClientInterface as IDatabaseClient } from "@/modules/DatabaseClient/DatabaseClientInterface";
+import { LoggerInterface as ILogger } from "@/modules/Logger/LoggerInterface";
 
 declare module "coreum" {
 	export interface Env extends IEnv {}

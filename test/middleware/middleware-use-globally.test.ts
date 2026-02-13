@@ -1,4 +1,4 @@
-import { Middleware } from "@/internal/modules/Middleware/Middleware";
+import { Middleware } from "@/modules/Middleware/Middleware";
 import { describe, it, expect } from "bun:test";
 import { Controller, Route } from "@/index";
 import { reqMaker } from "test/utils/reqMaker";
