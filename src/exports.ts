@@ -27,7 +27,9 @@ export { setLogger } from "@/modules/Logger/LoggerClass";
 
 export * from "@/modules/Middleware/Middleware";
 
-export * from "@/modules/Parser/types/InferSchema";
+export * from "@/modules/Parser/types/Schema";
+export * from "@/modules/Parser/types/InferModel";
+export * from "@/modules/Parser/ModelInterface";
 
 export { RepositoryAbstract as Repository } from "@/modules/Repository/RepositoryAbstract";
 

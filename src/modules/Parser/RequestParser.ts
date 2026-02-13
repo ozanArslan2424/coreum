@@ -63,9 +63,7 @@ export class RequestParser<B = unknown, S = unknown, P = unknown> {
 		const data: Record<string, unknown> = {};
 
 		if (!path.includes(":")) {
-			throw HttpError.unprocessableEntity(
-				"This endpoint doesn't take parameters.",
-			);
+			return data as P;
 		}
 
 		const defParts = path.split("/");
@@ -85,7 +83,13 @@ export class RequestParser<B = unknown, S = unknown, P = unknown> {
 	}
 
 	getSearch(url: URL, schema?: Schema<S>): S {
-		return this.parse(url, schema);
+		const data: Record<string, unknown> = {};
+
+		for (const [key, value] of url.searchParams) {
+			data[key] = getProcessedValue(value);
+		}
+
+		return this.parse(data, schema);
 	}
 
 	async getJsonBody(req: HttpRequestInterface): Promise<unknown> {
