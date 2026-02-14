@@ -6,7 +6,6 @@ async function build() {
 		entrypoints: ["./src/index.ts"],
 		outdir: "./dist",
 		target: "bun",
-		sourcemap: "external",
 	};
 
 	await Bun.spawn(["tsc", "-p", "tsconfig.build.json"]).exited;
