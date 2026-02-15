@@ -22,7 +22,7 @@ export abstract class RouteAbstract<
 		readonly controllerId?: string,
 	) {
 		this.handler = handler;
-		getServerInstance().router.addRoute(this);
+		getServerInstance().router.add(this);
 	}
 
 	handler: RouteHandler<R, B, S, P>;

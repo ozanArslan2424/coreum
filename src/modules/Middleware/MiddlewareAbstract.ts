@@ -26,16 +26,16 @@ export abstract class MiddlewareAbstract implements MiddlewareInterface {
 
 	useGlobally(): void {
 		getServerInstance()
-			.router.getRoutes()
+			.router.listRoutes()
 			.forEach((route) => {
 				this.useOnRoute(route);
 			});
 	}
 
 	useOnController(controller: ControllerInterface): ControllerInterface {
-		const controllerRoutes = getServerInstance().router.getControllerRoutes(
-			controller.id,
-		);
+		const controllerRoutes = getServerInstance()
+			.router.listRoutes()
+			.filter((r) => r.controllerId === controller.id);
 		for (const route of controllerRoutes) {
 			this.useOnRoute(route);
 		}
@@ -48,7 +48,7 @@ export abstract class MiddlewareAbstract implements MiddlewareInterface {
 			await this.callback(ctx);
 			return await originalHandler(ctx);
 		};
-		getServerInstance().router.updateRoute(route);
+		getServerInstance().router.update(route);
 		return route;
 	}
 }

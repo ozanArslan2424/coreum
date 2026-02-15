@@ -12,16 +12,12 @@ import { textSplit } from "@/utils/textSplit";
 export abstract class RouterAbstract implements RouterInterface {
 	globalPrefix: string = "";
 	private readonly possibles: string[] = [];
-	abstract addRoute(route: AnyRoute): void;
-	abstract getRoutes(): Array<AnyRoute>;
-	abstract updateRoute(route: AnyRoute): void;
+	abstract add(route: AnyRoute): void;
+	abstract listRoutes(): Array<AnyRoute>;
+	abstract update(route: AnyRoute): void;
 
 	getPossibleCollisions() {
 		return this.possibles;
-	}
-
-	getControllerRoutes(controllerId: string): Array<AnyRoute> {
-		return this.getRoutes().filter((r) => r.controllerId === controllerId);
 	}
 
 	protected addPossibleCollision(routePath: string) {
@@ -97,7 +93,7 @@ export abstract class RouterAbstract implements RouterInterface {
 		pathname: string,
 		method: string,
 	): AnyRoute | HttpErrorInterface {
-		const route = this.getRoutes().find((route) => {
+		const route = this.listRoutes().find((route) => {
 			if (route.path.includes(":")) {
 				return this.isPatternMatch(route, pathname);
 			} else {
@@ -118,7 +114,7 @@ export abstract class RouterAbstract implements RouterInterface {
 		return route;
 	}
 
-	findRoute(url: string, method: string): AnyRoute {
+	find(url: string, method: string): AnyRoute {
 		const pathname = new URL(url).pathname;
 		const result = this.findRouteByPathname(pathname, method);
 		if (result instanceof Error) {

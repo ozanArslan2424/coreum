@@ -1,0 +1,11 @@
+/src
+/test
+/node_modules
+
+.DS_Store
+
+.oxlintrc.json
+.prettierrc
+build.ts
+tsconfig.build.json
+tsconfig.json

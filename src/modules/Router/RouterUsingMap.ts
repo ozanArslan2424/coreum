@@ -6,15 +6,15 @@ import type { RouteId } from "@/modules/Route/types/RouteId";
 export class RouterUsingMap extends RouterAbstract implements RouterInterface {
 	private map = new Map<RouteId, AnyRoute>();
 
-	addRoute(route: AnyRoute): void {
+	add(route: AnyRoute): void {
 		this.map.set(route.id, route);
 	}
 
-	getRoutes(): Array<AnyRoute> {
+	listRoutes(): Array<AnyRoute> {
 		return Array.from(this.map.values());
 	}
 
-	updateRoute(route: AnyRoute): void {
+	update(route: AnyRoute): void {
 		this.map.set(route.id, route);
 	}
 }

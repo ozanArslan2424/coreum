@@ -2,9 +2,8 @@ import type { AnyRoute } from "@/modules/Route/types/AnyRoute";
 
 export interface RouterInterface {
 	globalPrefix: string;
-	addRoute(route: AnyRoute): void;
-	findRoute(url: string, method: string): AnyRoute;
-	getRoutes(): Array<AnyRoute>;
-	getControllerRoutes(controllerId: string): Array<AnyRoute>;
-	updateRoute(route: AnyRoute): void;
+	add(route: AnyRoute): void;
+	find(url: string, method: string): AnyRoute;
+	listRoutes(): Array<AnyRoute>;
+	update(route: AnyRoute): void;
 }

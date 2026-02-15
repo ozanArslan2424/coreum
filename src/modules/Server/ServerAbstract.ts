@@ -26,6 +26,10 @@ export abstract class ServerAbstract implements ServerInterface {
 	protected handleBeforeListen: (() => MaybePromise<void>) | undefined;
 	protected handleBeforeExit: (() => MaybePromise<void>) | undefined;
 
+	setRouter(cors: RouterInterface): void {
+		this.cors = new Router(cors);
+	}
+
 	setGlobalPrefix(value: string): void {
 		this.router.globalPrefix = value;
 	}
@@ -84,7 +88,7 @@ export abstract class ServerAbstract implements ServerInterface {
 		process.on("SIGINT", () => this.exit());
 		process.on("SIGTERM", () => this.exit());
 		const routes = this.router
-			.getRoutes()
+			.listRoutes()
 			.map((r) => `[${r.method}]\t:\t${r.path}`)
 			.join("\n");
 		console.log(`Listening on ${hostname}:${port}\n${routes}`);
@@ -119,7 +123,7 @@ export abstract class ServerAbstract implements ServerInterface {
 	};
 
 	private handleRoute: RequestHandler = async (req) => {
-		const route = this.router.findRoute(req.url, req.method);
+		const route = this.router.find(req.url, req.method);
 		const ctx = await RouteContext.makeFromRequest(req, route);
 		const returnData = await route.handler(ctx);
 		if (returnData instanceof HttpResponse) {

@@ -33,17 +33,17 @@ export class Router extends RouterAbstract implements RouterInterface {
 		this.instance = this.getInstance();
 	}
 
-	addRoute(route: AnyRoute): void {
+	add(route: AnyRoute): void {
 		this.checkPossibleCollision(route.path, route.method);
 		this.addPossibleCollision(route.path);
-		return this.instance.addRoute(route);
+		return this.instance.add(route);
 	}
 
-	getRoutes(): Array<AnyRoute> {
-		return this.instance.getRoutes();
+	listRoutes(): Array<AnyRoute> {
+		return this.instance.listRoutes();
 	}
 
-	updateRoute(route: AnyRoute): void {
-		return this.instance.updateRoute(route);
+	update(route: AnyRoute): void {
+		return this.instance.update(route);
 	}
 }

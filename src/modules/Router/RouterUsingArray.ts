@@ -8,15 +8,15 @@ export class RouterUsingArray
 {
 	private array: Array<AnyRoute> = [];
 
-	addRoute(route: AnyRoute): void {
+	add(route: AnyRoute): void {
 		this.array.push(route);
 	}
 
-	getRoutes(): Array<AnyRoute> {
+	listRoutes(): Array<AnyRoute> {
 		return this.array;
 	}
 
-	updateRoute(route: AnyRoute): void {
+	update(route: AnyRoute): void {
 		this.array.map((r) => (r.id === route.id ? route : r));
 	}
 }

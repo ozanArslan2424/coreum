@@ -9,15 +9,15 @@ export class RouterUsingObject
 {
 	private object: Record<RouteId, AnyRoute> = {};
 
-	addRoute(route: AnyRoute): void {
+	add(route: AnyRoute): void {
 		this.object[route.id] = route;
 	}
 
-	getRoutes(): Array<AnyRoute> {
+	listRoutes(): Array<AnyRoute> {
 		return Object.values(this.object).flat();
 	}
 
-	updateRoute(route: AnyRoute): void {
+	update(route: AnyRoute): void {
 		this.object[route.id] = route;
 	}
 }
