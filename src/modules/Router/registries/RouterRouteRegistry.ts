@@ -16,11 +16,11 @@ export class RouterRouteRegistry {
 	readonly routes: Record<RouteId, RegisteredRouteData> = {};
 
 	addRoute(r: AnyRoute) {
-		this.checkPossibleCollision(r.path, r.method);
-		this.addPossibleCollision(r.path);
+		this.checkPossibleCollision(r.endpoint, r.method);
+		this.addPossibleCollision(r.endpoint);
 		this.routes[r.id] = {
 			id: r.id,
-			path: r.path,
+			endpoint: r.endpoint,
 			method: r.method,
 			pattern: r.pattern,
 			handler: r.handler,
@@ -61,17 +61,20 @@ export class RouterRouteRegistry {
 
 			const similar = this.findRouteByPathname(possible, method);
 			if (!(similar instanceof Route)) continue;
-			if (similar.path === routePath) continue;
-			if (!this.pathsCollide(routePath, similar.path)) continue;
+			if (similar.endpoint === routePath) continue;
+			if (!this.pathsCollide(routePath, similar.endpoint)) continue;
 			console.warn(
-				`${similar.path} has params that clash with ${routePath}. Initialize ${routePath} before ${similar.path} or consider using a different endpoint.`,
+				`${similar.endpoint} has params that clash with ${routePath}. Initialize ${routePath} before ${similar.endpoint} or consider using a different endpoint.`,
 			);
 		}
 
 		const existingRoute = this.findRouteByPathname(routePath, method);
-		if (existingRoute instanceof Route && existingRoute.path !== routePath) {
+		if (
+			existingRoute instanceof Route &&
+			existingRoute.endpoint !== routePath
+		) {
 			console.warn(
-				`${routePath} clashes with existing route ${existingRoute.path}. Consider using a different endpoint.`,
+				`${routePath} clashes with existing route ${existingRoute.endpoint}. Consider using a different endpoint.`,
 			);
 		}
 	}
@@ -106,14 +109,14 @@ export class RouterRouteRegistry {
 			route = this.routes[possibleId];
 		} else {
 			route = Object.values(this.routes).find((r) => {
-				if (r.path.includes(":")) {
+				if (r.endpoint.includes(":")) {
 					const patternMatch = patternIsEqual(pathname, r.pattern);
 					if (patternMatch) return patternMatch;
-					const parts = textSplit("/", r.path);
+					const parts = textSplit("/", r.endpoint);
 					if (parts[parts.length - 1]) parts.pop();
 					return textIsEqual(joinPathSegments(...parts), pathname, "lower");
 				} else {
-					return textIsEqual(r.path, pathname, "lower");
+					return textIsEqual(r.endpoint, pathname, "lower");
 				}
 			});
 		}

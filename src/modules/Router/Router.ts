@@ -1,6 +1,6 @@
-import { RouterRouteRegistry } from "@/modules/Router/RouterRouteRegistry";
-import { RouterMiddlewareRegistry } from "@/modules/Router/RouterMiddlewareRegistry";
-import { RouterModelRegistry } from "@/modules/Router/RouterModelRegistry";
+import { RouterRouteRegistry } from "@/modules/Router/registries/RouterRouteRegistry";
+import { RouterMiddlewareRegistry } from "@/modules/Router/registries/RouterMiddlewareRegistry";
+import { RouterModelRegistry } from "@/modules/Router/registries/RouterModelRegistry";
 import type { AnyRoute } from "@/modules/Route/types/AnyRoute";
 import type { HttpRequestInterface } from "@/modules/HttpRequest/HttpRequestInterface";
 import type { RegisteredRouteData } from "@/modules/Router/types/RegisteredRouteData";
@@ -12,6 +12,7 @@ import type { AnyRouteModel } from "@/modules/Parser/types/AnyRouteModel";
 export class Router {
 	static globalPrefix: string = "";
 
+	// TODO: Caching for static routes
 	static routeRegistry = new RouterRouteRegistry();
 
 	static addRoute(r: AnyRoute) {

@@ -1,8 +1,9 @@
+import path from "path";
 import type { ConfigValueParser } from "@/modules/Config/types/ConfigValueParser";
 import type { ConfigEnvKey } from "@/modules/Config/types/ConfigEnvKey";
 
 export class Config {
-	static get env() {
+	static get env(): NodeJS.ProcessEnv {
 		if (typeof Bun !== "undefined") {
 			return Bun.env;
 		}
@@ -12,6 +13,14 @@ export class Config {
 		}
 
 		return {};
+	}
+
+	static cwd() {
+		return process.cwd();
+	}
+
+	static resolvePath(...paths: string[]) {
+		return path.resolve(...paths);
 	}
 
 	static get<T = string>(

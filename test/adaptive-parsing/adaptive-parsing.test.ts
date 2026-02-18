@@ -1,7 +1,9 @@
-import { CommonHeaders, Route, Status } from "@/exports";
 import { ControllerAbstract } from "@/modules/Controller/ControllerAbstract";
 import { HttpError } from "@/modules/HttpError/HttpError";
+import { CommonHeaders } from "@/modules/HttpHeaders/enums/CommonHeaders";
+import { Status } from "@/modules/HttpResponse/enums/Status";
 import { Parser } from "@/modules/Parser/Parser";
+import { Route } from "@/modules/Route/Route";
 import { type } from "arktype";
 import { describe, expect, it } from "bun:test";
 import { testServer } from "test/utils/testServer";
@@ -116,25 +118,25 @@ describe("adaptive parsing based on library and schema definition", () => {
 	it("zodModelBasic - variant", () => { expect(Parser.getParserVendor(Model.zodModelBasic)).toBe("zod"); });
 	it("arkReferenced - variant", () => { expect(Parser.getParserVendor(Model.arkReferenced)).toBe("arktype"); });
 	it("zodReferenced - variant", () => { expect(Parser.getParserVendor(Model.zodReferenced)).toBe("zod"); });
-	it("arkRoute - variant", () => { 
-		expect(Parser.getParserVendor(Model.arkRoute.params)).toBe("arktype"); 
-		expect(Parser.getParserVendor(Model.arkRoute.search)).toBe("arktype"); 
-		expect(Parser.getParserVendor(Model.arkRoute.body)).toBe("arktype"); 
+	it("arkRoute - variant", () => {
+		expect(Parser.getParserVendor(Model.arkRoute.params)).toBe("arktype");
+		expect(Parser.getParserVendor(Model.arkRoute.search)).toBe("arktype");
+		expect(Parser.getParserVendor(Model.arkRoute.body)).toBe("arktype");
 	});
-	it("zodRoute - variant", () => { 
-		expect(Parser.getParserVendor(Model.zodRoute.params)).toBe("zod"); 
-		expect(Parser.getParserVendor(Model.zodRoute.search)).toBe("zod"); 
-		expect(Parser.getParserVendor(Model.zodRoute.body)).toBe("zod"); 
+	it("zodRoute - variant", () => {
+		expect(Parser.getParserVendor(Model.zodRoute.params)).toBe("zod");
+		expect(Parser.getParserVendor(Model.zodRoute.search)).toBe("zod");
+		expect(Parser.getParserVendor(Model.zodRoute.body)).toBe("zod");
 	});
-	it("arkRouteReferenced - variant", () => { 
-		expect(Parser.getParserVendor(Model.arkRouteReferenced.params)).toBe("arktype"); 
-		expect(Parser.getParserVendor(Model.arkRouteReferenced.search)).toBe("arktype"); 
-		expect(Parser.getParserVendor(Model.arkRouteReferenced.body)).toBe("arktype"); 
+	it("arkRouteReferenced - variant", () => {
+		expect(Parser.getParserVendor(Model.arkRouteReferenced.params)).toBe("arktype");
+		expect(Parser.getParserVendor(Model.arkRouteReferenced.search)).toBe("arktype");
+		expect(Parser.getParserVendor(Model.arkRouteReferenced.body)).toBe("arktype");
 	});
-	it("zodRouteReferenced - variant", () => { 
-		expect(Parser.getParserVendor(Model.zodRouteReferenced.params)).toBe("zod"); 
-		expect(Parser.getParserVendor(Model.zodRouteReferenced.search)).toBe("zod"); 
-		expect(Parser.getParserVendor(Model.zodRouteReferenced.body)).toBe("zod"); 
+	it("zodRouteReferenced - variant", () => {
+		expect(Parser.getParserVendor(Model.zodRouteReferenced.params)).toBe("zod");
+		expect(Parser.getParserVendor(Model.zodRouteReferenced.search)).toBe("zod");
+		expect(Parser.getParserVendor(Model.zodRouteReferenced.body)).toBe("zod");
 	});
 
 	it("arkBasic - success", async () => { expect(await Parser.parse(successData, arkBasic)).toEqual(successData); });
@@ -143,22 +145,22 @@ describe("adaptive parsing based on library and schema definition", () => {
 	it("zodModelBasic - success", async () => { expect(await Parser.parse(successData, Model.zodModelBasic)).toEqual(successData); });
 	it("arkReferenced - success", async () => { expect(await Parser.parse(successData, Model.arkReferenced)).toEqual(successData); });
 	it("zodReferenced - success", async () => { expect(await Parser.parse(successData, Model.zodReferenced)).toEqual(successData); });
-	it("arkRoute - success", async () => { 
+	it("arkRoute - success", async () => {
 		expect(await Parser.parse(successRouteData.params, Model.arkRoute.params)).toEqual(successRouteData.params);
 		expect(await Parser.parse(successRouteData.search, Model.arkRoute.search)).toEqual(successRouteData.search);
 		expect(await Parser.parse(successRouteData.body, Model.arkRoute.body)).toEqual(successRouteData.body);
 	});
-	it("zodRoute - success", async () => { 
+	it("zodRoute - success", async () => {
 		expect(await Parser.parse(successRouteData.params, Model.zodRoute.params)).toEqual(successRouteData.params);
 		expect(await Parser.parse(successRouteData.search, Model.zodRoute.search)).toEqual(successRouteData.search);
 		expect(await Parser.parse(successRouteData.body, Model.zodRoute.body)).toEqual(successRouteData.body);
 	});
-	it("arkRouteReferenced - success", async () => { 
+	it("arkRouteReferenced - success", async () => {
 		expect(await Parser.parse(successRouteData.params, Model.arkRouteReferenced.params)).toEqual(successRouteData.params);
 		expect(await Parser.parse(successRouteData.search, Model.arkRouteReferenced.search)).toEqual(successRouteData.search);
 		expect(await Parser.parse(successRouteData.body, Model.arkRouteReferenced.body)).toEqual(successRouteData.body);
 	});
-	it("zodRouteReferenced - success", async () => { 
+	it("zodRouteReferenced - success", async () => {
 		expect(await Parser.parse(successRouteData.params, Model.zodRouteReferenced.params)).toEqual(successRouteData.params);
 		expect(await Parser.parse(successRouteData.search, Model.zodRouteReferenced.search)).toEqual(successRouteData.search);
 		expect(await Parser.parse(successRouteData.body, Model.zodRouteReferenced.body)).toEqual(successRouteData.body);
@@ -212,22 +214,22 @@ describe("adaptive parsing based on library and schema definition", () => {
 	it("zodModelBasic - fail", () => { expect(async() => await Parser.parse(failData, Model.zodModelBasic)).toThrow(HttpError); });
 	it("arkReferenced - fail", () => { expect(async() => await Parser.parse(failData, Model.arkReferenced)).toThrow(HttpError); });
 	it("zodReferenced - fail", () => { expect(async() => await Parser.parse(failData, Model.zodReferenced)).toThrow(HttpError); });
-	it("arkRoute - fail", () => { 
+	it("arkRoute - fail", () => {
 		expect(async()=>await Parser.parse(failRouteData.params, Model.arkRoute.params)).toThrow(HttpError);
 		expect(async()=>await Parser.parse(failRouteData.search, Model.arkRoute.search)).toThrow(HttpError);
 		expect(async()=>await Parser.parse(failRouteData.body, Model.arkRoute.body)).toThrow(HttpError);
 	});
-	it("zodRoute - fail", () => { 
+	it("zodRoute - fail", () => {
 		expect(async()=>await Parser.parse(failRouteData.params, Model.zodRoute.params)).toThrow(HttpError);
 		expect(async()=>await Parser.parse(failRouteData.search, Model.zodRoute.search)).toThrow(HttpError);
 		expect(async()=>await Parser.parse(failRouteData.body, Model.zodRoute.body)).toThrow(HttpError);
 	});
-	it("arkRouteReferenced - fail", () => { 
+	it("arkRouteReferenced - fail", () => {
 		expect(async()=>await Parser.parse(failRouteData.params, Model.arkRouteReferenced.params)).toThrow(HttpError);
 		expect(async()=>await Parser.parse(failRouteData.search, Model.arkRouteReferenced.search)).toThrow(HttpError);
 		expect(async()=>await Parser.parse(failRouteData.body, Model.arkRouteReferenced.body)).toThrow(HttpError);
 	});
-	it("zodRouteReferenced - fail", () => { 
+	it("zodRouteReferenced - fail", () => {
 		expect(async()=>await Parser.parse(failRouteData.params, Model.zodRouteReferenced.params)).toThrow(HttpError);
 		expect(async()=>await Parser.parse(failRouteData.search, Model.zodRouteReferenced.search)).toThrow(HttpError);
 		expect(async()=>await Parser.parse(failRouteData.body, Model.zodRouteReferenced.body)).toThrow(HttpError);
@@ -289,7 +291,6 @@ describe("adaptive parsing based on library and schema definition", () => {
 
 	it("missing required param", async ()=>{
 		const res = await testServer.handle(new Request(`http://localhost:3000/controller/missing`))
-		console.log(await res.text())
 		expect(res.ok).toBe(false)
 	})
 });

@@ -1,12 +1,11 @@
 import type { RouteInterface } from "@/modules/Route/RouteInterface";
 import type { RouteId } from "@/modules/Route/types/RouteId";
-import type { RouteHandler } from "@/modules/Route/types/RouteHandler";
-import type { RouteModel } from "@/modules/Parser/types/RouteSchemas";
-import { joinPathSegments } from "@/utils/joinPathSegments";
-import { textIsDefined } from "@/utils/textIsDefined";
 import type { RouteDefinition } from "@/modules/Route/types/RouteDefinition";
 import { Method } from "@/modules/HttpRequest/enums/Method";
 import { Router } from "@/modules/Router/Router";
+import { joinPathSegments } from "@/utils/joinPathSegments";
+import { RouteVariant } from "@/modules/Route/enums/RouteVariant";
+import type { RouteHandler } from "@/modules/Route/types/RouteHandler";
 
 export abstract class RouteAbstract<
 	Path extends string = string,
@@ -15,46 +14,40 @@ export abstract class RouteAbstract<
 	S = unknown,
 	P = unknown,
 > implements RouteInterface<Path, R, B, S, P> {
-	constructor(
-		private readonly definition: RouteDefinition<Path>,
-		handler: RouteHandler<R, B, S, P>,
-		model?: RouteModel<R, B, S, P>,
-	) {
-		this.handler = handler;
-		Router.addRoute(this);
-		Router.addModel(this.id, model);
-	}
+	abstract variant: RouteVariant;
+	abstract endpoint: Path;
+	abstract method: Method;
+	abstract pattern: RegExp;
+	abstract id: RouteId;
+	abstract handler: RouteHandler<R, B, S, P>;
 
-	handler: RouteHandler<R, B, S, P>;
-
-	get path(): Path {
+	resolveEndpoint(
+		definition: RouteDefinition<Path>,
+		variant: RouteVariant,
+	): Path {
 		const endpoint =
-			typeof this.definition === "string"
-				? this.definition
-				: this.definition.path;
+			typeof definition === "string" ? definition : definition.path;
 		const globalPrefix = Router.globalPrefix;
-		if (textIsDefined(globalPrefix) && !endpoint.startsWith(globalPrefix)) {
+		if (variant === RouteVariant.dynamic) {
 			return joinPathSegments(globalPrefix, endpoint);
 		}
 		return endpoint;
 	}
 
-	get method(): Method {
-		return typeof this.definition === "string"
-			? Method.GET
-			: this.definition.method;
+	resolveMethod(definition: RouteDefinition<Path>): Method {
+		return typeof definition === "string" ? Method.GET : definition.method;
 	}
 
-	get pattern(): RegExp {
+	resolvePattern(endpoint: Path): RegExp {
 		// Convert route pattern to regex: "/users/:id" -> /^\/users\/([^\/]+)$/
-		const regex = this.path
+		const regex = endpoint
 			.split("/")
 			.map((part) => (part.startsWith(":") ? "([^\\/]+)" : part))
 			.join("/");
 		return new RegExp(`^${regex}$`);
 	}
 
-	get id(): RouteId {
-		return `[${this.method.toUpperCase()}]:[${this.path}]`;
+	resolveId(method: Method, endpoint: Path): RouteId {
+		return `[${method.toUpperCase()}]:[${endpoint}]`;
 	}
 }

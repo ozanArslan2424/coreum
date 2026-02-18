@@ -11,8 +11,7 @@ import type { Schema } from "@/modules/Parser/types/Schema";
 import type { StandardSchemaV1 } from "@/modules/Parser/types/StandardSchema";
 import { isObjectWith } from "@/utils/isObjectWith";
 import type { UnknownObject } from "@/utils/UnknownObject";
-
-type ReqRes = Request | Response;
+import type { ReqRes } from "@/modules/Parser/types/ReqRes";
 
 export class Parser {
 	static async parse<T = UnknownObject>(

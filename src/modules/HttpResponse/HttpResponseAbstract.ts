@@ -63,7 +63,12 @@ export abstract class HttpResponseAbstract<
 	}
 
 	private setContentType(value: string) {
-		this.headers.set(CommonHeaders.ContentType, value);
+		if (
+			!this.headers.has(CommonHeaders.ContentType) ||
+			this.headers.get(CommonHeaders.ContentType) === "text/plain"
+		) {
+			this.headers.set(CommonHeaders.ContentType, value);
+		}
 	}
 
 	private getBody() {

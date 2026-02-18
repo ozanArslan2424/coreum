@@ -1,8 +1,8 @@
 import type { ServerInterface } from "@/modules/Server/ServerInterface";
 import { ServerAbstract } from "@/modules/Server/ServerAbstract";
 import { RuntimeOptions } from "@/modules/Runtime/enums/RuntimeOptions";
-import { ServerUsingBun } from "@/modules/Server/ServerUsingBun";
-import { ServerUsingNode } from "@/modules/Server/ServerUsingNode";
+import { ServerUsingBun } from "@/modules/Server/variants/ServerUsingBun";
+import { ServerUsingNode } from "@/modules/Server/variants/ServerUsingNode";
 import type { ServeOptions } from "@/modules/Server/types/ServeOptions";
 import { getRuntime } from "@/modules/Runtime/getRuntime";
 

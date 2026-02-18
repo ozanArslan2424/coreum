@@ -1,0 +1,8 @@
+import type { StaticPageProps } from "@/modules/StaticRoute/types/StaticPageProps";
+import type { StaticScriptProps } from "@/modules/StaticRoute/types/StaticScriptProps";
+import type { StaticStyleProps } from "@/modules/StaticRoute/types/StaticStyleProps";
+
+export type StaticRouteOptions =
+	| { extension: "html"; props: StaticPageProps }
+	| { extension: "js"; props: StaticScriptProps }
+	| { extension: "css"; props: StaticStyleProps };

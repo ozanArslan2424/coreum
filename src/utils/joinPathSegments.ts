@@ -1,4 +1,4 @@
-export function joinPathSegments<E extends string = string>(
+export function joinPathSegments<E extends string>(
 	...segments: (string | undefined)[]
 ): E {
 	const joined = segments

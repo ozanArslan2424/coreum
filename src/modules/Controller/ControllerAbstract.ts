@@ -10,6 +10,9 @@ import { textIsDefined } from "@/utils/textIsDefined";
 import { Method } from "@/modules/HttpRequest/enums/Method";
 import type { RouteId } from "@/modules/Route/types/RouteId";
 import { Router } from "@/modules/Router/Router";
+import type { StaticRouteOptions } from "@/modules/StaticRoute/types/StaticRouteOptions";
+import { StaticRoute } from "@/modules/StaticRoute/StaticRoute";
+import type { StaticRouteInterface } from "@/modules/StaticRoute/StaticRouteInterface";
 
 /** Extend this class to create your own controllers. */
 
@@ -40,7 +43,13 @@ export abstract class ControllerAbstract<
 		schemas?: RouteModel<B, R, S, P>,
 	): RouteInterface<Path, B, R, S, P> {
 		const route = new Route(
-			this.resolveRouteDefinition(definition),
+			{
+				method: typeof definition === "string" ? Method.GET : definition.method,
+				path: joinPathSegments<Path>(
+					this.prefix,
+					typeof definition === "string" ? definition : definition.path,
+				),
+			},
 			async (ctx) => {
 				await this.opts?.beforeEach?.(ctx);
 				return handler(ctx);
@@ -51,17 +60,11 @@ export abstract class ControllerAbstract<
 		return route;
 	}
 
-	protected resolveRouteDefinition<Path extends string = string>(
-		definition: RouteDefinition<Path>,
-	): RouteDefinition<Path> {
-		const path = typeof definition === "string" ? definition : definition.path;
-		const method =
-			typeof definition === "string" ? Method.GET : definition.method;
-
-		if (textIsDefined(this.prefix)) {
-			return { method, path: joinPathSegments(this.prefix, path) };
-		}
-
-		return { method, path };
+	staticRoute<Path extends string = string>(
+		opts: StaticRouteOptions<Path>,
+	): StaticRouteInterface<Path> {
+		const route = new StaticRoute(opts);
+		this.routeIds.add(route.id);
+		return route;
 	}
 }

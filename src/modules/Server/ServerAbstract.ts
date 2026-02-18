@@ -23,6 +23,9 @@ export abstract class ServerAbstract implements ServerInterface {
 	protected cors: CorsInterface | undefined;
 	protected handleBeforeListen: (() => MaybePromise<void>) | undefined;
 	protected handleBeforeExit: (() => MaybePromise<void>) | undefined;
+	protected handleAfterResponse:
+		| ((res: HttpResponseInterface) => MaybePromise<HttpResponseInterface>)
+		| undefined;
 
 	setGlobalPrefix(value: string): void {
 		Router.globalPrefix = value;
@@ -48,6 +51,14 @@ export abstract class ServerAbstract implements ServerInterface {
 		this.handleBeforeListen = handler;
 	}
 
+	setOnAfterResponse(
+		handler: (
+			res: HttpResponseInterface,
+		) => MaybePromise<HttpResponseInterface>,
+	): void {
+		this.handleAfterResponse = handler;
+	}
+
 	async listen(
 		port: ServeOptions["port"],
 		hostname: ServeOptions["hostname"] = "0.0.0.0",
@@ -68,9 +79,12 @@ export abstract class ServerAbstract implements ServerInterface {
 
 	async handle(request: Request): Promise<Response> {
 		const req = new HttpRequest(request);
-		const res = await this.getResponse(req);
+		let res = await this.getResponse(req);
 		if (this.cors !== undefined) {
 			this.cors.apply(req, res);
+		}
+		if (this.handleAfterResponse) {
+			res = await this.handleAfterResponse(res);
 		}
 		return res.response;
 	}
@@ -81,9 +95,9 @@ export abstract class ServerAbstract implements ServerInterface {
 	) {
 		process.on("SIGINT", () => this.exit());
 		process.on("SIGTERM", () => this.exit());
-		const routes = Object.values(Router.routes).map(
-			(r) => `${r.method}\t:\t${r.path}`,
-		);
+		const routes = Object.values(Router.routes)
+			.map((r) => `${r.method}\t:\t${r.endpoint}`)
+			.join("\n");
 		console.log(`Listening on ${hostname}:${port}\n${routes}`);
 	}
 
@@ -118,7 +132,7 @@ export abstract class ServerAbstract implements ServerInterface {
 	private handleRoute: RequestHandler = async (req) => {
 		const route = Router.findRoute(req);
 		const model = Router.findModel(route.id);
-		const ctx = await Context.makeFromRequest(req, route.path, model);
+		const ctx = await Context.makeFromRequest(req, route.endpoint, model);
 		const middlewares = Router.findMiddleware(route.id);
 
 		for (const m of middlewares) {

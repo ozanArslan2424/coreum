@@ -1,5 +1,5 @@
-interface Env extends Record<string, string> {}
-interface DatabaseClientInterface {}
-interface ContextDataInterface {}
+export interface DatabaseClientInterface {}
 
-export { Env, DatabaseClientInterface, ContextDataInterface };
+export interface ContextDataInterface {}
+
+export interface Env {}

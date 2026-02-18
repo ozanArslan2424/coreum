@@ -25,11 +25,11 @@ export * from "@/modules/Middleware/Middleware";
 
 export * from "@/modules/Parser/types/Schema";
 export * from "@/modules/Parser/types/InferModel";
-export * from "@/modules/Parser/ModelInterface";
 
 export { RepositoryAbstract as Repository } from "@/modules/Repository/RepositoryAbstract";
 
 export * from "@/modules/Route/Route";
+export * from "@/modules/StaticRoute/StaticRoute";
 
 export * from "@/modules/Context/Context";
 
