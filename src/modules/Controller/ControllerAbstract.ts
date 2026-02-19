@@ -6,11 +6,9 @@ import type { RouteHandler } from "@/modules/Route/types/RouteHandler";
 import type { RouteDefinition } from "@/modules/Route/types/RouteDefinition";
 import type { RouteModel } from "@/modules/Parser/types/RouteSchemas";
 import { joinPathSegments } from "@/utils/joinPathSegments";
-import { textIsDefined } from "@/utils/textIsDefined";
 import { Method } from "@/modules/HttpRequest/enums/Method";
 import type { RouteId } from "@/modules/Route/types/RouteId";
-import { Router } from "@/modules/Router/Router";
-import type { StaticRouteOptions } from "@/modules/StaticRoute/types/StaticRouteOptions";
+import type { StaticRouteProps } from "@/modules/StaticRoute/types/StaticRouteProps";
 import { StaticRoute } from "@/modules/StaticRoute/StaticRoute";
 import type { StaticRouteInterface } from "@/modules/StaticRoute/StaticRouteInterface";
 
@@ -24,10 +22,10 @@ export abstract class ControllerAbstract<
 	routeIds: Set<RouteId> = new Set<RouteId>();
 
 	get prefix(): string | undefined {
-		const globalPrefix = Router.globalPrefix;
-		if (textIsDefined(globalPrefix)) {
-			return joinPathSegments(globalPrefix, this.opts?.prefix);
-		}
+		// const globalPrefix = Router.globalPrefix;
+		// if (textIsDefined(globalPrefix)) {
+		// 	return joinPathSegments(globalPrefix, this.opts?.prefix);
+		// }
 		return this.opts?.prefix;
 	}
 
@@ -61,9 +59,13 @@ export abstract class ControllerAbstract<
 	}
 
 	staticRoute<Path extends string = string>(
-		opts: StaticRouteOptions<Path>,
+		path: Path,
+		opts: StaticRouteProps,
 	): StaticRouteInterface<Path> {
-		const route = new StaticRoute(opts);
+		const route = new StaticRoute(
+			joinPathSegments<Path>(this.prefix, path),
+			opts,
+		);
 		this.routeIds.add(route.id);
 		return route;
 	}

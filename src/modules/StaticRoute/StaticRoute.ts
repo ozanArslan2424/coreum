@@ -1,6 +1,6 @@
 import { FileWalker } from "@/modules/FileWalker/FileWalker";
 import { HttpError } from "@/modules/HttpError/HttpError";
-import type { Method } from "@/modules/HttpRequest/enums/Method";
+import { Method } from "@/modules/HttpRequest/enums/Method";
 import { Status } from "@/modules/HttpResponse/enums/Status";
 import { HttpResponse } from "@/modules/HttpResponse/HttpResponse";
 import { RouteVariant } from "@/modules/Route/enums/RouteVariant";
@@ -11,21 +11,26 @@ import { HTML } from "@/modules/StaticRoute/utils/HTML";
 import { JS } from "@/modules/StaticRoute/utils/JS";
 import { StaticRouteAbstract } from "@/modules/StaticRoute/StaticRouteAbstract";
 import type { StaticRouteInterface } from "@/modules/StaticRoute/StaticRouteInterface";
-import type { StaticHtmlProps } from "@/modules/StaticRoute/types/StaticHtmlProps";
 import type { StaticRouteHandler } from "@/modules/StaticRoute/types/StaticRouteHandler";
-import type { StaticRouteOptions } from "@/modules/StaticRoute/types/StaticRouteOptions";
-import type { StaticScriptProps } from "@/modules/StaticRoute/types/StaticScriptProps";
-import type { StaticStyleProps } from "@/modules/StaticRoute/types/StaticStyleProps";
+import type {
+	StaticHtmlProps,
+	StaticRouteProps,
+	StaticScriptProps,
+	StaticStyleProps,
+} from "@/modules/StaticRoute/types/StaticRouteProps";
 
 export class StaticRoute<Path extends string = string>
 	extends StaticRouteAbstract<Path>
 	implements StaticRouteInterface<Path>
 {
-	constructor(private readonly opts: StaticRouteOptions<Path>) {
+	constructor(
+		path: Path,
+		private readonly opts: StaticRouteProps,
+	) {
 		super();
 		this.variant = RouteVariant.static;
-		this.endpoint = this.resolveEndpoint(opts.props.path, this.variant);
-		this.method = this.resolveMethod(opts.props.path);
+		this.method = Method.GET;
+		this.endpoint = this.resolveEndpoint(path, this.variant);
 		this.pattern = this.resolvePattern(this.endpoint);
 		this.id = this.resolveId(this.method, this.endpoint);
 		Router.addRoute(this);
@@ -38,12 +43,14 @@ export class StaticRoute<Path extends string = string>
 	pattern: RegExp;
 	handler: StaticRouteHandler = async () => {
 		switch (this.opts.extension) {
-			case "html":
+			case StaticExtension.html:
 				return await this.handleHtml(this.opts.props);
-			case "js":
+			case StaticExtension.js:
 				return await this.handleJs(this.opts.props);
-			case "css":
+			case StaticExtension.css:
 				return await this.handleCss(this.opts.props);
+			default:
+				return await this.handleFile(this.opts);
 		}
 	};
 

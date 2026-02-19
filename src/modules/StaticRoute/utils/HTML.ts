@@ -2,23 +2,23 @@ import type { HtmlSkeleton } from "@/modules/StaticRoute/types/HtmlSkeleton";
 
 export class HTML {
 	// prettier-ignore
-	static build(props: HtmlSkeleton): string {
+	static build(sk: HtmlSkeleton): string {
 		const lines: string[] = [];
 
 		const add = (tag: string, attr: { [key: string]: string | number }) =>
 			lines.push(
-				`<${tag} ${Object.entries(attr).map(([key, value]) => `${key}="${value}"`)}>`,
+				`<${tag} ${Object.entries(attr).map(([key, value]) => `${key}="${value}"`).join(" ")}>`,
 			);
 
-		add("meta", { charset: props.charset ?? "UTF-8" });
-		add("meta", { name: "viewport", content: props.viewport ?? "width=device-width, initial-scale=1.0" });
-		if (props.description) add("meta", { name: "description", content: props.description });
-		if (props.keywords?.length) add("meta", { name: "keywords", content: props.keywords.join(", ") });
-		if (props.author) add("meta", { name: "author", content: props.author });
-		if (props.robots) add("meta", { name: "robots", content: props.robots });
-		if (props.canonical) add("link", { rel: "canonical", href: props.canonical })
-		if (props.metas) {
-			for (const m of props.metas) {
+		add("meta", { charset: sk.charset ?? "UTF-8" });
+		add("meta", { name: "viewport", content: sk.viewport ?? "width=device-width, initial-scale=1.0" });
+		if (sk.description) add("meta", { name: "description", content: sk.description });
+		if (sk.keywords?.length) add("meta", { name: "keywords", content: sk.keywords.join(", ") });
+		if (sk.author) add("meta", { name: "author", content: sk.author });
+		if (sk.robots) add("meta", { name: "robots", content: sk.robots });
+		if (sk.canonical) add("link", { rel: "canonical", href: sk.canonical })
+		if (sk.metas) {
+			for (const m of sk.metas) {
 				if (m.name) {
 					add("meta", { name: m.name, content: m.content });
 				} else if (m.property) {
@@ -28,43 +28,43 @@ export class HTML {
 				}
 			}
 		}
-		if (props.og) {
-			if (props.og.title) add("meta", { property: "og:title", content: props.og.title });
-			if (props.og.description) add("meta", { property: "og:description", content: props.og.description });
-			if (props.og.image) add("meta", { property: "og:image", content: props.og.image });
-			if (props.og.url) add("meta", { property: "og:url", content: props.og.url });
-			if (props.og.type) add("meta", { property: "og:type", content: props.og.type });
-			if (props.og.siteName) add("meta", { property: "og:site_name", content: props.og.siteName });
-			if (props.og.locale) add("meta", { property: "og:locale", content: props.og.locale });
+		if (sk.og) {
+			if (sk.og.title) add("meta", { property: "og:title", content: sk.og.title });
+			if (sk.og.description) add("meta", { property: "og:description", content: sk.og.description });
+			if (sk.og.image) add("meta", { property: "og:image", content: sk.og.image });
+			if (sk.og.url) add("meta", { property: "og:url", content: sk.og.url });
+			if (sk.og.type) add("meta", { property: "og:type", content: sk.og.type });
+			if (sk.og.siteName) add("meta", { property: "og:site_name", content: sk.og.siteName });
+			if (sk.og.locale) add("meta", { property: "og:locale", content: sk.og.locale });
 		}
-		if (props.twitter) {
-			if (props.twitter.card) add("meta", { property: "twitter:card", content: props.twitter.card });
-			if (props.twitter.site) add("meta", { property: "twitter:site", content: props.twitter.site });
-			if (props.twitter.creator) add("meta", { property: "twitter:creator", content: props.twitter.creator });
-			if (props.twitter.title) add("meta", { property: "twitter:title", content: props.twitter.title });
-			if (props.twitter.description) add("meta", { property: "twitter:description", content: props.twitter.description });
-			if (props.twitter.image) add("meta", { property: "twitter:image", content: props.twitter.image });
-			if (props.twitter.imageAlt) add("meta", { property: "twitter:image:alt", content: props.twitter.imageAlt });
-			if (props.twitter.player) {
-				add("meta", { property: "twitter:player", content: props.twitter.player });
-				if (props.twitter.playerWidth) add("meta", { property: "twitter:player:width", content: props.twitter.playerWidth });
-				if (props.twitter.playerHeight) add("meta", { property: "twitter:player:height", content: props.twitter.playerHeight });
+		if (sk.twitter) {
+			if (sk.twitter.card) add("meta", { property: "twitter:card", content: sk.twitter.card });
+			if (sk.twitter.site) add("meta", { property: "twitter:site", content: sk.twitter.site });
+			if (sk.twitter.creator) add("meta", { property: "twitter:creator", content: sk.twitter.creator });
+			if (sk.twitter.title) add("meta", { property: "twitter:title", content: sk.twitter.title });
+			if (sk.twitter.description) add("meta", { property: "twitter:description", content: sk.twitter.description });
+			if (sk.twitter.image) add("meta", { property: "twitter:image", content: sk.twitter.image });
+			if (sk.twitter.imageAlt) add("meta", { property: "twitter:image:alt", content: sk.twitter.imageAlt });
+			if (sk.twitter.player) {
+				add("meta", { property: "twitter:player", content: sk.twitter.player });
+				if (sk.twitter.playerWidth) add("meta", { property: "twitter:player:width", content: sk.twitter.playerWidth });
+				if (sk.twitter.playerHeight) add("meta", { property: "twitter:player:height", content: sk.twitter.playerHeight });
 			}
-			if (props.twitter.appId) {
-				if (props.twitter.appId.iphone)  add("meta", { property: "twitter:app:id:iphone", content: props.twitter.appId.iphone });
-				if (props.twitter.appId.ipad)  add("meta", { property: "twitter:app:id:ipad", content: props.twitter.appId.ipad });
-				if (props.twitter.appId.googleplay)  add("meta", { property: "twitter:app:id:googleplay", content: props.twitter.appId.googleplay });
+			if (sk.twitter.appId) {
+				if (sk.twitter.appId.iphone)  add("meta", { property: "twitter:app:id:iphone", content: sk.twitter.appId.iphone });
+				if (sk.twitter.appId.ipad)  add("meta", { property: "twitter:app:id:ipad", content: sk.twitter.appId.ipad });
+				if (sk.twitter.appId.googleplay)  add("meta", { property: "twitter:app:id:googleplay", content: sk.twitter.appId.googleplay });
 			}
 		}
-		if (props.base) {
-			if (props.base.target) {
-				add("base", { href: props.base.href, target: props.base.target })
+		if (sk.base) {
+			if (sk.base.target) {
+				add("base", { href: sk.base.href, target: sk.base.target })
 			} else {
-				add("base", { href: props.base.href })
+				add("base", { href: sk.base.href })
 			}
 		}
-		if (props.favicons) {
-			for (const f of props.favicons) {
+		if (sk.favicons) {
+			for (const f of sk.favicons) {
 				const attr: Record<string, string> = { rel: f.rel, href: f.href }
 				if (f.sizes) attr.sizes = f.sizes
 				if (f.type) attr.type = f.type
@@ -72,8 +72,8 @@ export class HTML {
 				add("link", attr)
 			}
 		}
-		if (props.links) {
-			for (const l of props.links) {
+		if (sk.links) {
+			for (const l of sk.links) {
 				const attr: Record<string, string> = { rel: l.rel, href: l.href }
 				if (l.type) attr.type = l.type
 				if (l.sizes) attr.sizes = l.sizes
@@ -87,13 +87,13 @@ export class HTML {
 				add("link", attr)
 			}
 		}
-		if (props.jsonLd) {
-			for (const [i, j] of props.jsonLd.entries()) {
+		if (sk.jsonLd) {
+			for (const [i, j] of sk.jsonLd.entries()) {
 				lines.push(`<script type="application/ld+json" id="structured-data-${i + 1}">${JSON.stringify(j, null)}</script>`)
 			}
 		}
-		if (props.scripts) {
-			for (const s of props.scripts) {
+		if (sk.scripts) {
+			for (const s of sk.scripts) {
 				const attrs: string[] = [];
 				if (s.src) attrs.push(`src="${s.src}"`);
 				if (s.type) attrs.push(`type="${s.type}"`);
@@ -112,13 +112,13 @@ export class HTML {
 		}
 		const html = [
 			"<!DOCTYPE html>",
-			`<html lang="${props.lang}">`,
+			`<html lang="${sk.lang}">`,
 			"<head>",
-			`<title>${props.title}</title>`,
+			`<title>${sk.title}</title>`,
 			...lines,
 			"</head>",
 			"<body>",
-			props.contents,
+			sk.contents,
 			"</body>",
 			"</html>",
 		];
