@@ -5,7 +5,6 @@ import { Status } from "@/modules/HttpResponse/enums/Status";
 import { HttpResponse } from "@/modules/HttpResponse/HttpResponse";
 import { RouteVariant } from "@/modules/Route/enums/RouteVariant";
 import type { RouteId } from "@/modules/Route/types/RouteId";
-import { CSS } from "@/modules/Builders/utils/CSS";
 import { JS } from "@/modules/Builders/utils/JS";
 import { StaticRouteAbstract } from "@/modules/StaticRoute/StaticRouteAbstract";
 import type { StaticRouteInterface } from "@/modules/StaticRoute/StaticRouteInterface";
@@ -62,22 +61,19 @@ export class StaticRoute<Path extends string = string>
 
 	private async handleCss() {
 		const content = await this.getContent();
-		const minified = await CSS.minify(content);
-		return this.toResponse(minified);
+		return this.toResponse(content);
 	}
 
 	private async handleJs() {
 		const content = await this.getContent();
-		const minified = await JS.minify(content);
-		return this.toResponse(minified);
+		return this.toResponse(content);
 	}
 
 	private async handleTs() {
 		const content = await this.getContent();
 		const fileName = this.getFileName();
 		const transpiled = await JS.transpile(fileName, content);
-		const minified = await JS.minify(transpiled);
-		return this.toResponse(minified);
+		return this.toResponse(transpiled);
 	}
 
 	// TODO: Compress images and other binary files
