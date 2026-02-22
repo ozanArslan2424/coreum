@@ -1,5 +1,5 @@
 {
-	"name": "@tabula/corpus",
+	"name": "@ozanarslan/corpus",
 	"type": "module",
 	"module": "index.ts",
 	"version": "0.2.0",

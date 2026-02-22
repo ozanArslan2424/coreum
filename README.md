@@ -1,4 +1,4 @@
-# Tabula Corpus
+# Corpus
 
 A very simple typescript backend framework package to use for personal projects or simple crud applications.
 This package is by no means a replacement for full fledged backend frameworks commonly used in production.
@@ -8,17 +8,17 @@ This package is by no means a replacement for full fledged backend frameworks co
 Install the package:
 
 ```bash
-bun add @tabula/corpus
+bun add @ozanarslan/corpus
 ```
 
 ```bash
-npm install @tabula/corpus
+npm install @ozanarslan/corpus
 ```
 
 Create a simple server:
 
 ```typescript
-import { Server, Route, Config } from "@tabula/corpus";
+import { Server, Route, Config } from "@ozanarslan/corpus";
 
 // Initialize server
 const server = new Server();
@@ -58,7 +58,7 @@ Originally I wanted to support Node and Bun runtimes but to be honest, I didn't 
 // You can also use something else
 import { type } from "arktype";
 // You can also import everything by name
-import C from "@tabula/corpus";
+import C from "@ozanarslan/corpus";
 
 // You can use schemas however you want, I just really like this.
 export class ItemModel {
@@ -142,7 +142,7 @@ server.listen(
 ## What interfaces can be extended
 
 ```typescript
-declare module "@tabula/corpus" {
+declare module "@ozanarslan/corpus" {
 	// process.env basically
 	interface Env {}
 
