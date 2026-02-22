@@ -14,9 +14,9 @@ export interface ContextInterface<
 	readonly url: URL;
 	readonly headers: HttpHeadersInterface;
 	readonly cookies: CookiesInterface;
-	readonly body: B;
-	readonly search: S;
-	readonly params: P;
+	body: B;
+	search: S;
+	params: P;
 	res: HttpResponseInterface<R>;
 	data: ContextDataInterface;
 }

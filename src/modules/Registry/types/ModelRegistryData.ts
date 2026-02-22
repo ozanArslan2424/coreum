@@ -1,4 +1,4 @@
-import type { SchemaData } from "@/modules/Registry/types/SchemaData";
+import type { Validator } from "@/modules/Registry/types/SchemaData";
 
 export type ModelRegistryData<
 	R = unknown,
@@ -6,8 +6,8 @@ export type ModelRegistryData<
 	S = unknown,
 	P = unknown,
 > = {
-	response?: SchemaData<R>;
-	body?: SchemaData<B>;
-	search?: SchemaData<S>;
-	params?: SchemaData<P>;
+	response?: Validator<R>;
+	body?: Validator<B>;
+	search?: Validator<S>;
+	params?: Validator<P>;
 };

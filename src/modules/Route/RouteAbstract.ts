@@ -6,6 +6,7 @@ import { joinPathSegments } from "@/utils/joinPathSegments";
 import { RouteVariant } from "@/modules/Route/enums/RouteVariant";
 import type { RouteHandler } from "@/modules/Route/types/RouteHandler";
 import { getRouterInstance } from "@/modules/Router/RouterInstance";
+import { Route } from "@/modules/Route/Route";
 
 export abstract class RouteAbstract<
 	Path extends string = string,
@@ -47,6 +48,6 @@ export abstract class RouteAbstract<
 	}
 
 	resolveId(method: Method, endpoint: Path): RouteId {
-		return `[${method.toUpperCase()}]:[${endpoint}]`;
+		return Route.makeRouteId(method, endpoint);
 	}
 }

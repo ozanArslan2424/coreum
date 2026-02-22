@@ -10,7 +10,6 @@ import type { RequestHandler } from "@/modules/Server/types/RequestHandler";
 import type { ServeOptions } from "@/modules/Server/types/ServeOptions";
 import type { CorsInterface } from "@/modules/Cors/CorsInterface";
 import type { ErrorHandler } from "@/modules/Server/types/ErrorHandler";
-import { Context } from "@/modules/Context/Context";
 import { Cors } from "@/modules/Cors/Cors";
 import type { CorsOptions } from "@/modules/Cors/types/CorsOptions";
 import type { MaybePromise } from "@/utils/MaybePromise";
@@ -102,9 +101,7 @@ export abstract class ServerAbstract implements ServerInterface {
 	) {
 		process.on("SIGINT", () => this.exit());
 		process.on("SIGTERM", () => this.exit());
-		const routes = Object.values(getRouterInstance().routes)
-			.map((r) => `${r.method}\t:\t${r.endpoint}`)
-			.join("\n");
+		const routes = getRouterInstance().getRouteList();
 		console.log(`Listening on ${hostname}:${port}\n${routes}`);
 	}
 
@@ -139,27 +136,8 @@ export abstract class ServerAbstract implements ServerInterface {
 	};
 
 	private handleRoute: RequestHandler = async (req) => {
-		const route = getRouterInstance().findRoute(req);
-		const model = getRouterInstance().findModel(route.id);
-		const middlewares = getRouterInstance().findMiddleware(route.id);
-		const ctx = await Context.makeFromRequest(req, route.endpoint, model);
-
-		for (const m of middlewares) {
-			await m.handler(ctx);
-		}
-
-		const returnData = await route.handler(ctx);
-
-		if (returnData instanceof HttpResponse) {
-			return returnData;
-		}
-
-		return new HttpResponse(returnData, {
-			status: ctx.res.status,
-			statusText: ctx.res.statusText,
-			headers: ctx.res.headers,
-			cookies: ctx.res.cookies,
-		});
+		const handler = getRouterInstance().getRouteHandler(req);
+		return await handler();
 	};
 
 	private async getResponse(

@@ -3,7 +3,7 @@ import type { HttpRequestInterface } from "@/modules/HttpRequest/HttpRequestInte
 import { Parser } from "@/modules/Parser/Parser";
 import { ContextAbstract } from "@/modules/Context/ContextAbstract";
 import type { ContextInterface } from "@/modules/Context/ContextInterface";
-import type { RegisteredModelData } from "@/modules/Router/types/RegisteredModelData";
+import type { ModelRegistryData } from "@/modules/Registry/types/ModelRegistryData";
 
 /**
  * The context object used in Route "callback" parameter.
@@ -32,26 +32,24 @@ export class Context<R = unknown, B = unknown, S = unknown, P = unknown>
 	extends ContextAbstract<R, B, S, P>
 	implements ContextInterface<R, B, S, P>
 {
-	static async makeFromRequest<
+	static makeFromRequest(req: HttpRequestInterface): ContextInterface {
+		return new Context(req, {}, {}, {});
+	}
+
+	static async appendParsedData<
 		Path extends string = string,
 		R = unknown,
 		B = unknown,
 		S = unknown,
 		P = unknown,
 	>(
-		request: HttpRequestInterface,
-		path: Path,
-		model?: RegisteredModelData<R, B, S, P>,
-	): Promise<ContextInterface<R, B, S, P>> {
-		const req = new HttpRequest(request);
-		const url = new URL(req.url);
-		const headers = req.headers;
-		const cookies = req.cookies;
-
-		const body = await Parser.getBody(req, model?.body);
-		const search = await Parser.getSearch(url, model?.search);
-		const params = await Parser.getParams(path, url, model?.params);
-
-		return new Context(req, url, headers, cookies, body, search, params);
+		ctx: ContextInterface<R, B, S, P>,
+		req: HttpRequestInterface,
+		endpoint: Path,
+		model?: ModelRegistryData<R, B, S, P>,
+	) {
+		ctx.body = await Parser.getBody(req, model?.body);
+		ctx.search = await Parser.getSearch(ctx.url, model?.search);
+		ctx.params = await Parser.getParams(endpoint, ctx.url, model?.params);
 	}
 }

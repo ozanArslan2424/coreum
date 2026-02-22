@@ -20,6 +20,10 @@ export abstract class HttpRequestAbstract
 		super(input, init);
 	}
 
+	get urlObject(): URL {
+		return new URL(this.url);
+	}
+
 	override get headers(): HttpHeadersInterface {
 		if (this.input instanceof Request) {
 			return new HttpHeaders(this.input.headers);

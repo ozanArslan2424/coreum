@@ -11,25 +11,21 @@ import type { StandardSchemaV1 } from "@/modules/Parser/types/StandardSchema";
 import { isObjectWith } from "@/utils/isObjectWith";
 import type { UnknownObject } from "@/utils/UnknownObject";
 import type { ReqRes } from "@/modules/Parser/types/ReqRes";
-import type { SchemaData } from "@/modules/Registry/types/SchemaData";
+import type { Validator } from "@/modules/Registry/types/SchemaData";
 
 export class Parser {
 	// TODO: .pipe method doesn't infer correctly because arktype generics are hard
 	static async parse<T = UnknownObject>(
 		data: unknown,
-		schema?: SchemaData<T>,
+		validate?: Validator<T>,
 	): Promise<T> {
-		if (!schema) return data as T;
-		const result = await schema.validate(data);
+		if (!validate) return data as T;
+		const result = await validate(data);
 		if (result.issues !== undefined) {
 			const msg = this.issuesToErrorMessage(result.issues);
 			throw HttpError.unprocessableEntity(msg);
 		}
 		return result.value;
-	}
-
-	static getParserVendor(schema: SchemaData) {
-		return schema.vendor;
 	}
 
 	static issuesToErrorMessage(
@@ -58,7 +54,7 @@ export class Parser {
 
 	static async getSearch<S = UnknownObject>(
 		url: URL,
-		schema?: SchemaData<S>,
+		validate?: Validator<S>,
 	): Promise<S> {
 		const data: UnknownObject = {};
 
@@ -66,12 +62,12 @@ export class Parser {
 			data[key] = getProcessedValue(value);
 		}
 
-		return await this.parse(data, schema);
+		return await this.parse(data, validate);
 	}
 
 	static async getBody<B = UnknownObject>(
 		r: HttpRequestInterface | HttpResponseInterface | Response,
-		schema?: SchemaData<B>,
+		validate?: Validator<B>,
 	): Promise<B> {
 		let data;
 		const empty = {} as B;
@@ -108,7 +104,7 @@ export class Parser {
 					return empty;
 			}
 
-			return await this.parse(data, schema);
+			return await this.parse(data, validate);
 		} catch (err) {
 			if (err instanceof SyntaxError) return empty;
 			throw err;
@@ -116,17 +112,17 @@ export class Parser {
 	}
 
 	static async getParams<P = UnknownObject>(
-		path: string,
+		endpoint: string,
 		url: URL,
-		schema?: SchemaData<P>,
+		validate?: Validator<P>,
 	): Promise<P> {
 		const data: UnknownObject = {};
 
-		if (!path.includes(":")) {
+		if (!endpoint.includes(":")) {
 			return data as P;
 		}
 
-		const defParts = path.split("/");
+		const defParts = endpoint.split("/");
 		const reqParts = url.pathname.split("/");
 
 		for (const [i, defPart] of defParts.entries()) {
@@ -139,7 +135,7 @@ export class Parser {
 			}
 		}
 
-		return await this.parse(data, schema);
+		return await this.parse(data, validate);
 	}
 
 	private static async getJsonBody(req: ReqRes): Promise<unknown> {

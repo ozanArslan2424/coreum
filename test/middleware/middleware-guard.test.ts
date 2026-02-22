@@ -7,11 +7,7 @@ import { describe, it, expect } from "bun:test";
 import { HttpError } from "@/modules/HttpError/HttpError";
 import { Status } from "@/exports";
 import { ControllerAbstract } from "@/modules/Controller/ControllerAbstract";
-import {
-	getRouterInstance,
-	setRouterInstance,
-} from "@/modules/Router/RouterInstance";
-import { Router } from "@/modules/Router/Router";
+import { useTemporaryRouter } from "../utils/useTemporaryRouter";
 
 const prefix = "/middleware/guard";
 const path = pathMaker(prefix);
@@ -83,28 +79,24 @@ describe("Middleware Guard", () => {
 	});
 
 	it("*", async () => {
-		const originalRouter = getRouterInstance();
-		const newRouter = new Router();
-		setRouterInstance(newRouter);
+		await useTemporaryRouter(async () => {
+			new Route(path("/custom/r1"), () => "ok");
+			new Route(path("/custom/r2"), () => "ok");
+			new Route(path("/custom/r3"), () => "ok");
 
-		new Route(path("/custom/r1"), () => "ok");
-		new Route(path("/custom/r2"), () => "ok");
-		new Route(path("/custom/r3"), () => "ok");
+			new Middleware({
+				useOn: "*",
+				handler: () => {
+					throw HttpError.badRequest();
+				},
+			});
 
-		new Middleware({
-			useOn: "*",
-			handler: () => {
-				throw HttpError.badRequest();
-			},
+			const res1 = await testServer.handle(req("/custom/r1"));
+			expect(res1.status).toBe(Status.BAD_REQUEST);
+			const res2 = await testServer.handle(req("/custom/r2"));
+			expect(res2.status).toBe(Status.BAD_REQUEST);
+			const res3 = await testServer.handle(req("/custom/r3"));
+			expect(res3.status).toBe(Status.BAD_REQUEST);
 		});
-
-		const res1 = await testServer.handle(req("/custom/r1"));
-		expect(res1.status).toBe(Status.BAD_REQUEST);
-		const res2 = await testServer.handle(req("/custom/r2"));
-		expect(res2.status).toBe(Status.BAD_REQUEST);
-		const res3 = await testServer.handle(req("/custom/r3"));
-		expect(res3.status).toBe(Status.BAD_REQUEST);
-
-		setRouterInstance(originalRouter);
 	});
 });

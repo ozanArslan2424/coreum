@@ -1,29 +1,43 @@
+import type { Schema } from "@/exports";
 import type { AnyRouteModel } from "@/modules/Parser/types/AnyRouteModel";
 import type { ModelRegistryData } from "@/modules/Registry/types/ModelRegistryData";
+import type { Validator } from "@/modules/Registry/types/SchemaData";
 import type { RouteId } from "@/modules/Route/types/RouteId";
+import { strRemoveWhitespace } from "@/utils/strReplaceWhitespace";
 
 export class ModelRegistry {
-	readonly data: Record<RouteId, ModelRegistryData> = {};
+	readonly data = new Map<RouteId, ModelRegistryData>();
+	// Schemas can be repeated, this helps with pointer references
+	private internMap = new Map<string, Validator>();
+
+	private internValidator(schema: Schema<any>): Validator {
+		const value = schema["~standard"].validate;
+		const key = strRemoveWhitespace(JSON.stringify(schema));
+		const existing = this.internMap.get(key);
+		if (existing) return existing;
+		this.internMap.set(key, value);
+		return value;
+	}
 
 	add(routeId: RouteId, model: AnyRouteModel): void {
 		const entry: ModelRegistryData = {};
 
-		for (const [k, v] of Object.entries(model)) {
-			const keys = ["body", "search", "params", "response"];
-			if (!keys.includes(k)) {
-				continue;
-			}
-
-			entry[k as keyof ModelRegistryData] = {
-				validate: v["~standard"].validate,
-				vendor: v["~standard"].vendor,
-			};
+		if (model.body) {
+			entry["body"] = this.internValidator(model.body);
 		}
 
-		this.data[routeId] = entry;
+		if (model.params) {
+			entry["params"] = this.internValidator(model.params);
+		}
+
+		if (model.search) {
+			entry["search"] = this.internValidator(model.search);
+		}
+
+		this.data.set(routeId, entry);
 	}
 
 	find(routeId: RouteId): ModelRegistryData | undefined {
-		return this.data[routeId];
+		return this.data.get(routeId);
 	}
 }

@@ -48,4 +48,8 @@ export class Route<
 	method: Method;
 	pattern: RegExp;
 	id: RouteId;
+
+	static makeRouteId(method: string, endpoint: string): RouteId {
+		return `[${method.toUpperCase()}]:[${endpoint}]`;
+	}
 }

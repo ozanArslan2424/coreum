@@ -1,6 +1,6 @@
 import { Middleware } from "@/modules/Middleware/Middleware";
 import { describe, it, expect } from "bun:test";
-import { Controller, Route } from "@/index";
+import { Controller } from "@/index";
 import { pathMaker } from "../utils/pathMaker";
 import { reqMaker } from "../utils/reqMaker";
 import { testServer } from "../utils/testServer";
@@ -23,7 +23,6 @@ const register = (pfx: string) => {
 	}
 
 	new TestController();
-	new Route({ method: "GET", path: path("/route") }, (c) => c.data);
 };
 
 describe("Middleware Data", () => {
