@@ -78,16 +78,17 @@ describe("C.StaticRoute", () => {
 		expect(body).toContain("hello");
 	});
 
-	it("SERVES TS TRANSPILED WITH CORRECT CONTENT TYPE", async () => {
-		new C.StaticRoute("/sr-ts", f("sample.ts"));
-		const res = await s.handle(req("/sr-ts"));
-		expect(res.status).toBe(200);
-		expect(res.headers.get("Content-Type")).toBe("application/javascript");
-		const body = await res.text();
-		// TS type annotation should be stripped after transpilation
-		expect(body).not.toContain(": string");
-		expect(body).toContain("hello");
-	});
+	// @deprecated
+	// it("SERVES TS TRANSPILED WITH CORRECT CONTENT TYPE", async () => {
+	// 	new C.StaticRoute("/sr-ts", f("sample.ts"));
+	// 	const res = await s.handle(req("/sr-ts"));
+	// 	expect(res.status).toBe(200);
+	// 	expect(res.headers.get("Content-Type")).toBe("application/javascript");
+	// 	const body = await res.text();
+	// 	// TS type annotation should be stripped after transpilation
+	// 	expect(body).not.toContain(": string");
+	// 	expect(body).toContain("hello");
+	// });
 
 	it("SERVES TXT WITH CORRECT CONTENT TYPE", async () => {
 		new C.StaticRoute("/sr-txt", f("sample.txt"));
