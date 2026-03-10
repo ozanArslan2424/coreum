@@ -9,7 +9,7 @@ import type { Middleware, MiddlewareHandler } from "@/Middleware";
 import type { RouteId } from "@/Route/types/RouteId";
 import { compile } from "@/utils/compile";
 import { MiddlewareRegistry } from "@/Router/registries/MiddlewareRegistry";
-import type { HttpRequest } from "@/Request/HttpRequest";
+import type { CRequest } from "@/Request/CRequest";
 import type { AnyRoute } from "@/Route/types/AnyRoute";
 
 type MemoiristData = {
@@ -25,7 +25,7 @@ export class MemoiristAdapter implements RouterAdapterInterface {
 	// Pending middleware handlers keyed by RouteId, flushed when the route is registered
 	private pendingMiddlewares = new Map<RouteId, MiddlewareHandler[]>();
 
-	find(req: HttpRequest): RouterReturnData | null {
+	find(req: CRequest): RouterReturnData | null {
 		const method = req.method;
 		const pathname = req.urlObject.pathname;
 		const searchParams = req.urlObject.searchParams;

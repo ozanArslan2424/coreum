@@ -1,6 +1,6 @@
 import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
 import type { RouterRouteData } from "@/Router/types/RouterRouteData";
-import { HttpError } from "@/Error/HttpError";
+import { CError } from "@/Error/CError";
 import { isRegexMatch } from "@/utils/isRegexMatch";
 import { strIsEqual } from "@/utils/strIsEqual";
 import type { RouteId } from "@/Route/types/RouteId";
@@ -9,7 +9,7 @@ import { ModelRegistry } from "@/Router/registries/ModelRegistry";
 import type { RouterReturnData } from "@/Router/types/RouterReturnData";
 import type { AnyRouteModel } from "@/Model/types/AnyRouteModel";
 import { MiddlewareRegistry } from "@/Router/registries/MiddlewareRegistry";
-import type { HttpRequest } from "@/Request/HttpRequest";
+import type { CRequest } from "@/Request/CRequest";
 import type { AnyRoute } from "@/Route/types/AnyRoute";
 
 export class CorpusAdapter implements RouterAdapterInterface {
@@ -31,7 +31,7 @@ export class CorpusAdapter implements RouterAdapterInterface {
 		this.middlewareRegistry.add(middleware);
 	}
 
-	find(req: HttpRequest): RouterReturnData | null {
+	find(req: CRequest): RouterReturnData | null {
 		const method = req.method;
 		const pathname = req.urlObject.pathname;
 		const searchParams = req.urlObject.searchParams;
@@ -66,12 +66,12 @@ export class CorpusAdapter implements RouterAdapterInterface {
 		}
 
 		if (route === null) {
-			throw HttpError.notFound();
+			throw CError.notFound();
 		}
 
 		// The endpoint exists but the method is not allowed
 		if (!strIsEqual(method, route.method, "upper")) {
-			throw HttpError.methodNotAllowed();
+			throw CError.methodNotAllowed();
 		}
 
 		return {

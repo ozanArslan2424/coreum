@@ -19,15 +19,17 @@ export class FileWalkerUsingBun extends FileWalkerAbstract {
 	static async find(filePath: string): Promise<FileWalkerFile | null> {
 		const file = Bun.file(filePath);
 		const exists = await file.exists();
-		if (exists) {
-			return {
-				name: this.getFilename(filePath),
-				extension: this.getExtension(filePath),
-				mimeType: this.getMimeType(filePath),
-				text: () => file.text(),
-				stream: () => file.stream(),
-			};
+		if (!exists) {
+			console.error("File not found at:", filePath);
+			return null;
 		}
-		return null;
+
+		return {
+			name: this.getFilename(filePath),
+			extension: this.getExtension(filePath),
+			mimeType: this.getMimeType(filePath),
+			text: () => file.text(),
+			stream: () => file.stream(),
+		};
 	}
 }

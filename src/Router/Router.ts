@@ -1,8 +1,8 @@
 import { Context } from "@/Context/Context";
-import type { HttpRequest } from "@/Request/HttpRequest";
-import { HttpResponse } from "@/Response/HttpResponse";
+import type { CRequest } from "@/Request/CRequest";
+import { CResponse } from "@/Response/CResponse";
 import type { AnyRoute } from "@/Route/types/AnyRoute";
-import { HttpError } from "@/Error/HttpError";
+import { CError } from "@/Error/CError";
 import type { Func } from "@/utils/types/Func";
 import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
 import { CorpusAdapter } from "@/Router/adapters/CorpusAdapter";
@@ -16,7 +16,7 @@ export class Router {
 	}
 
 	private _adapter: RouterAdapterInterface;
-	private cache = new WeakMap<HttpRequest, Func<[], Promise<HttpResponse>>>();
+	private cache = new WeakMap<CRequest, Func<[], Promise<CResponse>>>();
 
 	checkPossibleCollision(n: RouterRouteData): boolean {
 		if (this._adapter instanceof CorpusAdapter) {
@@ -43,12 +43,12 @@ export class Router {
 		});
 	}
 
-	findRouteHandler(req: HttpRequest): Func<[], Promise<HttpResponse>> {
+	findRouteHandler(req: CRequest): Func<[], Promise<CResponse>> {
 		const cached = this.cache.get(req);
 		if (cached) return cached;
 
 		const match = this._adapter.find(req);
-		if (!match) throw HttpError.notFound();
+		if (!match) throw CError.notFound();
 
 		const ctx = Context.makeFromRequest(req);
 
@@ -62,9 +62,9 @@ export class Router {
 				match.model,
 			);
 			const res = await match.route.handler(ctx);
-			return res instanceof HttpResponse
+			return res instanceof CResponse
 				? res
-				: new HttpResponse(res, {
+				: new CResponse(res, {
 						cookies: ctx.res.cookies,
 						headers: ctx.res.headers,
 						status: ctx.res.status,

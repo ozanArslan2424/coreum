@@ -1,8 +1,8 @@
 import { Status } from "@/Response/enums/Status";
 import { _corsStore, _prefixStore, _routerStore } from "@/index";
-import { HttpError } from "@/Error/HttpError";
-import { HttpRequest } from "@/Request/HttpRequest";
-import { HttpResponse } from "@/Response/HttpResponse";
+import { CError } from "@/Error/CError";
+import { CRequest } from "@/Request/CRequest";
+import { CResponse } from "@/Response/CResponse";
 import type { ErrorHandler } from "@/Server/types/ErrorHandler";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
 import type { RequestHandler } from "@/Server/types/RequestHandler";
@@ -52,7 +52,7 @@ export abstract class ServerAbstract implements ServerInterface {
 	}
 
 	async handle(request: Request): Promise<Response> {
-		const req = new HttpRequest(request);
+		const req = new CRequest(request);
 		let res = await this.getResponse(req);
 		const cors = _corsStore.get();
 		if (cors !== null) {
@@ -64,16 +64,16 @@ export abstract class ServerAbstract implements ServerInterface {
 		return res.response;
 	}
 
-	private async getResponse(req: HttpRequest): Promise<HttpResponse> {
+	private async getResponse(req: CRequest): Promise<CResponse> {
 		try {
 			if (req.isPreflight) {
-				return new HttpResponse("Departed");
+				return new CResponse("Departed");
 			}
 
 			const handler = _routerStore.get().findRouteHandler(req);
 			return await handler();
 		} catch (err) {
-			if (err instanceof HttpError) {
+			if (err instanceof CError) {
 				if (err.isStatusOf(Status.NOT_FOUND)) {
 					return await this.handleNotFound(req);
 				}
@@ -110,16 +110,16 @@ export abstract class ServerAbstract implements ServerInterface {
 	}
 	defaultErrorHandler: ErrorHandler = (err) => {
 		if (!(err instanceof Error)) {
-			return new HttpResponse(
+			return new CResponse(
 				{ error: err, message: "Unknown" },
 				{ status: Status.INTERNAL_SERVER_ERROR },
 			);
 		}
 
-		if (err instanceof HttpError) {
+		if (err instanceof CError) {
 			return err.toResponse();
 		}
-		return new HttpResponse(
+		return new CResponse(
 			{ error: err, message: err.message },
 			{ status: Status.INTERNAL_SERVER_ERROR },
 		);
@@ -131,7 +131,7 @@ export abstract class ServerAbstract implements ServerInterface {
 		this.handleNotFound = handler;
 	}
 	defaultNotFoundHandler: RequestHandler = (req) => {
-		return new HttpResponse(
+		return new CResponse(
 			{ error: true, message: `${req.method} on ${req.url} does not exist.` },
 			{ status: Status.NOT_FOUND },
 		);
@@ -140,7 +140,7 @@ export abstract class ServerAbstract implements ServerInterface {
 	protected handleMethodNotAllowed: RequestHandler = (req) =>
 		this.defaultMethodNotFoundHandler(req);
 	defaultMethodNotFoundHandler: RequestHandler = (req) => {
-		return new HttpResponse(
+		return new CResponse(
 			{ error: `${req.method} ${req.url} does not exist.` },
 			{ status: Status.METHOD_NOT_ALLOWED },
 		);

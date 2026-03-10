@@ -1,35 +1,35 @@
-import type { HttpHeaderKey } from "@/Headers/types/HttpHeaderKey";
-import type { HttpHeadersInit } from "@/Headers/types/HttpHeadersInit";
+import type { HeaderKey } from "@/Headers/types/HeaderKey";
+import type { CHeadersInit } from "@/Headers/types/CHeadersInit";
 import { strIsDefined } from "@/utils/strIsDefined";
 
 /** Headers is extended to include helpers and intellisense for common header names. */
 
-export class HttpHeaders extends Headers {
-	constructor(init?: HttpHeadersInit) {
+export class CHeaders extends Headers {
+	constructor(init?: CHeadersInit) {
 		super(init);
 	}
 
-	override append(name: HttpHeaderKey, value: string): void {
+	override append(name: HeaderKey, value: string): void {
 		super.append(name, value);
 	}
 
-	override set(name: HttpHeaderKey, value: string): void {
+	override set(name: HeaderKey, value: string): void {
 		super.set(name, value);
 	}
 
-	override get(name: HttpHeaderKey): string | null {
+	override get(name: HeaderKey): string | null {
 		return super.get(name) || super.get(name.toLowerCase());
 	}
 
-	override has(name: HttpHeaderKey): boolean {
+	override has(name: HeaderKey): boolean {
 		return super.has(name) || super.has(name.toLowerCase());
 	}
 
-	override delete(name: HttpHeaderKey): void {
+	override delete(name: HeaderKey): void {
 		return super.delete(name);
 	}
 
-	static combine(source: HttpHeaders, target: HttpHeaders): HttpHeaders {
+	static combine(source: CHeaders, target: CHeaders): CHeaders {
 		source.forEach((value, key) => {
 			if (key.toLowerCase() === "set-cookie") {
 				target.append(key, value);
@@ -41,14 +41,14 @@ export class HttpHeaders extends Headers {
 		return target;
 	}
 
-	innerCombine(source: HttpHeaders): void {
-		HttpHeaders.combine(source, this);
+	innerCombine(source: CHeaders): void {
+		CHeaders.combine(source, this);
 	}
 
 	setMany(
 		init:
 			| [string, string][]
-			| (Record<string, string> & Partial<Record<HttpHeaderKey, string>>),
+			| (Record<string, string> & Partial<Record<HeaderKey, string>>),
 	): void {
 		const entries = Array.isArray(init) ? init : Object.entries(init);
 		for (const [key, value] of entries) {
@@ -58,11 +58,8 @@ export class HttpHeaders extends Headers {
 	}
 
 	/** @deprecated */
-	static findHeaderInInit(
-		init: HttpHeadersInit,
-		name: HttpHeaderKey,
-	): string | null {
-		if (init instanceof HttpHeaders || init instanceof Headers) {
+	static findHeaderInInit(init: CHeadersInit, name: HeaderKey): string | null {
+		if (init instanceof CHeaders || init instanceof Headers) {
 			return init.get(name);
 		} else if (Array.isArray(init)) {
 			return init.find((entry) => entry[0] === name)?.[1] ?? null;

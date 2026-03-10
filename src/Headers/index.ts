@@ -1,4 +1,4 @@
-export type { HttpHeaderKey as HeaderKey } from "./types/HttpHeaderKey";
-export type { HttpHeadersInit as HeadersInit } from "./types/HttpHeadersInit";
+export type { HeaderKey as HeaderKey } from "./types/HeaderKey";
+export type { CHeadersInit as HeadersInit } from "./types/CHeadersInit";
 export * from "./enums/CommonHeaders";
-export { HttpHeaders as Headers } from "./HttpHeaders";
+export { CHeaders as Headers } from "./CHeaders";

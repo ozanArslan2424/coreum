@@ -6,7 +6,28 @@ import type { RouteId } from "@/Route/types/RouteId";
 import { joinPathSegments } from "@/utils/joinPathSegments";
 import type { RouteDefinition } from "@/Route/types/RouteDefinition";
 
-/** Extend this class to create your own controllers. */
+/**
+ * Base class for grouping related routes under a shared prefix and optional middleware.
+ * Extend this class to create your own controllers.
+ *
+ * All routes registered via {@link ControllerAbstract.route} and {@link ControllerAbstract.staticRoute}
+ * automatically inherit the controller's prefix and run `beforeEach` before the handler if set.
+ *
+ * @example
+ * class UserController extends ControllerAbstract {
+ *     constructor() {
+ *         super({ prefix: "/users" });
+ *     }
+ *
+ *     getAll = this.route("/", () => getAllUsers());
+ *
+ *     create = this.route({ method: C.Method.POST, path: "/" }, (c) => createUser(c.body));
+ *
+ *     avatar = this.staticRoute("/avatar", { filePath: "assets/avatar.png", stream: true });
+ * }
+ *
+ * new UserController();
+ */
 
 export abstract class ControllerAbstract {
 	constructor(opts?: ControllerOptions) {
@@ -18,6 +39,10 @@ export abstract class ControllerAbstract {
 	protected prefix?: string;
 	protected beforeEach?: MiddlewareHandler;
 
+	/**
+	 * Registers a dynamic route under this controller. Behaves identically to {@link Route}
+	 * but automatically prepends the controller prefix and runs `beforeEach` before the handler.
+	 */
 	protected route<
 		Path extends string = string,
 		B = unknown,
@@ -41,6 +66,10 @@ export abstract class ControllerAbstract {
 		return route;
 	}
 
+	/**
+	 * Registers a static file route under this controller. Behaves identically to {@link StaticRoute}
+	 * but automatically prepends the controller prefix.
+	 */
 	protected staticRoute<
 		Path extends string = string,
 		B = unknown,

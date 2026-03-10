@@ -1,14 +1,9 @@
 import type { Context } from "@/Context/Context";
+import type { CResponse } from "@/Response/CResponse";
 import type { Func } from "@/utils/types/Func";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
 
 export type StaticRouteHandler<B = unknown, S = unknown, P = unknown> = Func<
-	[Context<B, S, P, string>, string],
-	MaybePromise<string>
+	[context: Context<B, S, P, string | CResponse>, content: string],
+	MaybePromise<string | CResponse>
 >;
-
-//
-// (
-// 	context: Context<B, S, P, string>,
-// 	content: string,
-// ) => MaybePromise<string>;

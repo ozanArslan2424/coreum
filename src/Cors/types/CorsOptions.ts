@@ -1,8 +1,8 @@
-import type { HttpHeaderKey } from "../../Headers/types/HttpHeaderKey";
+import type { HeaderKey } from "@/Headers/types/HeaderKey";
 
 export type CorsOptions = {
 	allowedOrigins?: string[];
 	allowedMethods?: string[];
-	allowedHeaders?: HttpHeaderKey[];
+	allowedHeaders?: HeaderKey[];
 	credentials?: boolean;
 };

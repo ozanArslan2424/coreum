@@ -1,10 +1,10 @@
 import type { Status } from "@/Response/enums/Status";
 import type { CookiesInit } from "@/Cookies/types/CookiesInit";
-import type { HttpHeadersInit } from "@/Headers/types/HttpHeadersInit";
+import type { CHeadersInit } from "@/Headers/types/CHeadersInit";
 
-export type HttpResponseInit = {
+export type CResponseInit = {
 	cookies?: CookiesInit;
-	headers?: HttpHeadersInit;
+	headers?: CHeadersInit;
 	status?: Status;
 	statusText?: string;
 };

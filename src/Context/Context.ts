@@ -1,7 +1,7 @@
 import type { Cookies } from "@/Cookies/Cookies";
-import type { HttpHeaders } from "@/Headers/HttpHeaders";
-import type { HttpRequest } from "@/Request/HttpRequest";
-import { HttpResponse } from "@/Response/HttpResponse";
+import type { CHeaders } from "@/Headers/CHeaders";
+import type { CRequest } from "@/Request/CRequest";
+import { CResponse } from "@/Response/CResponse";
 import { Parser } from "@/Model/Parser";
 import type { ContextDataInterface } from "@/types.d.ts";
 import type { RouterModelData } from "@/Router/types/RouterModelData";
@@ -28,11 +28,11 @@ import type { RouterModelData } from "@/Router/types/RouterModelData";
 
 export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
 	constructor(
-		req: HttpRequest,
+		req: CRequest,
 		body: B,
 		search: S,
 		params: P,
-		res?: HttpResponse<R>,
+		res?: CResponse<R>,
 	) {
 		this.req = req;
 		this.url = req.urlObject;
@@ -41,20 +41,20 @@ export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
 		this.body = body;
 		this.search = search;
 		this.params = params;
-		this.res = res ?? new HttpResponse<R>();
+		this.res = res ?? new CResponse<R>();
 	}
 
-	req: HttpRequest;
+	req: CRequest;
 	url: URL;
-	headers: HttpHeaders;
+	headers: CHeaders;
 	cookies: Cookies;
 	body: B;
 	search: S;
 	params: P;
-	res: HttpResponse<R>;
+	res: CResponse<R>;
 	data: ContextDataInterface = {};
 
-	static makeFromRequest(req: HttpRequest): Context {
+	static makeFromRequest(req: CRequest): Context {
 		return new Context(req, {}, {}, {});
 	}
 
@@ -65,7 +65,7 @@ export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
 		R = unknown,
 	>(
 		ctx: Context<B, S, P, R>,
-		req: HttpRequest,
+		req: CRequest,
 		params: Record<string, string>,
 		search: Record<string, string>,
 		model?: RouterModelData<B, S, P>,

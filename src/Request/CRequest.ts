@@ -1,17 +1,17 @@
 import { Method } from "@/Request/enums/Method";
 import { CommonHeaders } from "@/Headers/enums/CommonHeaders";
 import { Cookies } from "@/Cookies/Cookies";
-import { HttpHeaders } from "@/Headers/HttpHeaders";
-import type { HttpRequestInfo } from "@/Request/types/HttpRequestInfo";
-import type { HttpRequestInit } from "@/Request/types/HttpRequestInit";
+import { CHeaders } from "@/Headers/CHeaders";
+import type { CRequestInfo } from "@/Request/types/CRequestInfo";
+import type { CRequestInit } from "@/Request/types/CRequestInit";
 import { strSplit } from "@/utils/strSplit";
 
-/** HttpRequest includes a cookie jar, better headers, and some utilities. */
+/** CRequest includes a cookie jar, better headers, and some utilities. */
 
-export class HttpRequest extends Request {
+export class CRequest extends Request {
 	constructor(
-		readonly info: HttpRequestInfo,
-		readonly init?: HttpRequestInit,
+		readonly info: CRequestInfo,
+		readonly init?: CRequestInit,
 	) {
 		super(info, init);
 		this.urlObject = this.resolveUrlObject();
@@ -23,7 +23,7 @@ export class HttpRequest extends Request {
 	readonly urlObject: URL;
 	readonly isPreflight: boolean;
 	readonly cookies: Cookies;
-	override headers: HttpHeaders;
+	override headers: CHeaders;
 
 	private resolveUrlObject(): URL {
 		let urlObject: URL;
@@ -33,7 +33,7 @@ export class HttpRequest extends Request {
 				urlObject = this.info;
 				break;
 
-			case this.info instanceof HttpRequest:
+			case this.info instanceof CRequest:
 				urlObject = this.info.urlObject;
 				break;
 
@@ -53,14 +53,14 @@ export class HttpRequest extends Request {
 		return urlObject;
 	}
 
-	private resolveHeaders(): HttpHeaders {
+	private resolveHeaders(): CHeaders {
 		if (this.init?.headers !== undefined) {
-			return new HttpHeaders(this.init.headers);
+			return new CHeaders(this.init.headers);
 		}
-		if (this.info instanceof Request || this.info instanceof HttpRequest) {
-			return new HttpHeaders(this.info.headers);
+		if (this.info instanceof Request || this.info instanceof CRequest) {
+			return new CHeaders(this.info.headers);
 		}
-		return new HttpHeaders();
+		return new CHeaders();
 	}
 
 	/** Gets cookie header and collects cookies for the jar */

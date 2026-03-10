@@ -1,7 +1,7 @@
 import { Status } from "@/Response/enums/Status";
-import { HttpResponse } from "@/Response/HttpResponse";
+import { CResponse } from "@/Response/CResponse";
 
-export class HttpError extends Error {
+export class CError extends Error {
 	constructor(
 		public override message: string,
 		public status: Status,
@@ -10,8 +10,8 @@ export class HttpError extends Error {
 		super(message);
 	}
 
-	toResponse(): HttpResponse {
-		return new HttpResponse(
+	toResponse(): CResponse {
+		return new CResponse(
 			this.data
 				? { error: this.data, message: this.message }
 				: { error: true, message: this.message },
@@ -23,27 +23,27 @@ export class HttpError extends Error {
 		return this.status === status;
 	}
 
-	static internalServerError(msg?: string): HttpError {
+	static internalServerError(msg?: string): CError {
 		const status = Status.INTERNAL_SERVER_ERROR;
 		return new this(msg ?? status.toString(), status);
 	}
 
-	static badRequest(msg?: string): HttpError {
+	static badRequest(msg?: string): CError {
 		const status = Status.BAD_REQUEST;
 		return new this(msg ?? status.toString(), status);
 	}
 
-	static notFound(msg?: string): HttpError {
+	static notFound(msg?: string): CError {
 		const status = Status.NOT_FOUND;
 		return new this(msg ?? status.toString(), status);
 	}
 
-	static methodNotAllowed(msg?: string): HttpError {
+	static methodNotAllowed(msg?: string): CError {
 		const status = Status.METHOD_NOT_ALLOWED;
 		return new this(msg ?? status.toString(), status);
 	}
 
-	static unprocessableEntity(msg?: string): HttpError {
+	static unprocessableEntity(msg?: string): CError {
 		const status = Status.UNPROCESSABLE_ENTITY;
 		return new this(msg ?? status.toString(), status);
 	}

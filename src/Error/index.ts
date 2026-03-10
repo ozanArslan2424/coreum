@@ -1,1 +1,1 @@
-export { HttpError as Error } from "./HttpError";
+export { CError as Error } from "./CError";

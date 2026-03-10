@@ -9,11 +9,28 @@ import type { RouteId } from "@/Route/types/RouteId";
 import type { OrString } from "@/utils/types/OrString";
 
 /**
- * The object to define an endpoint. Can be instantiated with "new" or inside a controller
- * with {@link ControllerAbstract.route}. The callback recieves the {@link Context} and can
- * return {@link HttpResponse} or any data. Route instantiation automatically registers
- * to the router.
- * */
+ * Defines an HTTP endpoint. Accepts a {@link RouteDefinition} which can either be a plain
+ * path string (defaults to GET) or an object with a `method` and `path` for other HTTP methods.
+ *
+ * The handler receives a {@link Context} and can return any data, a {@link CResponse} directly,
+ * or a plain web `Response` for cases where full control over the response is needed.
+ * Returned data is automatically serialized by {@link CResponse} — plain objects become JSON,
+ * primitives become plain text, and so on.
+ *
+ * An optional {@link RouteModel} can be provided to validate and parse the request body,
+ * URL params, and search params — the parsed results are typed and available on the context.
+ *
+ * Route instantiation automatically registers to the router.
+ *
+ * @example
+ * // GET /users
+ * new Route("/users", () => [{ id: 1 }]);
+ *
+ * // POST /users with typed body
+ * new Route({ method: C.Method.POST, path: "/users" }, (c) => {
+ *     return { created: c.body.name };
+ * }, { body: UserModel });
+ */
 
 export class Route<
 	Path extends string = string,

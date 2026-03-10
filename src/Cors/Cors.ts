@@ -1,5 +1,5 @@
-import type { HttpRequest } from "@/Request/HttpRequest";
-import type { HttpResponse } from "@/Response/HttpResponse";
+import type { CRequest } from "@/Request/CRequest";
+import type { CResponse } from "@/Response/CResponse";
 import type { CorsOptions } from "@/Cors/types/CorsOptions";
 import { boolToString } from "@/utils/boolToString";
 import { isSomeArray } from "@/utils/isSomeArray";
@@ -21,7 +21,7 @@ export class Cors {
 	private readonly headersKey = "Access-Control-Allow-Headers";
 	private readonly credentialsKey = "Access-Control-Allow-Credentials";
 
-	getCorsHeaders(req: HttpRequest, res: HttpResponse) {
+	getCorsHeaders(req: CRequest, res: CResponse) {
 		const reqOrigin = req.headers.get("origin") ?? "";
 
 		const { allowedOrigins, allowedMethods, allowedHeaders, credentials } =
@@ -44,7 +44,7 @@ export class Cors {
 		return res.headers;
 	}
 
-	apply(req: HttpRequest, res: HttpResponse): void {
+	apply(req: CRequest, res: CResponse): void {
 		const headers = this.getCorsHeaders(req, res);
 		res.headers.innerCombine(headers);
 	}

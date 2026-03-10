@@ -1,9 +1,9 @@
 import { Status } from "@/Response/enums/Status";
 import { Method } from "@/Request/enums/Method";
 import { CommonHeaders } from "@/Headers/enums/CommonHeaders";
-import { HttpError } from "@/Error/HttpError";
-import type { HttpRequest } from "@/Request/HttpRequest";
-import type { HttpResponse } from "@/Response/HttpResponse";
+import { CError } from "@/Error/CError";
+import type { CRequest } from "@/Request/CRequest";
+import type { CResponse } from "@/Response/CResponse";
 import type { StandardSchemaV1 } from "@/Model/types/StandardSchema";
 import type { UnknownObject } from "@/utils/types/UnknownObject";
 import type { SchemaValidator } from "@/Model/types/SchemaValidator";
@@ -20,7 +20,7 @@ export class Parser {
 		const result = await validate(data);
 		if (result.issues !== undefined) {
 			const msg = this.issuesToErrorMessage(result.issues);
-			throw HttpError.unprocessableEntity(msg);
+			throw CError.unprocessableEntity(msg);
 		}
 		return result.value;
 	}
@@ -62,7 +62,7 @@ export class Parser {
 
 	/** This can be used for both request and response bodies */
 	static async parseBody<B = UnknownObject>(
-		r: HttpRequest | HttpResponse | Response,
+		r: CRequest | CResponse | Response,
 		validate?: SchemaValidator<B>,
 	): Promise<B> {
 		let data;
@@ -93,7 +93,7 @@ export class Parser {
 				case "image":
 				case "audio":
 				case "video":
-					throw new HttpError(
+					throw new CError(
 						"unprocessable.contentType",
 						Status.UNPROCESSABLE_ENTITY,
 					);
