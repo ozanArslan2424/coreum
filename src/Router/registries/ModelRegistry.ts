@@ -1,5 +1,4 @@
 import type { AnyRouteModel } from "@/Model/types/AnyRouteModel";
-import { Route } from "@/Route/Route";
 import type { RouteId } from "@/Route/types/RouteId";
 import type { RouterModelData } from "@/Router/types/RouterModelData";
 import { LazyMap } from "@/Store/LazyMap";
@@ -10,9 +9,9 @@ export class ModelRegistry {
 	// RouteId -> ModelRegistryData
 	private map = new LazyMap<RouteId, RouterModelData>();
 
-	add(method: string, endpoint: string, model: AnyRouteModel): void {
+	add(routeId: RouteId, model: AnyRouteModel): void {
 		const entry = ModelRegistry.toRouterModelData(model);
-		this.map.set(Route.makeRouteId(method, endpoint), entry);
+		this.map.set(routeId, entry);
 	}
 
 	find(routeId: RouteId): RouterModelData | undefined {

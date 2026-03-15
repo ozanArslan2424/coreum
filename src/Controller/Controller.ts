@@ -1,10 +1,10 @@
-import { Route } from "@/Route/Route";
-import { StaticRoute } from "@/Route/StaticRoute";
+import { DynamicRoute } from "@/DynamicRoute/DynamicRoute";
+import { StaticRoute } from "@/StaticRoute/StaticRoute";
 import type { ControllerOptions } from "@/Controller/types/ControllerOptions";
 import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";
 import type { RouteId } from "@/Route/types/RouteId";
 import { joinPathSegments } from "@/utils/joinPathSegments";
-import type { RouteDefinition } from "@/Route/types/RouteDefinition";
+import type { DynamicRouteDefinition } from "@/DynamicRoute/types/DynamicRouteDefinition";
 
 /**
  * Base class for grouping related routes under a shared prefix and optional middleware.
@@ -40,7 +40,7 @@ export abstract class Controller {
 	protected beforeEach?: MiddlewareHandler;
 
 	/**
-	 * Registers a dynamic route under this controller. Behaves identically to {@link Route}
+	 * Registers a dynamic route under this controller. Behaves identically to {@link DynamicRoute}
 	 * but automatically prepends the controller prefix and runs `beforeEach` before the handler.
 	 */
 	protected route<
@@ -50,11 +50,11 @@ export abstract class Controller {
 		P = unknown,
 		R = unknown,
 	>(
-		...args: ConstructorParameters<typeof Route<Path, B, S, P, R>>
-	): Route<Path, B, S, P, R> {
+		...args: ConstructorParameters<typeof DynamicRoute<Path, B, S, P, R>>
+	): DynamicRoute<Path, B, S, P, R> {
 		const [definition, handler, model] = args;
 
-		const route = new Route(
+		const route = new DynamicRoute(
 			this.resolveRouteDefinition(definition),
 			async (ctx) => {
 				await this.beforeEach?.(ctx);
@@ -90,8 +90,8 @@ export abstract class Controller {
 	}
 
 	private resolveRouteDefinition<Path extends string = string>(
-		definition: RouteDefinition<Path>,
-	): RouteDefinition<Path> {
+		definition: DynamicRouteDefinition<Path>,
+	): DynamicRouteDefinition<Path> {
 		if (typeof definition === "string") {
 			return joinPathSegments<Path>(this.prefix, definition);
 		}

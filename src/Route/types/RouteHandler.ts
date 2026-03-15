@@ -7,4 +7,4 @@ export type RouteHandler<
 	S = unknown,
 	P = unknown,
 	R = unknown,
-> = Func<[Context<B, S, P, R>], MaybePromise<R>>;
+> = Func<[context: Context<B, S, P, R>], MaybePromise<R>>;

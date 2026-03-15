@@ -4,9 +4,9 @@ import { GlobalCorsStore } from "@/Store/globals/GlobalCorsStore.js";
 import * as C from "@/C";
 import * as X from "@/X";
 
-export const _prefixStore = new GlobalPrefixStore();
-export const _routerStore = new GlobalRouterStore();
-export const _corsStore = new GlobalCorsStore();
+export const $prefixStore = new GlobalPrefixStore();
+export const $routerStore = new GlobalRouterStore();
+export const $corsStore = new GlobalCorsStore();
 
 export type * from "./types.d.ts";
 export * from "@/C";

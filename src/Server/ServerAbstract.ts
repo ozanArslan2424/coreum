@@ -1,5 +1,6 @@
+import { Context } from "@/Context/Context";
 import { Status } from "@/CResponse/enums/Status";
-import { _corsStore, _prefixStore, _routerStore } from "@/index";
+import { $corsStore, $prefixStore, $routerStore } from "@/index";
 import { CError } from "@/CError/CError";
 import { CRequest } from "@/CRequest/CRequest";
 import { CResponse } from "@/CResponse/CResponse";
@@ -19,15 +20,15 @@ export abstract class ServerAbstract implements ServerInterface {
 	abstract close(): Promise<void>;
 
 	constructor(protected readonly opts?: ServerOptions) {
-		_routerStore.set(new Router(opts?.adapter));
+		$routerStore.set(new Router(opts?.adapter));
 	}
 
 	get routes(): Array<[string, string]> {
-		return _routerStore.get().getRouteList();
+		return $routerStore.get().getRouteList();
 	}
 
 	setGlobalPrefix(value: string): void {
-		_prefixStore.set(value);
+		$prefixStore.set(value);
 	}
 
 	async listen(
@@ -55,7 +56,7 @@ export abstract class ServerAbstract implements ServerInterface {
 	async handle(request: Request): Promise<Response> {
 		const req = new CRequest(request);
 		let res = await this.getResponse(req);
-		const cors = _corsStore.get();
+		const cors = $corsStore.get();
 		if (cors !== null) {
 			cors.apply(req, res);
 		}
@@ -68,14 +69,18 @@ export abstract class ServerAbstract implements ServerInterface {
 	private async getResponse(req: CRequest): Promise<CResponse> {
 		try {
 			if (req.isPreflight) {
-				return new CResponse("Departed");
+				return await this.handlePreflight(req);
 			}
 
-			const handler = _routerStore.get().findRouteHandler(req);
-			if (!handler) {
-				return await this.handleNotFound(req);
+			const router = $routerStore.get();
+			const ctx = Context.makeFromRequest(req);
+			const globalMiddleware = router.findMiddleware("*");
+			await globalMiddleware(ctx);
+			const handler = router.findRouteHandler(req);
+			if (handler) {
+				return await handler(ctx);
 			}
-			return await handler();
+			return await this.handleNotFound(req);
 		} catch (err) {
 			return await this.handleError(err as Error);
 		}
@@ -124,5 +129,14 @@ export abstract class ServerAbstract implements ServerInterface {
 			{ error: true, message: `${req.method} on ${req.url} does not exist.` },
 			{ status: Status.NOT_FOUND },
 		);
+	};
+
+	protected handlePreflight: RequestHandler = (req) =>
+		this.defaultPreflightHandler(req);
+	setOnPreflight(handler: RequestHandler): void {
+		this.handlePreflight = handler;
+	}
+	defaultPreflightHandler: RequestHandler = () => {
+		return new CResponse("Departed");
 	};
 }

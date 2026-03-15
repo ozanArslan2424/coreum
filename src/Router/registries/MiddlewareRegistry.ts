@@ -1,7 +1,7 @@
 import type { Context } from "@/Context/Context";
 import { Controller } from "@/Controller/Controller";
 import type { Middleware } from "@/Middleware/Middleware";
-import { Route } from "@/Route/Route";
+import { DynamicRoute } from "@/DynamicRoute/DynamicRoute";
 import type { RouteId } from "@/Route/types/RouteId";
 import type { RouterMiddlewareData } from "@/Router/types/RouterMiddlewareData";
 import { LazyMap } from "@/Store/LazyMap";
@@ -12,25 +12,23 @@ export class MiddlewareRegistry {
 	// RouteId | "*" -> RouterMiddlewareData
 	private middlewares = new LazyMap<string, RouterMiddlewareData>();
 
-	add(m: Middleware): void {
-		const resolved = MiddlewareRegistry.resolveRouteIds(m);
+	add(middleware: Middleware): void {
+		const resolved = MiddlewareRegistry.resolveRouteIds(middleware);
 
 		if (resolved.isGlobal) {
 			const existing = this.middlewares.get("*") ?? [];
-			this.middlewares.set("*", [...existing, m.handler]);
+			this.middlewares.set("*", [...existing, middleware.handler]);
 			return;
 		}
 
 		for (const routeId of resolved.routeIds) {
 			const existing = this.middlewares.get(routeId) ?? [];
-			this.middlewares.set(routeId, [...existing, m.handler]);
+			this.middlewares.set(routeId, [...existing, middleware.handler]);
 		}
 	}
 
-	find(routeId: RouteId): Func<[Context]> {
-		const globals = this.middlewares.get("*") ?? [];
-		const locals = this.middlewares.get(routeId) ?? [];
-		return compile([...globals, ...locals]);
+	find(routeId: RouteId | "*"): Func<[Context]> {
+		return compile(this.middlewares.get(routeId) ?? []);
 	}
 
 	// STATIC
@@ -45,7 +43,7 @@ export class MiddlewareRegistry {
 		const routeIds: RouteId[] = [];
 
 		for (const target of targets) {
-			if (target instanceof Route) {
+			if (target instanceof DynamicRoute) {
 				routeIds.push(target.id);
 			} else if (target instanceof Controller) {
 				routeIds.push(...target.routeIds);

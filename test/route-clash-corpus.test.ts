@@ -1,4 +1,4 @@
-import { _routerStore, type RouteDefinition } from "@/index";
+import { type DynamicRouteDefinition } from "@/index";
 import { createTestServer } from "./utils/createTestServer";
 import C from "@/index";
 import { beforeEach, describe, expect, it, spyOn } from "bun:test";
@@ -13,7 +13,7 @@ describe("CorpusAdapter - Route Collision Detection", () => {
 	const errorSpy = spyOn(internalLogger, "error");
 	beforeEach(() => errorSpy.mockReset());
 
-	function makeRoutes(r1: RouteDefinition, r2: RouteDefinition) {
+	function makeRoutes(r1: DynamicRouteDefinition, r2: DynamicRouteDefinition) {
 		new C.Route(r1, () => "ok");
 		new C.Route(r2, () => "ok");
 	}

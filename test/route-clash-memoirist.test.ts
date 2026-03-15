@@ -1,4 +1,4 @@
-import { _routerStore, type RouteDefinition } from "@/index";
+import { type DynamicRouteDefinition } from "@/index";
 import { createTestServer } from "./utils/createTestServer";
 import C from "@/index";
 import { describe, expect, it } from "bun:test";
@@ -10,7 +10,7 @@ describe("MemoiristAdapter - Route Collision Detection", () => {
 		adapter: new MemoiristAdapter(),
 	});
 
-	function makeRoutes(r1: RouteDefinition, r2: RouteDefinition) {
+	function makeRoutes(r1: DynamicRouteDefinition, r2: DynamicRouteDefinition) {
 		try {
 			new C.Route(r1, () => "ok");
 			new C.Route(r2, () => "ok");

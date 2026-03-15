@@ -3,33 +3,18 @@ import type { RouterRouteData } from "@/Router/types/RouterRouteData";
 import { isRegexMatch } from "@/utils/isRegexMatch";
 import { strIsEqual } from "@/utils/strIsEqual";
 import type { RouteId } from "@/Route/types/RouteId";
-import { ModelRegistry } from "@/Router/registries/ModelRegistry";
 import type { RouterReturnData } from "@/Router/types/RouterReturnData";
-import type { AnyRouteModel } from "@/Model/types/AnyRouteModel";
-import { MiddlewareRegistry } from "@/Router/registries/MiddlewareRegistry";
 import type { CRequest } from "@/CRequest/CRequest";
-import type { AnyRoute } from "@/Route/types/AnyRoute";
-import { Route } from "@/Route/Route";
-import type { Middleware } from "@/Middleware/Middleware";
+import { DynamicRoute } from "@/DynamicRoute/DynamicRoute";
 import { internalLogger } from "@/utils/internalLogger";
 
 export class CorpusAdapter implements RouterAdapterInterface {
 	// RouteId -> RouteRegistryData
 	private routes = new Map<RouteId, RouterRouteData>();
-	private modelRegistry = new ModelRegistry();
-	private middlewareRegistry = new MiddlewareRegistry();
 
-	addRoute(data: RouterRouteData): void {
+	add(data: RouterRouteData): void {
 		this.checkPossibleCollision(data);
 		this.routes.set(data.id, data);
-	}
-
-	addModel(route: AnyRoute, model: AnyRouteModel): void {
-		this.modelRegistry.add(route.method, route.endpoint, model);
-	}
-
-	addMiddleware(middleware: Middleware): void {
-		this.middlewareRegistry.add(middleware);
 	}
 
 	find(req: CRequest): RouterReturnData | null {
@@ -76,8 +61,6 @@ export class CorpusAdapter implements RouterAdapterInterface {
 
 		return {
 			route,
-			model: this.modelRegistry.find(route.id),
-			middleware: this.middlewareRegistry.find(route.id),
 			params: this.extractParams(pathname, route.endpoint),
 			search: Object.fromEntries(searchParams),
 		};
@@ -146,7 +129,7 @@ export class CorpusAdapter implements RouterAdapterInterface {
 				if (
 					isRegexMatch(
 						n.endpoint,
-						Route.makeRoutePattern(this.removeLastParam(o.endpoint)),
+						DynamicRoute.makeRoutePattern(this.removeLastParam(o.endpoint)),
 					)
 				) {
 					shadowMsg(n.id, o.id);

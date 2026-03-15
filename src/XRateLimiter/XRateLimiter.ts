@@ -10,9 +10,9 @@ import { RateLimiterRedisStore } from "@/XRateLimiter/stores/RateLimiterRedisSto
 import { RateLimiterMemoryStore } from "@/XRateLimiter/stores/RateLimiterMemoryStore";
 import { Status } from "@/CResponse/enums/Status";
 import { CommonHeaders } from "@/CHeaders/enums/CommonHeaders";
-import { Middleware } from "@/C";
+import { Middleware } from "@/Middleware/Middleware";
 import { XCors } from "@/XCors/XCors";
-import { _corsStore } from "@/index";
+import { $corsStore } from "@/index";
 
 export class XRateLimiter {
 	constructor(
@@ -230,7 +230,7 @@ export class XRateLimiter {
 
 	private registerMiddleware() {
 		const exposedHeaders = Object.values(this.config.headerNames);
-		const cors = _corsStore.get();
+		const cors = $corsStore.get();
 		if (cors) {
 			cors.updateOptions({ exposedHeaders });
 		} else {

@@ -11,14 +11,15 @@ export { Cookies } from "./Cookies/Cookies";
 
 export { CError as Error } from "./CError/CError";
 
-export type { HeaderKey as HeaderKey } from "./CHeaders/types/HeaderKey";
+export type { HeaderKey } from "./CHeaders/types/HeaderKey";
 export type { CHeadersInit as HeadersInit } from "./CHeaders/types/CHeadersInit";
 export * from "./CHeaders/enums/CommonHeaders";
 export { CHeaders as Headers } from "./CHeaders/CHeaders";
 
 export type { MiddlewareHandler } from "./Middleware/types/MiddlewareHandler";
-export type { MiddlewareOptions } from "./Middleware/types/MiddlewareOptions";
 export type { MiddlewareUseOn } from "./Middleware/types/MiddlewareUseOn";
+export type { MiddlewareOptions } from "./Middleware/types/MiddlewareOptions";
+export { MiddlewareAbstract } from "./Middleware/MiddlewareAbstract";
 export { Middleware } from "./Middleware/Middleware";
 
 export type { Schema } from "./Model/types/Schema";
@@ -35,11 +36,17 @@ export type { CResponseBody as ResponseBody } from "./CResponse/types/CResponseB
 export type { CResponseInit as ResponseInit } from "./CResponse/types/CResponseInit";
 export { CResponse as Response } from "./CResponse/CResponse";
 
-export type { RouteDefinition } from "./Route/types/RouteDefinition";
 export type { RouteHandler } from "./Route/types/RouteHandler";
-export type { StaticRouteHandler } from "./Route/types/StaticRouteHandler";
-export { Route } from "./Route/Route";
-export { StaticRoute } from "./Route/StaticRoute";
+export type { RouteInterface } from "./Route/RouteInterface";
+
+export type { DynamicRouteDefinition } from "./DynamicRoute/types/DynamicRouteDefinition";
+export { DynamicRouteAbstract } from "./DynamicRoute/DynamicRouteAbstract";
+export { DynamicRoute as Route } from "./DynamicRoute/DynamicRoute";
+
+export type { StaticRouteDefinition } from "./StaticRoute/types/StaticRouteDefinition";
+export type { StaticRouteHandler } from "./StaticRoute/types/StaticRouteHandler";
+export { StaticRouteAbstract } from "./StaticRoute/StaticRouteAbstract";
+export { StaticRoute } from "./StaticRoute/StaticRoute";
 
 export type { ServerOptions } from "./Server/types/ServerOptions";
 export type { ServeArgs } from "./Server/types/ServeArgs";

@@ -1,4 +1,5 @@
-import { _routerStore } from "@/index";
+import { $routerStore } from "@/index";
+import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
 import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";
 import type { MiddlewareOptions } from "@/Middleware/types/MiddlewareOptions";
 import type { MiddlewareUseOn } from "@/Middleware/types/MiddlewareUseOn";
@@ -8,11 +9,12 @@ import type { MiddlewareUseOn } from "@/Middleware/types/MiddlewareUseOn";
  * Manipulates context.
  * */
 
-export class Middleware {
+export class Middleware extends MiddlewareAbstract {
 	constructor(opts: MiddlewareOptions) {
+		super();
 		this.useOn = opts.useOn;
 		this.handler = opts.handler;
-		_routerStore.get().addMiddleware(opts);
+		$routerStore.get().addMiddleware(this);
 	}
 
 	useOn: MiddlewareUseOn;

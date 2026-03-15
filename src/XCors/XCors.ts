@@ -3,7 +3,7 @@ import type { CResponse } from "@/CResponse/CResponse";
 import type { CorsOptions } from "@/XCors/types/CorsOptions";
 import { boolToString } from "@/utils/boolToString";
 import { isSomeArray } from "@/utils/isSomeArray";
-import { _corsStore } from "@/index";
+import { $corsStore } from "@/index";
 import { arrMerge } from "@/utils/arrMerge";
 import type { CHeaders } from "@/CHeaders/CHeaders";
 
@@ -12,9 +12,9 @@ import type { CHeaders } from "@/CHeaders/CHeaders";
 export class XCors {
 	constructor(public opts: CorsOptions | undefined) {
 		if (opts === undefined) {
-			_corsStore.set(null);
+			$corsStore.set(null);
 		} else {
-			_corsStore.set(this);
+			$corsStore.set(this);
 		}
 	}
 
@@ -83,6 +83,6 @@ export class XCors {
 			),
 		};
 
-		_corsStore.set(this);
+		$corsStore.set(this);
 	}
 }

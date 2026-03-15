@@ -1,3 +1,3 @@
-import type { Route } from "@/Route/Route";
+import type { RouteInterface } from "@/Route/RouteInterface";
 
-export type AnyRoute = Route<string, any, any, any, any>;
+export type AnyRoute = RouteInterface<string, any, any, any, any>;
