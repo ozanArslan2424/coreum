@@ -1,7 +1,7 @@
 import type { AnyRouteModel } from "@/Model/types/AnyRouteModel";
 import type { RouteId } from "@/Route/types/RouteId";
 import type { RouterModelData } from "@/Router/types/RouterModelData";
-import { LazyMap } from "@/Store/LazyMap";
+import { LazyMap } from "@/utils/LazyMap";
 import { strRemoveWhitespace } from "@/utils/strRemoveWhitespace";
 import type { Func } from "@/utils/types/Func";
 

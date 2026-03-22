@@ -1,7 +1,7 @@
 import C from "@/index";
 import { describe, expect, it, spyOn } from "bun:test";
 import { RuntimeOptions } from "@/Config/enums/RuntimeOptions";
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 
 describe("C.Config", () => {
 	const undefinedKey = "undefined_env_var_key";
@@ -47,7 +47,7 @@ describe("C.Config", () => {
 	});
 
 	it("GET - UNDEFINED", () => {
-		const errorSpy = spyOn(internalLogger, "error");
+		const errorSpy = spyOn(log, "error");
 		expect(C.Config.get(undefinedKey)).toBeUndefined();
 		expect(errorSpy).toBeCalled();
 	});

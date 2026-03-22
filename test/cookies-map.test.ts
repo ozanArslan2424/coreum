@@ -1,4 +1,4 @@
-import { CookiesUsingMap } from "@/Cookies/CookiesUsingMap";
+import CookiesUsingMap from "@/Cookies/Cookies.node";
 import type { CookieOptions } from "@/Cookies/types/CookieOptions";
 import { describe, expect, it } from "bun:test";
 

@@ -25,6 +25,7 @@ export const CommonHeaders = {
 	Referer: "Referer",
 	/** Indicates whether the connection should be kept alive */
 	Connection: "Connection",
+	Upgrade: "Upgrade",
 	/** Used to specify directives that must be obeyed by caching mechanisms */
 	Pragma: "Pragma",
 	/** The date and time at which the message was sent */

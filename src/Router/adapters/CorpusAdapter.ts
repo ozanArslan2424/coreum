@@ -6,7 +6,7 @@ import type { RouteId } from "@/Route/types/RouteId";
 import type { RouterReturnData } from "@/Router/types/RouterReturnData";
 import type { CRequest } from "@/CRequest/CRequest";
 import { DynamicRoute } from "@/DynamicRoute/DynamicRoute";
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 
 export class CorpusAdapter implements RouterAdapterInterface {
 	// RouteId -> RouteRegistryData
@@ -73,25 +73,25 @@ export class CorpusAdapter implements RouterAdapterInterface {
 	checkPossibleCollision(n: RouterRouteData): boolean {
 		// Collision 1 — exact duplicate route id (same method + same endpoint)
 		const dupeMsg = (nId: string) =>
-			internalLogger.error(
+			log.error(
 				`Duplicate route detected. ${nId} has already been registered.`,
 			);
 
 		// Collision 2 — two param routes match the same URL space
 		const dynamicPatternMsg = (nId: string, oId: string) =>
-			internalLogger.error(
+			log.error(
 				`Ambiguous dynamic routes. ${nId} and ${oId} match the same URL patterns.`,
 			);
 
 		// Collision 3 — new param route's base matches an existing route
 		const baseDupeMsg = (nId: string, oId: string) =>
-			internalLogger.error(
+			log.error(
 				`Dynamic route overlaps existing route. ${nId} — dropping the last param segment matches ${oId}.`,
 			);
 
 		// Collision 4 — new route falls within an existing param route's URL space
 		const shadowMsg = (nId: string, oId: string) =>
-			internalLogger.error(
+			log.error(
 				`Route shadowed by existing dynamic route. ${nId} will be unreachable — ${oId} captures the same URL space.`,
 			);
 

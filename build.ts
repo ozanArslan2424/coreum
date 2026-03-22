@@ -1,15 +1,13 @@
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 import type { BuildConfig } from "bun";
 import dts from "bun-plugin-dts";
 
 async function build() {
 	try {
 		await Bun.$`rm -rf ./dist`.quiet();
-		internalLogger.log("🧹 Cleaned ./dist folder");
+		log.log("🧹 Cleaned ./dist folder");
 	} catch {
-		internalLogger.warn(
-			"⚠️  Could not clean ./dist folder (might not exist yet)",
-		);
+		log.warn("⚠️  Could not clean ./dist folder (might not exist yet)");
 	}
 
 	const defaultBuildConfig: BuildConfig = {
@@ -45,4 +43,4 @@ await build();
 
 const end = performance.now();
 const startup = end - start;
-internalLogger.log(`🚀 build function took ${startup.toFixed(2)}ms`);
+log.log(`🚀 build function took ${startup.toFixed(2)}ms`);

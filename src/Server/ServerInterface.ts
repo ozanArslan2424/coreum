@@ -3,13 +3,23 @@ import type { MaybePromise } from "@/utils/types/MaybePromise";
 import type { RequestHandler } from "@/Server/types/RequestHandler";
 import type { ServeArgs } from "@/Server/types/ServeArgs";
 import type { AfterResponseHandler } from "@/Server/types/AfterResponseHandler";
+import type { Func } from "@/utils/types/Func";
 
 export interface ServerInterface {
 	serve(options: ServeArgs): void;
 
 	close(): Promise<void>;
 
+	get routes(): Array<[string, string]>;
+
 	setGlobalPrefix(value: string): void;
+
+	listen(
+		port: ServeArgs["port"],
+		hostname?: ServeArgs["hostname"],
+	): Promise<void>;
+
+	handle(request: Request): Promise<Response>;
 
 	/**
 	 *
@@ -27,6 +37,7 @@ export interface ServerInterface {
 	 * ```
 	 */
 	setOnError(handler: ErrorHandler): void;
+	defaultErrorHandler: ErrorHandler;
 
 	/**
 	 *
@@ -37,17 +48,17 @@ export interface ServerInterface {
 	 * ```
 	 */
 	setOnNotFound(handler: RequestHandler): void;
+	defaultNotFoundHandler: RequestHandler;
 
-	setOnBeforeListen(handler: () => MaybePromise<void>): void;
+	setOnBeforeListen(handler: Func<[], MaybePromise<void>> | undefined): void;
+	defaultOnBeforeListen: Func<[], MaybePromise<void>> | undefined;
 
 	setOnBeforeClose(handler: () => MaybePromise<void>): void;
+	defaultOnBeforeClose: Func<[], MaybePromise<void>> | undefined;
 
-	setOnAfterResponse(handler: AfterResponseHandler): void;
+	setOnAfterResponse(handler: AfterResponseHandler | undefined): void;
+	defaultOnAfterResponse: AfterResponseHandler | undefined;
 
-	listen(
-		port: ServeArgs["port"],
-		hostname: ServeArgs["hostname"],
-	): Promise<void>;
-
-	handle(request: Request): Promise<Response>;
+	setOnPreflight(handler: RequestHandler): void;
+	defaultPreflightHandler: RequestHandler;
 }

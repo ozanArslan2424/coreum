@@ -2,7 +2,9 @@ import type { CookieOptions } from "@/Cookies/types/CookieOptions";
 import type { CookiesInit } from "@/Cookies/types/CookiesInit";
 
 export abstract class CookiesAbstract {
-	protected abstract map: Bun.CookieMap | Map<string, string>;
+	constructor(_?: CookiesInit) {}
+
+	protected abstract map: Iterable<[string, string]>;
 	abstract set(opts: CookieOptions): void;
 	abstract get(name: string): string | null;
 	abstract has(name: string): boolean;

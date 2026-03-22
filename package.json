@@ -31,7 +31,8 @@
 	"scripts": {
 		"fm": "bunx --bun prettier --write .",
 		"lint": "bunx oxlint -c ./.oxlintrc.json --fix",
-		"build": "bun run build.ts"
+		"build": "bun run build.ts",
+		"serve-test": "bun run test/other/test-server.ts"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.3.9",

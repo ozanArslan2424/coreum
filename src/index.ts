@@ -1,6 +1,6 @@
-import { GlobalPrefixStore } from "@/Store/globals/GlobalPrefixStore";
-import { GlobalRouterStore } from "@/Store/globals/GlobalRouterStore";
-import { GlobalCorsStore } from "@/Store/globals/GlobalCorsStore.js";
+import { GlobalPrefixStore } from "@/store/GlobalPrefixStore.js";
+import { GlobalRouterStore } from "@/store/GlobalRouterStore.js";
+import { GlobalCorsStore } from "@/store/GlobalCorsStore.js";
 import * as C from "@/C";
 import * as X from "@/X";
 

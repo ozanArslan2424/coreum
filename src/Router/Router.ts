@@ -9,13 +9,15 @@ import type { Middleware } from "@/Middleware/Middleware";
 import { ModelRegistry } from "@/Router/registries/ModelRegistry";
 import { MiddlewareRegistry } from "@/Router/registries/MiddlewareRegistry";
 import type { RouteId } from "@/Route/types/RouteId";
+import { WebSocketRoute } from "@/WebSocketRoute/WebSocketRoute";
+import type { RouterReturnData } from "@/Router/types/RouterReturnData";
 
 export class Router {
 	constructor(private adapter: RouterAdapterInterface = new CorpusAdapter()) {}
 
 	private modelRegistry = new ModelRegistry();
 	private middlewareRegistry = new MiddlewareRegistry();
-	private cache = new WeakMap<CRequest, Func<[Context], Promise<CResponse>>>();
+	private cache = new WeakMap<CRequest, RouterReturnData>();
 
 	addMiddleware(middleware: Middleware): void {
 		this.middlewareRegistry.add(middleware);
@@ -39,12 +41,15 @@ export class Router {
 		}
 	}
 
-	findRouteHandler(req: CRequest): Func<[Context], Promise<CResponse>> | null {
-		const match = this.adapter.find(req);
+	findRouteHandler(
+		req: CRequest,
+	): Func<[Context], Promise<CResponse | WebSocketRoute>> | null {
+		const match = this.cache.get(req) ?? this.adapter.find(req);
 		if (!match) return null;
+		this.cache.set(req, match);
 		const model = this.modelRegistry.find(match.route.id);
 		const middleware = this.middlewareRegistry.find(match.route.id);
-		const handler: Func<[Context], Promise<CResponse>> = async (ctx) => {
+		return async (ctx) => {
 			await middleware(ctx);
 			await Context.appendParsedData(
 				ctx,
@@ -54,12 +59,14 @@ export class Router {
 				model,
 			);
 			const result = await match.route.handler(ctx);
-			return result instanceof CResponse
-				? result
-				: new CResponse(result, ctx.res);
+			if (result instanceof WebSocketRoute) {
+				return result;
+			}
+			if (result instanceof CResponse) {
+				return result;
+			}
+			return new CResponse(result, ctx.res);
 		};
-		this.cache.set(req, handler);
-		return handler;
 	}
 
 	getRouteList(): Array<[string, string]> {

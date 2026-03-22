@@ -1,4 +1,4 @@
-import { CookiesUsingBun } from "@/Cookies/CookiesUsingBun";
+import CookiesUsingBun from "@/Cookies/Cookies.bun";
 import type { CookieOptions } from "@/Cookies/types/CookieOptions";
 import { describe, expect, it } from "bun:test";
 

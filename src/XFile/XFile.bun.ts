@@ -1,7 +1,10 @@
 import { XFileAbstract } from "@/XFile/XFileAbstract";
 import type { XFileInterface } from "@/XFile/XFileInterface";
 
-export class XFileUsingBun extends XFileAbstract implements XFileInterface {
+export default class XFileUsingBun
+	extends XFileAbstract
+	implements XFileInterface
+{
 	constructor(...args: ConstructorParameters<typeof XFileAbstract>) {
 		super(...args);
 		this.file = Bun.file(args[0]);

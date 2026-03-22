@@ -1,3 +1,4 @@
+import { log } from "@/utils/internalLogger";
 import type { RateLimitStoreInterface } from "@/XRateLimiter/stores/RateLimitStoreInterface";
 import type { RateLimitEntry } from "@/XRateLimiter/types/RateLimitEntry";
 import crypto from "crypto";
@@ -9,20 +10,14 @@ export class RateLimiterFileStore implements RateLimitStoreInterface {
 	private readonly storeDir: string;
 	private locks = new Map<string, Promise<void>>();
 
-	constructor(
-		storeDir?: string,
-		private readonly logger: Pick<typeof console, "log" | "error"> = console,
-	) {
+	constructor(storeDir?: string) {
 		this.storeDir = storeDir || path.join(os.tmpdir(), "rate-limit-store");
 		this.ensureStoreDir();
 	}
 
 	private ensureStoreDir() {
 		fs.mkdir(this.storeDir, { recursive: true }).catch((err) => {
-			this.logger.error(
-				"Rate Limit File Store Directory could not be created:",
-				err,
-			);
+			log.error("Rate Limit File Store Directory could not be created:", err);
 		});
 	}
 

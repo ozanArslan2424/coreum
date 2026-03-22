@@ -2,7 +2,10 @@ import { XFileAbstract } from "@/XFile/XFileAbstract";
 import type { XFileInterface } from "@/XFile/XFileInterface";
 import fs from "node:fs";
 
-export class XFileUsingNode extends XFileAbstract implements XFileInterface {
+export default class XFileUsingNode
+	extends XFileAbstract
+	implements XFileInterface
+{
 	async exists(): Promise<boolean> {
 		return fs.existsSync(this.path);
 	}

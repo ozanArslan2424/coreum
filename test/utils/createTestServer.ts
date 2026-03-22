@@ -1,5 +1,5 @@
 import C from "@/index";
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 
 export function createTestServer(
 	opts?: C.ServerOptions & { withLogging?: boolean },
@@ -11,12 +11,12 @@ export function createTestServer(
 
 	if (withLogging === true) {
 		s.setOnError((err) => {
-			internalLogger.error("thrown error", err);
+			log.error("thrown error", err);
 			return s.defaultErrorHandler(err);
 		});
 
 		s.setOnNotFound((req) => {
-			internalLogger.error("not found request", req);
+			log.error("not found request", req);
 			return s.defaultNotFoundHandler(req);
 		});
 	}

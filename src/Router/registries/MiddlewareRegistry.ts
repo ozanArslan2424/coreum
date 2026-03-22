@@ -4,7 +4,7 @@ import type { Middleware } from "@/Middleware/Middleware";
 import { DynamicRoute } from "@/DynamicRoute/DynamicRoute";
 import type { RouteId } from "@/Route/types/RouteId";
 import type { RouterMiddlewareData } from "@/Router/types/RouterMiddlewareData";
-import { LazyMap } from "@/Store/LazyMap";
+import { LazyMap } from "@/utils/LazyMap";
 import { compile } from "@/utils/compile";
 import type { Func } from "@/utils/types/Func";
 

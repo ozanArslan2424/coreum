@@ -6,11 +6,11 @@ import { strAfterMark } from "@/utils/strAfterMark";
 import { strBeforeMark } from "@/utils/strBeforeMark";
 import { strCapitalize } from "@/utils/strCapitalize";
 import { strSplit } from "@/utils/strSplit";
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 
-export class CookiesUsingMap extends CookiesAbstract {
+export default class CookiesUsingMap extends CookiesAbstract {
 	constructor(init?: CookiesInit) {
-		super();
+		super(init);
 		this.applyInit(init);
 	}
 
@@ -103,17 +103,13 @@ export class CookiesUsingMap extends CookiesAbstract {
 			if (part.includes("=")) {
 				const [key, val] = strSplit("=", part, 2);
 				if (!key || !keyMap[key]) {
-					internalLogger.warn(
-						`cookie extracting and ${key} is not a cookie key`,
-					);
+					log.warn(`cookie extracting and ${key} is not a cookie key`);
 					continue;
 				}
 				opts[keyMap[key]] = val;
 			} else {
 				if (!keyMap[part]) {
-					internalLogger.warn(
-						`cookie extracting and ${part} is not a cookie key`,
-					);
+					log.warn(`cookie extracting and ${part} is not a cookie key`);
 					continue;
 				}
 				opts[keyMap[part]] = true;

@@ -18,10 +18,12 @@ export class CRequest extends Request {
 		this.headers = this.resolveHeaders();
 		this.cookies = this.resolveCookies();
 		this.isPreflight = this.resolveIsPreflight();
+		this.isWebsocket = this.resolveIsWebsocketUpgrade();
 	}
 
 	readonly urlObject: URL;
 	readonly isPreflight: boolean;
+	readonly isWebsocket: boolean;
 	readonly cookies: Cookies;
 	override headers: CHeaders;
 
@@ -83,9 +85,17 @@ export class CRequest extends Request {
 	}
 
 	private resolveIsPreflight() {
-		const accessControlRequestMethodHeader = this.headers.has(
-			CommonHeaders.AccessControlRequestMethod,
+		return (
+			this.method === Method.OPTIONS &&
+			this.headers.has(CommonHeaders.AccessControlRequestMethod)
 		);
-		return this.method === Method.OPTIONS && accessControlRequestMethodHeader;
+	}
+
+	private resolveIsWebsocketUpgrade() {
+		const isUpgrade =
+			this.headers.get(CommonHeaders.Connection)?.toLowerCase() === "upgrade";
+		const isWebsocket =
+			this.headers.get(CommonHeaders.Upgrade)?.toLowerCase() === "websocket";
+		return isUpgrade && isWebsocket;
 	}
 }

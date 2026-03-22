@@ -3,7 +3,7 @@ import { describe, expect, it, spyOn } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 import { RouteVariant } from "@/Route/enums/RouteVariant";
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 
 const s = createTestServer();
 
@@ -122,7 +122,7 @@ describe("C.StaticRoute", () => {
 	// ─── not found ────────────────────────────────────────────────
 
 	it("RETURNS 404 WHEN FILE DOES NOT EXIST", async () => {
-		const errorSpy = spyOn(internalLogger, "error");
+		const errorSpy = spyOn(log, "error");
 		new C.StaticRoute("/sr-missing", f("does-not-exist.html"));
 		const res = await s.handle(req("/sr-missing"));
 		expect(res.status).toBe(404);

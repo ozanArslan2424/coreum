@@ -42,7 +42,7 @@ import { XFile } from "@/XFile/XFile";
 export class CResponse<R = unknown> {
 	constructor(
 		public data?: CResponseBody<R>,
-		protected readonly init?: CResponseInit,
+		protected readonly init?: CResponseInit | CResponse,
 	) {
 		this.cookies = this.resolveCookies();
 		this.headers = this.resolveHeaders();
@@ -218,7 +218,9 @@ export class CResponse<R = unknown> {
 	}
 
 	private resolveCookies(): Cookies {
-		return new Cookies(this.init?.cookies);
+		return this.init?.cookies instanceof Cookies
+			? this.init.cookies
+			: new Cookies(this.init?.cookies);
 	}
 
 	private resolveHeaders(): CHeaders {

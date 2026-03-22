@@ -1,8 +1,8 @@
 import { Config } from "@/Config/Config";
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 
 export function testDebug(...data: any[]) {
 	if (Config.nodeEnv !== "test") return;
 
-	internalLogger.log("[TEST DEBUG]: ", ...data);
+	log.log("[TEST DEBUG]: ", ...data);
 }

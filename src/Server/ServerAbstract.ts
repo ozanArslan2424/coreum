@@ -13,7 +13,8 @@ import type { AfterResponseHandler } from "@/Server/types/AfterResponseHandler";
 import { Router } from "@/Router/Router";
 import type { Func } from "@/utils/types/Func";
 import type { ServerOptions } from "@/Server/types/ServerOptions";
-import { internalLogger } from "@/utils/internalLogger";
+import { log, logFatal } from "@/utils/internalLogger";
+import { WebSocketRoute } from "@/WebSocketRoute/WebSocketRoute";
 
 export abstract class ServerAbstract implements ServerInterface {
 	abstract serve(options: ServeArgs): void;
@@ -39,51 +40,81 @@ export abstract class ServerAbstract implements ServerInterface {
 			process.on("SIGINT", () => this.close());
 			process.on("SIGTERM", () => this.close());
 
-			internalLogger.log(`Listening on ${hostname}:${port}`);
+			log.log(`Listening on ${hostname}:${port}`);
 
 			await this.handleBeforeListen?.();
 			this.serve({
 				port,
 				hostname,
-				fetch: (r) => this.handle(r),
 			});
 		} catch (err) {
-			internalLogger.error("Server unable to start:", err);
+			log.error("Server unable to start:", err);
 			await this.close();
 		}
 	}
 
 	async handle(request: Request): Promise<Response> {
 		const req = new CRequest(request);
-		let res = await this.getResponse(req);
-		const cors = $corsStore.get();
-		if (cors !== null) {
-			cors.apply(req, res);
+		const handled = await this.handleRequest(req, () => undefined);
+		if (!handled) {
+			logFatal("WebSocket requests cannot be handled with this method.");
 		}
-		if (this.handleAfterResponse) {
-			res = await this.handleAfterResponse(res);
-		}
-		return res.response;
+		return handled;
 	}
 
-	private async getResponse(req: CRequest): Promise<CResponse> {
+	protected async handleRequest(
+		req: CRequest,
+		onUpgrade: Func<[WebSocketRoute], undefined>,
+	): Promise<Response | undefined> {
+		let res: CResponse;
+
 		try {
 			if (req.isPreflight) {
-				return await this.handlePreflight(req);
+				// preflight for cors
+				res = await this.handlePreflight(req);
+			} else {
+				// get router
+				const router = $routerStore.get();
+				// get route handler
+				const handleFound = router.findRouteHandler(req);
+				// create context for middleware
+				const ctx = Context.makeFromRequest(req);
+				// get global middleware
+				const handleGlobalMiddleware = router.findMiddleware("*");
+				// handleGlobalMiddleware
+				await handleGlobalMiddleware(ctx);
+				// handleFound
+				const result = await handleFound?.(ctx);
+				if (result instanceof WebSocketRoute && req.isWebsocket) {
+					// ws requests return undefined
+					return onUpgrade(result);
+				} else if (result instanceof CResponse) {
+					// http request
+					res = result;
+				} else {
+					// nothing found
+					res = await this.handleNotFound(req);
+				}
 			}
-
-			const router = $routerStore.get();
-			const ctx = Context.makeFromRequest(req);
-			const globalMiddleware = router.findMiddleware("*");
-			await globalMiddleware(ctx);
-			const handler = router.findRouteHandler(req);
-			if (handler) {
-				return await handler(ctx);
-			}
-			return await this.handleNotFound(req);
 		} catch (err) {
-			return await this.handleError(err as Error);
+			// handle any thrown error
+			res = await this.handleError(err as Error);
 		}
+
+		// get cors config
+		const cors = $corsStore.get();
+		if (cors !== null) {
+			// apply cors config
+			cors.apply(req, res);
+		}
+
+		if (this.handleAfterResponse) {
+			// apply response transformation
+			res = await this.handleAfterResponse(res);
+		}
+
+		// return regular web response
+		return res.response;
 	}
 
 	protected handleBeforeListen: Func<[], MaybePromise<void>> | undefined;

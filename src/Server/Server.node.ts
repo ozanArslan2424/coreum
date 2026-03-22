@@ -1,8 +1,9 @@
 import { Config } from "@/Config/Config";
+import { CRequest } from "@/CRequest/CRequest";
 import { Method } from "@/CRequest/enums/Method";
 import { ServerAbstract } from "@/Server/ServerAbstract";
 import type { ServeArgs } from "@/Server/types/ServeArgs";
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 import http from "node:http";
 import https from "node:https";
 
@@ -10,17 +11,17 @@ type ServerAppUsingNode =
 	| http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 	| https.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
 
-export class ServerUsingNode extends ServerAbstract {
+export default class ServerUsingNode extends ServerAbstract {
 	private app: ServerAppUsingNode | undefined;
 
 	serve(args: ServeArgs): void {
-		this.app = this.createApp(args);
+		this.app = this.createApp();
 		this.app.listen(args.port, args.hostname);
 	}
 
 	async close(): Promise<void> {
 		await this.handleBeforeClose?.();
-		internalLogger.log("Closing...");
+		log.log("Closing...");
 
 		this.app?.close();
 		this.app?.closeAllConnections();
@@ -31,7 +32,7 @@ export class ServerUsingNode extends ServerAbstract {
 		}
 	}
 
-	private createApp(options: ServeArgs): ServerAppUsingNode {
+	private createApp(): ServerAppUsingNode {
 		const handler = async (
 			incomingMessage: http.IncomingMessage,
 			serverResponse: http.ServerResponse,
@@ -41,9 +42,13 @@ export class ServerUsingNode extends ServerAbstract {
 			const method = this.getMethod(incomingMessage);
 			const headers = this.getHeaders(incomingMessage);
 			const request = this.getRequest(url, method, headers, body);
-			const response = await options.fetch(request);
-			const data = await this.getData(response);
+			const req = new CRequest(request);
+			const response = await this.handleRequest(req, () => undefined);
+			if (!response) {
+				return undefined;
+			}
 
+			const data = await this.getData(response);
 			serverResponse.statusCode = response.status;
 			serverResponse.setHeaders(response.headers);
 			serverResponse.end(Buffer.from(data));

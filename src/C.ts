@@ -48,6 +48,8 @@ export type { StaticRouteHandler } from "./StaticRoute/types/StaticRouteHandler"
 export { StaticRouteAbstract } from "./StaticRoute/StaticRouteAbstract";
 export { StaticRoute } from "./StaticRoute/StaticRoute";
 
+export { WebSocketRoute } from "./WebSocketRoute/WebSocketRoute";
+
 export type { ServerOptions } from "./Server/types/ServerOptions";
 export type { ServeArgs } from "./Server/types/ServeArgs";
 export { Server } from "./Server/Server";

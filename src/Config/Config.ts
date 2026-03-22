@@ -1,7 +1,7 @@
 import { RuntimeOptions } from "@/Config/enums/RuntimeOptions";
 import type { ConfigEnvKey } from "@/Config/types/ConfigEnvKey";
 import type { ConfigValueParser } from "@/Config/types/ConfigValueParser";
-import { internalLogger } from "@/utils/internalLogger";
+import { log } from "@/utils/internalLogger";
 import { strIsDefined } from "@/utils/strIsDefined";
 import type { OrString } from "@/utils/types/OrString";
 import path from "path";
@@ -16,7 +16,7 @@ export class Config {
 			return RuntimeOptions.node;
 		}
 
-		internalLogger.warn(
+		log.warn(
 			"⚠️ Runtime isn't Bun or NodeJS. Features may not be available. App might not start.",
 		);
 		return "unknown";
@@ -33,7 +33,7 @@ export class Config {
 			case RuntimeOptions.node:
 				return process.env;
 			default:
-				internalLogger.warn(
+				log.warn(
 					"⚠️ process.env wasn't available. Your environment variables are in memory.",
 				);
 				return {};
@@ -62,7 +62,7 @@ export class Config {
 			return opts?.fallback;
 		}
 
-		internalLogger.warn(`${key} doesn't exist in env`);
+		log.warn(`${key} doesn't exist in env`);
 		return undefined as T;
 	}
 

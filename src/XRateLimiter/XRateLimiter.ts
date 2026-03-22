@@ -13,12 +13,10 @@ import { CommonHeaders } from "@/CHeaders/enums/CommonHeaders";
 import { Middleware } from "@/Middleware/Middleware";
 import { XCors } from "@/XCors/XCors";
 import { $corsStore } from "@/index";
+import { logFatal } from "@/utils/internalLogger";
 
 export class XRateLimiter {
-	constructor(
-		config: Partial<RateLimitConfig> = {},
-		private readonly logger?: Pick<typeof console, "log" | "error">,
-	) {
+	constructor(config: Partial<RateLimitConfig> = {}) {
 		this.config = { ...this.defaultConfig, ...config };
 		this.store = this.resolveStore();
 		this.storedSalt = this.getRandomBytes();
@@ -74,13 +72,6 @@ export class XRateLimiter {
 		if (allowed) {
 			return { headers: responseHeaders, success: true };
 		}
-
-		this.logger?.error("RATE_LIMIT_HIT", {
-			prefix: id.charAt(0),
-			timestamp: now,
-			remaining,
-			resetIn: Math.ceil((entry.resetAt - now) / 1000),
-		});
 
 		return { headers: responseHeaders, success: false };
 	}
@@ -154,9 +145,6 @@ export class XRateLimiter {
 		if (Date.now() > this.saltRotatesAt) {
 			this.storedSalt = this.getRandomBytes();
 			this.saltRotatesAt = Date.now() + this.config.saltRotateMs;
-			this.logger?.log("RATE_LIMIT_SALT_ROTATED", {
-				nextRotation: new Date(this.saltRotatesAt).toISOString(),
-			});
 		}
 		return this.storedSalt;
 	}
@@ -170,14 +158,11 @@ export class XRateLimiter {
 		if (shouldClean) await this.cleanStore();
 	}
 
-	private async cleanStore(): Promise<void> {
+	private async cleanStore(): Promise<number> {
 		const now = Date.now();
 		await this.store.cleanup(now);
 
-		const remainingSize = await this.store.size();
-		this.logger?.log("STORE_CLEANUP_COMPLETED", {
-			remainingEntries: remainingSize,
-		});
+		return await this.store.size();
 	}
 
 	private hash(data: string, len: number): string {
@@ -190,7 +175,6 @@ export class XRateLimiter {
 
 	async clearStore(): Promise<void> {
 		await this.store.clear();
-		this.logger?.log("STORE_CLEARED");
 	}
 
 	async getStoreSize(): Promise<number> {
@@ -215,11 +199,10 @@ export class XRateLimiter {
 	private resolveStore(): RateLimitStoreInterface {
 		switch (this.config.storeType) {
 			case "file":
-				return new RateLimiterFileStore(this.config.storeDir, this.logger);
+				return new RateLimiterFileStore(this.config.storeDir);
 			case "redis":
 				if (!this.config.redisClient) {
-					this.logger?.error("Redis client required for redis store type");
-					process.exit(1);
+					logFatal("Redis client required for redis store type");
 				}
 				return new RateLimiterRedisStore(this.config.redisClient);
 			case "memory":
