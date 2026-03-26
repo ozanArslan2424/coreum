@@ -1,6 +1,5 @@
 import { Controller } from "@/Controller/Controller";
 import { DynamicRoute } from "@/Route/DynamicRoute";
-import type { RouterMiddlewareData } from "@/Router/types/RouterMiddlewareData";
 import { LazyMap } from "@/utils/LazyMap";
 import { compile } from "@/utils/compile";
 import type { MiddlewareInterface } from "@/Middleware/MiddlwareInterface";
@@ -8,38 +7,35 @@ import { MiddlewareVariant } from "@/Middleware/enums/MiddlewareVariant";
 import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";
 
 export class MiddlewareRegistry {
-	// RouteId | "*" -> RouterMiddlewareData
-	private middlewares = new LazyMap<string, RouterMiddlewareData>();
+	private inboundMiddlewares = new LazyMap<string, Array<MiddlewareHandler>>();
+	private outboundMiddlewares = new LazyMap<string, Array<MiddlewareHandler>>();
 
 	add(middleware: MiddlewareInterface): void {
 		const resolved = MiddlewareRegistry.resolveRouteIds(middleware);
+		const map =
+			resolved.variant === MiddlewareVariant.inbound
+				? this.inboundMiddlewares
+				: this.outboundMiddlewares;
 
 		if (resolved.isGlobal) {
-			const existing = this.middlewares.get("*") ?? [];
-			this.middlewares.set("*", [...existing, middleware]);
+			const existing = map.get("*") ?? [];
+			map.set("*", [...existing, middleware.handler]);
 			return;
 		}
 
 		for (const routeId of resolved.routeIds) {
-			const existing = this.middlewares.get(routeId) ?? [];
-			this.middlewares.set(routeId, [...existing, middleware]);
+			const existing = map.get(routeId) ?? [];
+			map.set(routeId, [...existing, middleware.handler]);
 		}
 	}
 
-	find(routeId: string | "*"): {
+	find(routeId: string): {
 		inbound: MiddlewareHandler;
 		outbound: MiddlewareHandler;
 	} {
-		const arr = this.middlewares.get(routeId) ?? [];
-		const inbound = arr
-			.filter((m) => m.variant === MiddlewareVariant.inbound)
-			.map((m) => m.handler);
-		const outbound = arr
-			.filter((m) => m.variant === MiddlewareVariant.outbound)
-			.map((m) => m.handler);
 		return {
-			inbound: compile(inbound),
-			outbound: compile(outbound),
+			inbound: compile(this.inboundMiddlewares.get(routeId) ?? []),
+			outbound: compile(this.outboundMiddlewares.get(routeId) ?? []),
 		};
 	}
 
@@ -48,8 +44,10 @@ export class MiddlewareRegistry {
 	/** Returns a discriminated union — isGlobal true means useOn was "*" */
 	static resolveRouteIds(
 		m: MiddlewareInterface,
-	): { isGlobal: true } | { isGlobal: false; routeIds: string[] } {
-		if (m.useOn === "*") return { isGlobal: true };
+	):
+		| { isGlobal: true; variant: MiddlewareVariant }
+		| { isGlobal: false; routeIds: string[]; variant: MiddlewareVariant } {
+		if (m.useOn === "*") return { isGlobal: true, variant: m.variant };
 
 		const targets = Array.isArray(m.useOn) ? m.useOn : [m.useOn];
 		const routeIds: string[] = [];
@@ -62,6 +60,6 @@ export class MiddlewareRegistry {
 			}
 		}
 
-		return { isGlobal: false, routeIds };
+		return { isGlobal: false, routeIds, variant: m.variant };
 	}
 }

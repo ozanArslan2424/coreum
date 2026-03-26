@@ -2,12 +2,13 @@ import type { Func } from "@/utils/types/Func";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
 
 export function compile<F extends Func>(
-	fns: (F | undefined)[],
-): Func<Parameters<F>, MaybePromise<void>> {
+	fns: Array<F | undefined>,
+): Func<Parameters<F>, MaybePromise<Awaited<ReturnType<F>> | void>> {
 	return async (...args: Parameters<F>) => {
 		for (const fn of fns) {
 			if (!fn) continue;
-			await fn(...args);
+			const result = await fn(...args);
+			if (result !== undefined) return result;
 		}
 	};
 }

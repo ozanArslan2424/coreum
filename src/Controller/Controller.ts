@@ -53,22 +53,15 @@ export abstract class Controller {
 	>(
 		...args: ConstructorParameters<typeof DynamicRoute<E, B, S, P, R>>
 	): DynamicRoute<E, B, S, P, R> {
-		let [definition, handler, model] = args;
-
-		if (typeof definition === "string") {
-			definition = {
-				method: Method.GET,
-				path: joinPathSegments<E>(this.prefix, definition),
-			};
-		}
-
-		definition = {
-			method: definition.method,
-			path: joinPathSegments(this.prefix, definition.path),
-		};
+		const [def, handler, model] = args;
+		const method = typeof def === "string" ? Method.GET : def.method;
+		const path = joinPathSegments<E>(
+			this.prefix,
+			typeof def === "string" ? def : def.path,
+		);
 
 		const route = new DynamicRoute(
-			definition,
+			{ method, path },
 			async (ctx) => {
 				await this.beforeEach?.(ctx);
 				return handler(ctx);

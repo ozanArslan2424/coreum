@@ -11,7 +11,7 @@ import type { RouterRouteData } from "@/Router/types/RouterRouteData";
 import type { RouteModel } from "@/Model/types/RouteModel";
 import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";
 import type { Middleware } from "@/Middleware/Middleware";
-import type { RouteInterface } from "@/index";
+import type { RouteInterface } from "@/Route/RouteInterface";
 import { objGetKeys } from "@/utils/objGetKeys";
 
 export class Router {
@@ -25,7 +25,7 @@ export class Router {
 		this.middlewareRegistry.add(middleware);
 	}
 
-	findMiddleware(id: string | "*"): {
+	findMiddleware(id: string): {
 		inbound: MiddlewareHandler;
 		outbound: MiddlewareHandler;
 	} {

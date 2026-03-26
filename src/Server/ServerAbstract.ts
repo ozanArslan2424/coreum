@@ -70,135 +70,51 @@ export abstract class ServerAbstract implements ServerInterface {
 				return await this.handlePreflight(req);
 			}
 
-			const res = await this.handleMiddleware(
-				Context.makeFromRequest(req),
-				"*",
-				async (ctx1) => {
-					const match = $routerStore.get().findRoute(req);
-					if (!match) {
-						return await this.handleNotFound(req);
-					} else {
-						return await this.handleMiddleware(
-							ctx1,
-							match.route.id,
-							async (ctx2) => {
-								await Context.appendParsedData(ctx2, req, match);
-								const result = await match.route.handler(ctx2);
-								if (result instanceof WebSocketRoute && req.isWebsocket) {
-									// ws requests return undefined
-									return onUpgrade(result);
-								} else if (result instanceof CResponse) {
-									return result;
-								} else {
-									return new CResponse(result, ctx2.res);
-								}
-							},
-						);
-					}
-				},
-			);
+			const router = $routerStore.get();
+			const ctx = Context.makeFromRequest(req);
+			// gmw = global middlewares
+			const gmw = router.findMiddleware("*");
 
-			return res;
+			const gmwir = await gmw.inbound(ctx);
+			if (gmwir instanceof CResponse) {
+				return gmwir;
+			}
+
+			const match = router.findRoute(req);
+			if (!match) {
+				ctx.res = await this.handleNotFound(req);
+			} else {
+				// lmw = local middlewares
+				const lmw = router.findMiddleware(match.route.id);
+
+				const lmwir = await lmw.inbound(ctx);
+				if (lmwir instanceof CResponse) {
+					return lmwir;
+				}
+
+				await Context.appendParsedData(ctx, req, match);
+				const mr = await match.route.handler(ctx);
+				if (mr instanceof WebSocketRoute && req.isWebsocket) {
+					return onUpgrade(mr);
+				} else {
+					ctx.res = mr instanceof CResponse ? mr : new CResponse(mr, ctx.res);
+				}
+
+				const lmwor = await lmw.outbound(ctx);
+				if (lmwor instanceof CResponse) {
+					return lmwor;
+				}
+			}
+
+			const gmwor = await gmw.outbound(ctx);
+			if (gmwor instanceof CResponse) {
+				return gmwor;
+			}
+
+			return ctx.res;
 		} catch (err) {
 			return await this.handleError(err as Error);
 		}
-	}
-
-	// async handleRequest(
-	// 	req: CRequest,
-	// 	onUpgrade: Func<[WebSocketRoute], undefined>,
-	// ): Promise<CResponse | undefined> {
-	// 	try {
-	// 		if (req.isPreflight) {
-	// 			log.debug("returned on req.isPreflight");
-	// 			return await this.handlePreflight(req);
-	// 		}
-	//
-	// 		const router = $routerStore.get();
-	//
-	// 		const ctx = Context.makeFromRequest(req);
-	//
-	// 		// gmw = global middlewares
-	// 		const gmw = router.findMiddleware("*");
-	// 		const gmwInboundResult = await gmw.inbound(ctx);
-	// 		if (gmwInboundResult instanceof CResponse) {
-	// 			log.debug("returned on gmwInboundResult");
-	// 			return gmwInboundResult;
-	// 		}
-	//
-	// 		const match = router.findRoute(req);
-	// 		if (!match) {
-	// 			log.debug("res from not found");
-	// 			ctx.res = await this.handleNotFound(req);
-	// 		} else {
-	// 			// lmw = local middlewares
-	// 			const lmw = router.findMiddleware(match.route.id);
-	//
-	// 			const lmwInboundResult = await lmw.inbound(ctx);
-	// 			if (lmwInboundResult instanceof CResponse) {
-	// 				log.debug("returned on lmwInboundResult");
-	// 				return lmwInboundResult;
-	// 			}
-	//
-	// 			await Context.appendParsedData(ctx, req, match);
-	// 			const result = await match.route.handler(ctx);
-	// 			if (result instanceof WebSocketRoute && req.isWebsocket) {
-	// 				// ws requests return undefined
-	// 				log.debug("returned on onUpgrade");
-	// 				return onUpgrade(result);
-	// 			} else {
-	// 				log.debug("res from route");
-	// 				ctx.res =
-	// 					result instanceof CResponse
-	// 						? result
-	// 						: new CResponse(result, ctx.res);
-	// 			}
-	//
-	// 			const lmwOutboundResult = await lmw.outbound(ctx);
-	// 			if (lmwOutboundResult instanceof CResponse) {
-	// 				log.debug("returned on lmwOutboundResult");
-	// 				return lmwOutboundResult;
-	// 			}
-	// 		}
-	//
-	// 		const gmwOutboundResult = await gmw.outbound(ctx);
-	// 		if (gmwOutboundResult instanceof CResponse) {
-	// 			log.debug("returned on gmwOutboundResult");
-	// 			return gmwOutboundResult;
-	// 		}
-	//
-	// 		return ctx.res;
-	// 	} catch (err) {
-	// 		log.debug("returned on handleError");
-	// 		return await this.handleError(err as Error);
-	// 	}
-	// }
-	//
-	protected async handleMiddleware(
-		ctx: Context,
-		id: string | "*",
-		cb: Func<[Context], MaybePromise<CResponse | undefined>>,
-	): Promise<CResponse | undefined> {
-		const mw = $routerStore.get().findMiddleware(id);
-		const mwInboundResult = await mw.inbound(ctx);
-		if (mwInboundResult instanceof CResponse) {
-			log.debug("returned on mwInboundResult");
-			return mwInboundResult;
-		}
-
-		const cbResult = await cb(ctx);
-		if (!cbResult) {
-			return cbResult;
-		}
-
-		ctx.res = cbResult;
-		const mwOutboundResult = await mw.outbound(ctx);
-		if (mwOutboundResult instanceof CResponse) {
-			log.debug("returned on mwOutboundResult");
-			return mwOutboundResult;
-		}
-
-		return ctx.res;
 	}
 
 	protected handleBeforeListen: Func<[], MaybePromise<void>> | undefined;

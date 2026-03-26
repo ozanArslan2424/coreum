@@ -6,53 +6,53 @@ import { req } from "./utils/req";
 import { beforeEach } from "node:test";
 import { log } from "@/utils/internalLogger";
 
-const s = createTestServer();
-const middlewareData = "Hello";
-const overrideData = "world";
-const logSpy = spyOn(log, "log");
-beforeEach(() => logSpy.mockClear());
-
-const r1 = new C.Route("/r1", (c) => c.data);
-new C.Route("r2", (c) => c.data);
-const c1 = createTestController("c1");
-new C.Middleware({
-	useOn: [r1, c1.cr1],
-	handler: (c) => {
-		c.data = middlewareData;
-	},
-});
-
-const r3 = new C.Route("/r3", (c) => c.data);
-new C.Middleware({
-	useOn: [r3],
-	handler: (c) => {
-		c.data = { user: "john", role: "admin", count: 1 };
-	},
-});
-
-const r4 = new C.Route("/r4", (c) => c.data);
-new C.Middleware({
-	useOn: [r4],
-	handler: (c) => {
-		c.data = { user: "john", role: "admin", count: 1 };
-	},
-});
-new C.Middleware({
-	useOn: [r4],
-	handler: (c) => {
-		(c.data as Record<string, unknown>).role = "superadmin";
-		(c.data as Record<string, unknown>).count = 2;
-	},
-});
-
-new C.Middleware({
-	useOn: "*",
-	handler: (c) => {
-		log.log(c.url.pathname);
-	},
-});
-
 describe("C.Middleware", () => {
+	const s = createTestServer();
+	const middlewareData = "Hello";
+	const overrideData = "world";
+	const logSpy = spyOn(log, "log");
+	beforeEach(() => logSpy.mockClear());
+
+	const r1 = new C.Route("/r1", (c) => c.data);
+	new C.Route("r2", (c) => c.data);
+	const c1 = createTestController("c1");
+	new C.Middleware({
+		useOn: [r1, c1.cr1],
+		handler: (c) => {
+			c.data = middlewareData;
+		},
+	});
+
+	const r3 = new C.Route("/r3", (c) => c.data);
+	new C.Middleware({
+		useOn: [r3],
+		handler: (c) => {
+			c.data = { user: "john", role: "admin", count: 1 };
+		},
+	});
+
+	const r4 = new C.Route("/r4", (c) => c.data);
+	new C.Middleware({
+		useOn: [r4],
+		handler: (c) => {
+			c.data = { user: "john", role: "admin", count: 1 };
+		},
+	});
+	new C.Middleware({
+		useOn: [r4],
+		handler: (c) => {
+			(c.data as Record<string, unknown>).role = "superadmin";
+			(c.data as Record<string, unknown>).count = 2;
+		},
+	});
+
+	new C.Middleware({
+		useOn: "*",
+		handler: (c) => {
+			log.log(c.url.pathname);
+		},
+	});
+
 	it("ROUTE - APPLIES TO REGISTERED ROUTE", async () => {
 		const res = await s.handle(req("/r1"));
 		const data = await X.Parser.parseBody<string>(res);
