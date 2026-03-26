@@ -1,10 +1,10 @@
 import { Method } from "@/CRequest/enums/Method";
 import { RouteVariant } from "@/Route/enums/RouteVariant";
-import type { RouteHandler } from "@/Route/types/RouteHandler";
-import type { RouteId } from "@/Route/types/RouteId";
 import type { RouteModel } from "@/Model/types/RouteModel";
-import type { OrString } from "@/utils/types/OrString";
 import type { RouteInterface } from "@/Route/RouteInterface";
+import type { Context } from "@/Context/Context";
+import type { Func } from "@/utils/types/Func";
+import type { MaybePromise } from "@/utils/types/MaybePromise";
 
 export abstract class RouteAbstract<
 	E extends string = string,
@@ -15,21 +15,21 @@ export abstract class RouteAbstract<
 > implements RouteInterface<E, B, S, P, R> {
 	abstract variant: RouteVariant;
 	abstract endpoint: E;
-	abstract method: OrString<Method>;
+	abstract method: Method;
 	abstract pattern: RegExp;
-	abstract id: RouteId;
-	abstract handler: RouteHandler<B, S, P, R>;
+	abstract id: string;
+	abstract handler: Func<[Context<B, S, P, R>], MaybePromise<R>>;
 	abstract model?: RouteModel<B, S, P, R>;
 
 	protected resolvePattern(endpoint: E): RegExp {
 		return RouteAbstract.makeRoutePattern(endpoint);
 	}
 
-	protected resolveId(method: string, endpoint: E): RouteId {
+	protected resolveId(method: string, endpoint: E): string {
 		return RouteAbstract.makeRouteId(method, endpoint);
 	}
 
-	static makeRouteId(method: string, endpoint: string): RouteId {
+	static makeRouteId(method: string, endpoint: string): string {
 		return `${method.toUpperCase()} ${endpoint}`;
 	}
 

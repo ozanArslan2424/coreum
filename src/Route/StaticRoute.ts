@@ -1,18 +1,19 @@
 import { Method } from "@/CRequest/enums/Method";
 import { CResponse } from "@/CResponse/CResponse";
-import type { RouteId } from "@/Route/types/RouteId";
 import type { RouteModel } from "@/Model/types/RouteModel";
-import type { StaticRouteHandler } from "@/Route/types/StaticRouteHandler";
-import type { StaticRouteDefinition } from "@/Route/types/StaticRouteDefinition";
 import { $routerStore } from "@/index";
-import type { RouteHandler } from "@/Route/types/RouteHandler";
-import type { OrString } from "@/utils/types/OrString";
 import { CError } from "@/CError/CError";
 import { RouteVariant } from "@/Route/enums/RouteVariant";
 import { RouteAbstract } from "@/Route/RouteAbstract";
 import { XFile } from "@/XFile/XFile";
 import { Status } from "@/CResponse/enums/Status";
 import { CommonHeaders } from "@/CHeaders/enums/CommonHeaders";
+import type { Context } from "@/Context/Context";
+import type { Func } from "@/utils/types/Func";
+import type { MaybePromise } from "@/utils/types/MaybePromise";
+import type { StaticRouteDefinition } from "@/Route/types/StaticRouteDefinition";
+
+type R = CResponse | string;
 
 /**
  * Defines a route that serves a static file. Accepts a path and a {@link StaticRouteDefinition}
@@ -38,8 +39,6 @@ import { CommonHeaders } from "@/CHeaders/enums/CommonHeaders";
  * });
  */
 
-type R = CResponse | string;
-
 export class StaticRoute<
 	E extends string = string,
 	B = unknown,
@@ -49,7 +48,10 @@ export class StaticRoute<
 	constructor(
 		path: E,
 		definition: StaticRouteDefinition,
-		handler?: StaticRouteHandler<B, S, P, R>,
+		handler?: Func<
+			[context: Context<B, S, P, R>, content: string],
+			MaybePromise<R>
+		>,
 		model?: RouteModel<B, S, P, R>,
 	) {
 		super();
@@ -63,11 +65,11 @@ export class StaticRoute<
 		$routerStore.get().addRoute(this);
 	}
 
-	id: RouteId;
-	method: OrString<Method>;
+	id: string;
+	method: Method;
 	endpoint: E;
 	pattern: RegExp;
-	handler: RouteHandler<B, S, P, R>;
+	handler: Func<[Context<B, S, P, R>], MaybePromise<R>>;
 	model?: RouteModel<B, S, P, R>;
 	protected filePath: string;
 	variant: RouteVariant = RouteVariant.static;
@@ -78,8 +80,8 @@ export class StaticRoute<
 
 	protected resolveHandler(
 		definition: StaticRouteDefinition,
-		customHandler?: StaticRouteHandler<B, S, P, R>,
-	): RouteHandler<B, S, P, R> {
+		customHandler?: Func<[Context<B, S, P, R>, string], MaybePromise<R>>,
+	): Func<[Context<B, S, P, R>], MaybePromise<R>> {
 		if (customHandler !== undefined) {
 			return async (c) => {
 				const file = new XFile(this.filePath);

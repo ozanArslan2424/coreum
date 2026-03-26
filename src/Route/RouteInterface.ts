@@ -1,9 +1,9 @@
 import type { Method } from "@/CRequest/enums/Method";
-import type { RouteHandler } from "@/Route/types/RouteHandler";
 import type { RouteModel } from "@/Model/types/RouteModel";
 import type { RouteVariant } from "@/Route/enums/RouteVariant";
-import type { RouteId } from "@/Route/types/RouteId";
-import type { OrString } from "@/utils/types/OrString";
+import type { Context } from "@/Context/Context";
+import type { Func } from "@/utils/types/Func";
+import type { MaybePromise } from "@/utils/types/MaybePromise";
 
 export interface RouteInterface<
 	E extends string = string,
@@ -13,10 +13,10 @@ export interface RouteInterface<
 	R = unknown,
 > {
 	variant: RouteVariant;
-	id: RouteId;
-	method: OrString<Method>;
+	id: string;
+	method: Method;
 	endpoint: E;
 	pattern: RegExp;
-	handler: RouteHandler<B, S, P, R>;
+	handler: Func<[Context<B, S, P, R>], MaybePromise<R>>;
 	model?: RouteModel<B, S, P, R>;
 }

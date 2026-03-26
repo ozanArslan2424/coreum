@@ -1,12 +1,11 @@
 import { DynamicRoute } from "@/Route/DynamicRoute";
 import { StaticRoute } from "@/Route/StaticRoute";
 import type { ControllerOptions } from "@/Controller/types/ControllerOptions";
-import type { RouteId } from "@/Route/types/RouteId";
 import { joinPathSegments } from "@/utils/joinPathSegments";
-import type { DynamicRouteDefinition } from "@/Route/types/DynamicRouteDefinition";
 import type { Func } from "@/utils/types/Func";
 import type { Context } from "@/Context/Context";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
+import { Method } from "@/CRequest/enums/Method";
 
 /**
  * Base class for grouping related routes under a shared prefix and optional middleware.
@@ -37,7 +36,7 @@ export abstract class Controller {
 		this.beforeEach = opts?.beforeEach;
 	}
 
-	routeIds: Set<RouteId> = new Set<RouteId>();
+	routeIds: Set<string> = new Set<string>();
 	protected prefix?: string;
 	protected beforeEach?: Func<[context: Context], MaybePromise<void>>;
 
@@ -54,10 +53,22 @@ export abstract class Controller {
 	>(
 		...args: ConstructorParameters<typeof DynamicRoute<E, B, S, P, R>>
 	): DynamicRoute<E, B, S, P, R> {
-		const [definition, handler, model] = args;
+		let [definition, handler, model] = args;
+
+		if (typeof definition === "string") {
+			definition = {
+				method: Method.GET,
+				path: joinPathSegments<E>(this.prefix, definition),
+			};
+		}
+
+		definition = {
+			method: definition.method,
+			path: joinPathSegments(this.prefix, definition.path),
+		};
 
 		const route = new DynamicRoute(
-			this.resolveRouteDefinition(definition),
+			definition,
 			async (ctx) => {
 				await this.beforeEach?.(ctx);
 				return handler(ctx);
@@ -89,18 +100,5 @@ export abstract class Controller {
 		);
 		this.routeIds.add(route.id);
 		return route;
-	}
-
-	private resolveRouteDefinition<E extends string = string>(
-		definition: DynamicRouteDefinition<E>,
-	): DynamicRouteDefinition<E> {
-		if (typeof definition === "string") {
-			return joinPathSegments<E>(this.prefix, definition);
-		}
-
-		return {
-			method: definition.method,
-			path: joinPathSegments(this.prefix, definition.path),
-		};
 	}
 }

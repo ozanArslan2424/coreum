@@ -2,7 +2,6 @@ import type { CRequest } from "@/CRequest/CRequest";
 import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
 import { CorpusAdapter } from "@/Router/adapters/CorpusAdapter";
 import { MiddlewareRegistry } from "@/Router/registries/MiddlewareRegistry";
-import type { RouteId } from "@/Route/types/RouteId";
 import type { RouterReturnData } from "@/Router/types/RouterReturnData";
 import { LazyMap } from "@/utils/LazyMap";
 import type { Func } from "@/utils/types/Func";
@@ -26,7 +25,7 @@ export class Router {
 		this.middlewareRegistry.add(middleware);
 	}
 
-	findMiddleware(id: RouteId | "*"): {
+	findMiddleware(id: string | "*"): {
 		inbound: MiddlewareHandler;
 		outbound: MiddlewareHandler;
 	} {

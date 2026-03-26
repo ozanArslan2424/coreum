@@ -36,16 +36,9 @@ export type { CResponseBody as ResponseBody } from "./CResponse/types/CResponseB
 export type { CResponseInit as ResponseInit } from "./CResponse/types/CResponseInit";
 export { CResponse as Response } from "./CResponse/CResponse";
 
-export type { RouteHandler } from "./Route/types/RouteHandler";
 export type { RouteInterface } from "./Route/RouteInterface";
-
-export type { DynamicRouteDefinition } from "./Route/types/DynamicRouteDefinition";
 export { DynamicRoute as Route } from "./Route/DynamicRoute";
-
-export type { StaticRouteDefinition } from "./Route/types/StaticRouteDefinition";
-export type { StaticRouteHandler } from "./Route/types/StaticRouteHandler";
 export { StaticRoute } from "./Route/StaticRoute";
-
 export { WebSocketRoute } from "./Route/WebSocketRoute";
 
 export type { ServerOptions } from "./Server/types/ServerOptions";

@@ -14,7 +14,6 @@ import type { Func } from "@/utils/types/Func";
 import type { ServerOptions } from "@/Server/types/ServerOptions";
 import { log, logFatal } from "@/utils/internalLogger";
 import { WebSocketRoute } from "@/Route/WebSocketRoute";
-import type { RouteId } from "@/Route/types/RouteId";
 
 export abstract class ServerAbstract implements ServerInterface {
 	abstract serve(options: ServeArgs): void;
@@ -177,7 +176,7 @@ export abstract class ServerAbstract implements ServerInterface {
 	//
 	protected async handleMiddleware(
 		ctx: Context,
-		id: RouteId | "*",
+		id: string | "*",
 		cb: Func<[Context], MaybePromise<CResponse | undefined>>,
 	): Promise<CResponse | undefined> {
 		const mw = $routerStore.get().findMiddleware(id);
@@ -202,63 +201,6 @@ export abstract class ServerAbstract implements ServerInterface {
 		return ctx.res;
 	}
 
-	//
-	// protected async handleRequest(
-	// 	req: CRequest,
-	// 	onUpgrade: Func<[WebSocketRoute], undefined>,
-	// ): Promise<Response | undefined> {
-	// 	let res: CResponse;
-	//
-	// 	try {
-	// 		if (req.isPreflight) {
-	// 			res = await this.handlePreflight(req);
-	// 		} else {
-	// 			const router = $routerStore.get();
-	//
-	// 			const ctx = Context.makeFromRequest(req);
-	// 			// gmw = global middlewares
-	// 			const gmw = router.findMiddleware("*");
-	// 			await gmw.inbound(ctx);
-	//
-	// 			const match = router.findRoute(req);
-	// 			if (!match) {
-	// 				res = await this.handleNotFound(req);
-	// 			} else {
-	// 				// lmw = local middlewares
-	// 				const lmw = router.findMiddleware(match.route.id);
-	// 				await lmw.inbound(ctx);
-	//
-	// 				await Context.appendParsedData(ctx, req, match);
-	//
-	// 				const result = await match.route.handler(ctx);
-	// 				if (result instanceof WebSocketRoute && req.isWebsocket) {
-	// 					// ws requests return undefined
-	// 					return onUpgrade(result);
-	// 				} else if (result instanceof CResponse) {
-	// 					res = result;
-	// 				} else {
-	// 					res = new CResponse(result, ctx.res);
-	// 				}
-	// 				const mwResult = await lmw.outbound(ctx);
-	// 				if (mwResult instanceof CResponse) {
-	// 					res = mwResult;
-	// 				}
-	// 			}
-	//
-	// 			const gmwResult = await gmw.outbound(ctx);
-	// 			if (gmwResult instanceof CResponse) {
-	// 				res = gmwResult;
-	// 			}
-	// 		}
-	// 	} catch (err) {
-	// 		// handle any thrown error
-	// 		res = await this.handleError(err as Error);
-	// 	}
-	//
-	// 	// return regular web response
-	// 	return res.response;
-	// }
-	//
 	protected handleBeforeListen: Func<[], MaybePromise<void>> | undefined;
 	setOnBeforeListen(handler: Func<[], MaybePromise<void>> | undefined): void {
 		this.handleBeforeListen = handler;

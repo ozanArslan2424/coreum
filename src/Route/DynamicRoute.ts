@@ -1,13 +1,13 @@
 import { Method } from "@/CRequest/enums/Method";
 import { $prefixStore, $routerStore } from "@/index";
 import type { RouteModel } from "@/Model/types/RouteModel";
-import type { DynamicRouteDefinition } from "@/Route/types/DynamicRouteDefinition";
-import type { RouteHandler } from "@/Route/types/RouteHandler";
-import type { RouteId } from "@/Route/types/RouteId";
-import type { OrString } from "@/utils/types/OrString";
 import { RouteVariant } from "@/Route/enums/RouteVariant";
 import { RouteAbstract } from "@/Route/RouteAbstract";
 import { joinPathSegments } from "@/utils/joinPathSegments";
+import type { Context } from "@/Context/Context";
+import type { Func } from "@/utils/types/Func";
+import type { MaybePromise } from "@/utils/types/MaybePromise";
+import type { DynamicRouteDefinition } from "@/Route/types/DynamicRouteDefinition";
 
 /**
  * Defines an HTTP endpoint. Accepts a {@link DynamicRouteDefinition} which can either be a plain
@@ -42,7 +42,7 @@ export class DynamicRoute<
 > extends RouteAbstract<E, B, S, P, R> {
 	constructor(
 		definition: DynamicRouteDefinition<E>,
-		handler: RouteHandler<B, S, P, R>,
+		handler: Func<[context: Context<B, S, P, R>], MaybePromise<R>>,
 		model?: RouteModel<B, S, P, R>,
 	) {
 		super();
@@ -55,11 +55,11 @@ export class DynamicRoute<
 		$routerStore.get().addRoute(this);
 	}
 
-	id: RouteId;
-	method: OrString<Method>;
+	id: string;
+	method: Method;
 	endpoint: E;
 	pattern: RegExp;
-	handler: RouteHandler<B, S, P, R>;
+	handler: Func<[context: Context<B, S, P, R>], MaybePromise<R>>;
 	model?: RouteModel<B, S, P, R>;
 	variant: RouteVariant = RouteVariant.dynamic;
 

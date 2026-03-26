@@ -2,7 +2,6 @@ import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInte
 import type { RouterRouteData } from "@/Router/types/RouterRouteData";
 import { isRegexMatch } from "@/utils/isRegexMatch";
 import { strIsEqual } from "@/utils/strIsEqual";
-import type { RouteId } from "@/Route/types/RouteId";
 import type { RouterReturnData } from "@/Router/types/RouterReturnData";
 import type { CRequest } from "@/CRequest/CRequest";
 import { DynamicRoute } from "@/Route/DynamicRoute";
@@ -10,7 +9,7 @@ import { log } from "@/utils/internalLogger";
 
 export class CorpusAdapter implements RouterAdapterInterface {
 	// RouteId -> RouteRegistryData
-	private routes = new Map<RouteId, RouterRouteData>();
+	private routes = new Map<string, RouterRouteData>();
 
 	add(data: RouterRouteData): void {
 		this.checkPossibleCollision(data);

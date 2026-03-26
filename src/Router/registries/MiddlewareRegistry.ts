@@ -1,6 +1,5 @@
 import { Controller } from "@/Controller/Controller";
 import { DynamicRoute } from "@/Route/DynamicRoute";
-import type { RouteId } from "@/Route/types/RouteId";
 import type { RouterMiddlewareData } from "@/Router/types/RouterMiddlewareData";
 import { LazyMap } from "@/utils/LazyMap";
 import { compile } from "@/utils/compile";
@@ -27,7 +26,7 @@ export class MiddlewareRegistry {
 		}
 	}
 
-	find(routeId: RouteId | "*"): {
+	find(routeId: string | "*"): {
 		inbound: MiddlewareHandler;
 		outbound: MiddlewareHandler;
 	} {
@@ -49,11 +48,11 @@ export class MiddlewareRegistry {
 	/** Returns a discriminated union — isGlobal true means useOn was "*" */
 	static resolveRouteIds(
 		m: MiddlewareInterface,
-	): { isGlobal: true } | { isGlobal: false; routeIds: RouteId[] } {
+	): { isGlobal: true } | { isGlobal: false; routeIds: string[] } {
 		if (m.useOn === "*") return { isGlobal: true };
 
 		const targets = Array.isArray(m.useOn) ? m.useOn : [m.useOn];
-		const routeIds: RouteId[] = [];
+		const routeIds: string[] = [];
 
 		for (const target of targets) {
 			if (target instanceof DynamicRoute) {
