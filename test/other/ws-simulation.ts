@@ -1,6 +1,6 @@
 import { log } from "@/utils/internalLogger";
 import { TEST_PORT } from "../utils/req";
-import C from "@/index";
+import { C } from "@/index";
 import { createTestServer } from "../utils/createTestServer";
 import { manualExpect } from "../utils/manual-expect";
 

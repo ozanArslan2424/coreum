@@ -18,7 +18,7 @@ npm install @ozanarslan/corpus
 Create a simple server:
 
 ```typescript
-import C from "@ozanarslan/corpus";
+import { C } from "@ozanarslan/corpus";
 
 // Initialize server
 const server = new C.Server();

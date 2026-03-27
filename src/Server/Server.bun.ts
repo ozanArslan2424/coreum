@@ -1,4 +1,4 @@
-import { Config } from "@/Config/Config";
+import { XConfig } from "@/XConfig/XConfig";
 import { CRequest } from "@/CRequest/CRequest";
 import { Status } from "@/CResponse/enums/Status";
 import { ServerAbstract } from "@/Server/ServerAbstract";
@@ -22,7 +22,7 @@ export default class ServerUsingBun extends ServerAbstract {
 
 		await this.app?.stop(true);
 
-		if (Config.nodeEnv !== "test") {
+		if (XConfig.nodeEnv !== "test") {
 			process.exit(0);
 		}
 	}

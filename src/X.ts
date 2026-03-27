@@ -1,3 +1,5 @@
+export { XConfig as Config } from "./XConfig/XConfig";
+
 export type { CorsOptions } from "./XCors/types/CorsOptions";
 export { XCors as Cors } from "./XCors/XCors";
 

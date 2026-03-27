@@ -1,4 +1,4 @@
-import C from "@/index";
+import { C } from "@/index";
 import { createTestServer } from "../utils/createTestServer";
 import { TEST_PORT } from "../utils/req";
 import { log } from "@/utils/internalLogger";

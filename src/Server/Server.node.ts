@@ -1,4 +1,4 @@
-import { Config } from "@/Config/Config";
+import { XConfig } from "@/XConfig/XConfig";
 import { CRequest } from "@/CRequest/CRequest";
 import { Method } from "@/CRequest/enums/Method";
 import { CWebSocketNode } from "@/CWebSocket/CWebSocket.node";
@@ -105,7 +105,7 @@ export default class ServerUsingNode extends ServerAbstract {
 		this.app?.close();
 		this.app?.closeAllConnections();
 		this.app?.closeIdleConnections();
-		if (Config.nodeEnv !== "test") {
+		if (XConfig.nodeEnv !== "test") {
 			process.exit(0);
 		}
 	}

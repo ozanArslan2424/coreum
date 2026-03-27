@@ -1,4 +1,4 @@
-import C, { Status, X } from "@/index";
+import { C, X } from "@/index";
 import { describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
@@ -69,7 +69,7 @@ describe("C.Error", () => {
 
 	it("INTEGRATION - THROWN IN ROUTE RETURNS CORRECT STATUS", async () => {
 		new C.Route("/error-404", () => {
-			throw new C.Error("not here", Status.NOT_FOUND);
+			throw new C.Error("not here", C.Status.NOT_FOUND);
 		});
 
 		const res = await s.handle(req("/error-404"));
@@ -78,7 +78,7 @@ describe("C.Error", () => {
 
 	it("INTEGRATION - THROWN IN ROUTE RETURNS CORRECT BODY", async () => {
 		new C.Route("/error-422", () => {
-			throw new C.Error("invalid fields", Status.UNPROCESSABLE_ENTITY);
+			throw new C.Error("invalid fields", C.Status.UNPROCESSABLE_ENTITY);
 		});
 
 		const res = await s.handle(req("/error-422"));
