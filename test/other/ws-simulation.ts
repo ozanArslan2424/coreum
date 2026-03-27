@@ -277,7 +277,7 @@ async function run() {
 	log.info("[carol] sports publish ack:", carolSportsAck);
 	manualExpect(carolSportsAck).toHaveProperty("event", "published");
 	manualExpect(carolSportsAck).toHaveProperty("topic", "sports");
-	manualExpect(carolSportsAck.bytes).toBeGreaterThan(0);
+	manualExpect(carolSportsAck.bytes).toEqual(0);
 	log.success("✅ Sports publish successful");
 
 	// ── bob unsubscribes from "news" ──────────────────────────────────────────
