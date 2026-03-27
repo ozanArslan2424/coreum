@@ -1,5 +1,3 @@
-export { Config } from "./Config/Config";
-
 export { Context } from "./Context/Context";
 
 export { Controller } from "./Controller/Controller";

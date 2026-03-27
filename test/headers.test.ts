@@ -1,4 +1,4 @@
-import C from "@/index";
+import { C } from "@/index";
 import { describe, expect, it } from "bun:test";
 
 describe("C.Headers", () => {

@@ -1,8 +1,8 @@
-import { Config } from "@/Config/Config";
+import { XConfig } from "@/XConfig/XConfig";
 import { log } from "@/utils/internalLogger";
 
 export function testDebug(...data: any[]) {
-	if (Config.nodeEnv !== "test") return;
+	if (XConfig.nodeEnv !== "test") return;
 
 	log.log("[TEST DEBUG]: ", ...data);
 }

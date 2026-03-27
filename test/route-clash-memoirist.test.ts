@@ -1,5 +1,5 @@
 import { createTestServer } from "./utils/createTestServer";
-import C from "@/index";
+import { C } from "@/index";
 import { describe, expect, it } from "bun:test";
 import { MemoiristAdapter } from "@/Router/adapters/MemoiristAdapter";
 

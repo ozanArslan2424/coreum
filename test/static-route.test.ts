@@ -1,4 +1,4 @@
-import C from "@/index";
+import { C, X } from "@/index";
 import { describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
@@ -6,7 +6,7 @@ import { RouteVariant } from "@/Route/enums/RouteVariant";
 
 const s = createTestServer();
 
-const f = (file: string) => C.Config.resolvePath("test", "fixtures", file);
+const f = (file: string) => X.Config.resolvePath("test", "fixtures", file);
 
 describe("C.StaticRoute", () => {
 	// ─── constructor ──────────────────────────────────────────────

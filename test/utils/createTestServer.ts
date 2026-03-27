@@ -1,4 +1,4 @@
-import C from "@/index";
+import { C } from "@/index";
 import { log } from "@/utils/internalLogger";
 
 export function createTestServer(

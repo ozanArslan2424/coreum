@@ -1,4 +1,4 @@
-import C, { X } from "@/index";
+import { C, X } from "@/index";
 import { describe, expect, it, spyOn } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { createTestController } from "./utils/createTestController";

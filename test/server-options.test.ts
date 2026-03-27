@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
-import C from "@/index";
+import { C } from "@/index";
 import net from "node:net";
 
 const PORT = 4481;

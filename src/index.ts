@@ -10,4 +10,4 @@ export type * from "./types.d.ts";
 export * from "@/C";
 export * from "@/X";
 
-export { C, C as default, X, X as Extra };
+export { C, C as Corpus, X, X as Extra };

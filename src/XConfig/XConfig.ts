@@ -1,19 +1,18 @@
-import { RuntimeOptions } from "@/Config/enums/RuntimeOptions";
-import type { ConfigEnvKey } from "@/Config/types/ConfigEnvKey";
-import type { ConfigValueParser } from "@/Config/types/ConfigValueParser";
+import type { Env } from "@/types.d.ts";
 import { log } from "@/utils/internalLogger";
 import { strIsDefined } from "@/utils/strIsDefined";
+import type { Func } from "@/utils/types/Func";
 import type { OrString } from "@/utils/types/OrString";
 import path from "path";
 
-export class Config {
+export class XConfig {
 	static get runtime(): string {
 		if (typeof Bun !== "undefined") {
-			return RuntimeOptions.bun;
+			return "bun";
 		}
 
 		if (typeof process !== "undefined" && process?.env) {
-			return RuntimeOptions.node;
+			return "node";
 		}
 
 		log.warn(
@@ -28,9 +27,9 @@ export class Config {
 
 	static get env(): NodeJS.ProcessEnv {
 		switch (this.runtime) {
-			case RuntimeOptions.bun:
+			case "bun":
 				return Bun.env;
-			case RuntimeOptions.node:
+			case "node":
 				return process.env;
 			default:
 				log.warn(
@@ -49,8 +48,8 @@ export class Config {
 	}
 
 	static get<T = string>(
-		key: ConfigEnvKey,
-		opts?: { parser?: ConfigValueParser<T>; fallback?: T },
+		key: OrString<keyof Env>,
+		opts?: { parser?: Func<[raw: string], T>; fallback?: T },
 	): T {
 		const value = this.env[key];
 
