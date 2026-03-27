@@ -3,7 +3,7 @@ import { C, X } from "@/index";
 const server = new C.Server();
 
 function addr(...path: string[]) {
-	return C.Config.resolvePath(C.Config.cwd(), "docs", ...path);
+	return X.Config.resolvePath(X.Config.cwd(), "docs", ...path);
 }
 
 function insert(target: string, entries: Record<string, string>) {
