@@ -25,7 +25,6 @@ export class XCors extends MiddlewareAbstract {
 	useOn: MiddlewareUseOn = "*";
 	variant: MiddlewareVariant = MiddlewareVariant.outbound;
 	handler: MiddlewareHandler = async (c) => {
-		console.log(c.headers.toJSON());
 		const reqOrigin = c.headers.get("origin") ?? "";
 		const {
 			allowedOrigins,

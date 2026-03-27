@@ -1,6 +1,7 @@
 import C from "@/index";
 import { createTestServer } from "../utils/createTestServer";
 import { TEST_PORT } from "../utils/req";
+import { log } from "@/utils/internalLogger";
 
 const server = createTestServer();
 
@@ -15,7 +16,7 @@ new C.WebSocketRoute("/ws", {
 	},
 
 	onClose: (_ws, code, reason) => {
-		console.log(`[ws] closed — code=${code} reason=${reason}`);
+		log.log(`[ws] closed — code=${code} reason=${reason}`);
 	},
 
 	onMessage: (ws, message) => {

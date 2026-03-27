@@ -96,8 +96,10 @@ export abstract class ServerAbstract implements ServerInterface {
 				const mr = await match.route.handler(ctx);
 				if (mr instanceof WebSocketRoute && req.isWebsocket) {
 					return onUpgrade(mr);
+				} else if (mr instanceof CResponse) {
+					ctx.res = mr;
 				} else {
-					ctx.res = mr instanceof CResponse ? mr : new CResponse(mr, ctx.res);
+					ctx.res = new CResponse(mr, ctx.res);
 				}
 
 				const lmwor = await lmw.outbound(ctx);

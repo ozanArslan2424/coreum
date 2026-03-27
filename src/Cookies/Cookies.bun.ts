@@ -1,10 +1,11 @@
 import { CookiesAbstract } from "@/Cookies/CookiesAbstract";
+import type { CookiesInterface } from "@/Cookies/CookiesInterface";
 import type { CookieOptions } from "@/Cookies/types/CookieOptions";
 import type { CookiesInit } from "@/Cookies/types/CookiesInit";
 
 export default class CookiesUsingBun extends CookiesAbstract {
-	constructor(init?: CookiesInit) {
-		super(init);
+	constructor(init?: CookiesInit | CookiesInterface) {
+		super();
 		this.applyInit(init);
 	}
 

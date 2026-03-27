@@ -58,6 +58,14 @@ export class CResponse<R = unknown> {
 	cookies: Cookies;
 
 	get response(): Response {
+		const setCookieHeaders = this.cookies.toSetCookieHeaders();
+
+		if (setCookieHeaders.length > 0) {
+			for (const header of setCookieHeaders) {
+				this.headers.append(CommonHeaders.SetCookie, header);
+			}
+		}
+
 		return new Response(this.body, {
 			status: this.status,
 			statusText: this.statusText,
@@ -224,17 +232,7 @@ export class CResponse<R = unknown> {
 	}
 
 	private resolveHeaders(): CHeaders {
-		const headers = new CHeaders(this.init?.headers);
-
-		const setCookieHeaders = this.cookies.toSetCookieHeaders();
-
-		if (setCookieHeaders.length > 0) {
-			for (const header of setCookieHeaders) {
-				headers.append(CommonHeaders.SetCookie, header);
-			}
-		}
-
-		return headers;
+		return new CHeaders(this.init?.headers);
 	}
 
 	private resolveStatus(): Status {

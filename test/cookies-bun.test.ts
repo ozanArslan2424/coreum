@@ -1,11 +1,10 @@
-import CookiesUsingBun from "@/Cookies/Cookies.bun";
-import type { CookieOptions } from "@/Cookies/types/CookieOptions";
+import C from "@/index";
 import { describe, expect, it } from "bun:test";
 
-describe("CookiesUsingBun", () => {
+describe("Cookies", () => {
 	const firstName = "firstCookie";
 	const firstValue = "firstValue";
-	const firstCookie: CookieOptions = {
+	const firstCookie: C.CookieOptions = {
 		value: firstValue,
 		name: firstName,
 		domain: "localhost",
@@ -13,14 +12,14 @@ describe("CookiesUsingBun", () => {
 	};
 	const secondName = "secondCookie";
 	const secondValue = "secondValue";
-	const secondCookie: CookieOptions = {
+	const secondCookie: C.CookieOptions = {
 		value: secondValue,
 		name: secondName,
 		domain: "localhost",
 		path: "/",
 	};
 
-	function expectMethods(cookies: CookiesUsingBun, count: number = 1) {
+	function expectMethods(cookies: C.Cookies, count: number = 1) {
 		expect(cookies.count).toBe(count);
 		expect(cookies.get(firstName)).toBe(firstValue);
 		expect(cookies.has(firstName)).toBeTrue();
@@ -33,35 +32,33 @@ describe("CookiesUsingBun", () => {
 	}
 
 	it("INIT - SINGLE", () => {
-		const cookies = new CookiesUsingBun(firstCookie);
+		const cookies = new C.Cookies(firstCookie);
 		expectMethods(cookies);
 	});
 
 	it("INIT - ARRAY", () => {
-		const cookies = new CookiesUsingBun([firstCookie, secondCookie]);
+		const cookies = new C.Cookies([firstCookie, secondCookie]);
 		expectMethods(cookies, 2);
 	});
 
 	it("INIT - COOKIES - INNER INIT SINGLE", () => {
-		const cookies = new CookiesUsingBun(new CookiesUsingBun(firstCookie));
+		const cookies = new C.Cookies(new C.Cookies(firstCookie));
 		expectMethods(cookies);
 	});
 
 	it("INIT - COOKIES - INNER INIT ARRAY", () => {
-		const cookies = new CookiesUsingBun(
-			new CookiesUsingBun([firstCookie, secondCookie]),
-		);
+		const cookies = new C.Cookies(new C.Cookies([firstCookie, secondCookie]));
 		expectMethods(cookies, 2);
 	});
 
 	it("SET", () => {
-		const cookies = new CookiesUsingBun();
+		const cookies = new C.Cookies();
 		cookies.set(firstCookie);
 		expectMethods(cookies);
 	});
 
 	it("SETMANY", () => {
-		const cookies = new CookiesUsingBun();
+		const cookies = new C.Cookies();
 		cookies.setMany([firstCookie, secondCookie]);
 		expectMethods(cookies, 2);
 	});

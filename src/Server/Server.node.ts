@@ -93,8 +93,6 @@ export default class ServerUsingNode extends ServerAbstract {
 			},
 		);
 
-		console.log(app.eventNames());
-
 		this.app = app;
 		this.wss = wss;
 		app.listen(args.port, args.hostname);
