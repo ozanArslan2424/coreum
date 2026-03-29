@@ -16,7 +16,7 @@ async function build() {
 		target: "bun",
 	};
 
-	await Promise.all([
+	const [esm, cjs] = await Promise.all([
 		Bun.build({
 			...defaultBuildConfig,
 			plugins: [
@@ -35,6 +35,10 @@ async function build() {
 			naming: "[dir]/[name].cjs",
 		}),
 	]);
+
+	if (!esm.success) esm.logs.forEach((l) => console.error(l));
+	if (!cjs.success) cjs.logs.forEach((l) => console.error(l));
+	if (!esm.success || !cjs.success) process.exit(1);
 }
 
 const start = performance.now();
