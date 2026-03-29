@@ -5,7 +5,7 @@ FROM base AS build
 COPY package.json bun.lock .
 RUN bun install --frozen-lockfile
 COPY . .
-RUN bun build ./src/index.ts --outdir ./dist --target bun --format esm
+RUN bun run build
 
 FROM base AS prerelease
 RUN bun add marked
