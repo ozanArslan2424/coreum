@@ -20,7 +20,7 @@ export class Middleware extends MiddlewareAbstract {
 		if (opts.handler) {
 			this.handler = opts.handler;
 		}
-		$routerStore.get().addMiddleware(this);
+		queueMicrotask(() => $routerStore.get().addMiddleware(this));
 	}
 
 	readonly variant: MiddlewareVariant;

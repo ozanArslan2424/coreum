@@ -1,30 +1,31 @@
 import type { CorsOptions } from "@/XCors/types/CorsOptions";
 import { isSomeArray } from "@/utils/isSomeArray";
 import { MiddlewareVariant } from "@/Middleware/enums/MiddlewareVariant";
-import { Middleware } from "@/Middleware/Middleware";
+import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
 import { CResponse } from "@/CResponse/CResponse";
 import { Status } from "@/CResponse/enums/Status";
 import { CommonHeaders } from "@/CHeaders/enums/CommonHeaders";
 import type { RequestHandler } from "@/Server/types/RequestHandler";
 import { boolToString } from "@/utils/boolToString";
-import { $routerStore } from "@/index";
+import {
+	$routerStore,
+	type MiddlewareHandler,
+	type MiddlewareUseOn,
+} from "@/index";
 
 /** Simple cors helper to set CORS headers. Also provides a preflight handler for the Server. */
-export class XCors {
+export class XCors extends MiddlewareAbstract {
 	constructor(private readonly opts: CorsOptions | undefined) {
-		this.registerMiddleware();
+		super();
+		$routerStore.get().addMiddleware(this);
 		$routerStore.get().cors = this;
 	}
 
-	private registerMiddleware() {
-		new Middleware({
-			variant: MiddlewareVariant.outbound,
-			useOn: "*",
-			handler: async (c) => {
-				this.applyHeaders(c.res.headers, c.headers.get("origin") ?? "");
-			},
-		});
-	}
+	override variant: MiddlewareVariant = MiddlewareVariant.outbound;
+	override useOn: MiddlewareUseOn = "*";
+	override handler: MiddlewareHandler = (c) => {
+		this.applyHeaders(c.res.headers, c.headers.get("origin") ?? "");
+	};
 
 	/** Applies CORS headers to a Headers object given the request origin. */
 	private applyHeaders(

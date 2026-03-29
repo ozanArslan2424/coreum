@@ -1,12 +1,11 @@
 import { C, X } from "@/index";
-import { describe, expect, it, spyOn } from "bun:test";
+import { describe, expect, it, spyOn, beforeEach } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { createTestController } from "./utils/createTestController";
 import { req } from "./utils/req";
-import { beforeEach } from "node:test";
 import { log } from "@/utils/internalLogger";
 
-describe("C.Middleware", () => {
+describe("C.Middleware using constructor", () => {
 	const s = createTestServer();
 	const middlewareData = "Hello";
 	const overrideData = "world";

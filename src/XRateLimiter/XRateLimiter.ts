@@ -9,40 +9,38 @@ import { RateLimiterFileStore } from "@/XRateLimiter/stores/RateLimiterFileStore
 import { RateLimiterMemoryStore } from "@/XRateLimiter/stores/RateLimiterMemoryStore";
 import { Status } from "@/CResponse/enums/Status";
 import { CommonHeaders } from "@/CHeaders/enums/CommonHeaders";
-import { Middleware } from "@/Middleware/Middleware";
 import { logFatal } from "@/utils/internalLogger";
+import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
+import { $routerStore } from "@/index";
+import { MiddlewareVariant } from "@/Middleware/enums/MiddlewareVariant";
+import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";
+import type { MiddlewareUseOn } from "@/Middleware/types/MiddlewareUseOn";
 
-export class XRateLimiter {
+export class XRateLimiter extends MiddlewareAbstract {
 	constructor(config: Partial<RateLimitConfig> = {}) {
+		super();
 		this.config = { ...this.defaultConfig, ...config };
 		this.store = this.resolveStore();
 		this.storedSalt = this.getRandomBytes();
 		this.saltRotatesAt = Date.now() + this.config.saltRotateMs;
-		this.registerMiddleware();
+		$routerStore.get().addMiddleware(this);
 	}
 
-	private registerMiddleware() {
-		new Middleware({
-			useOn: "*",
-			handler: async (c) => {
-				const result = await this.getResult(c.headers);
-				c.res.headers.innerCombine(result.headers);
-				const exposedHeaders = Object.values(this.config.headerNames);
-				c.res.headers.append(
-					CommonHeaders.AccessControlExposeHeaders,
-					exposedHeaders,
-				);
+	override variant: MiddlewareVariant = MiddlewareVariant.inbound;
+	override useOn: MiddlewareUseOn = "*";
+	override handler: MiddlewareHandler = async (c) => {
+		const result = await this.getResult(c.headers);
+		c.res.headers.innerCombine(result.headers);
+		const exposedHeaders = Object.values(this.config.headerNames);
+		c.res.headers.append(
+			CommonHeaders.AccessControlExposeHeaders,
+			exposedHeaders,
+		);
 
-				if (!result.success) {
-					throw new CError(
-						"Too many requests",
-						Status.TOO_MANY_REQUESTS,
-						c.res,
-					);
-				}
-			},
-		});
-	}
+		if (!result.success) {
+			throw new CError("Too many requests", Status.TOO_MANY_REQUESTS, c.res);
+		}
+	};
 
 	private readonly config: RateLimitConfig;
 	private store: RateLimitStoreInterface;
