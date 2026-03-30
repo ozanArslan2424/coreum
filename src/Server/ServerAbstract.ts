@@ -66,23 +66,21 @@ export abstract class ServerAbstract implements ServerInterface {
 		req: CRequest,
 		onUpgrade: Func<[WebSocketRoute], undefined>,
 	): Promise<CResponse | undefined> {
+		const router = $routerStore.get();
+		const ctx = new Context(req);
+		// gmw = global middlewares
+		const gmw = router.findMiddleware("*");
+
 		try {
-			if (req.isPreflight) {
-				return await this.handlePreflight(req);
-			}
-
-			const router = $routerStore.get();
-			const ctx = new Context(req);
-			// gmw = global middlewares
-			const gmw = router.findMiddleware("*");
-
 			const gmwir = await gmw.inbound(ctx);
 			if (gmwir instanceof CResponse) {
 				return gmwir;
 			}
-
 			const match = router.findRoute(req);
-			if (!match) {
+
+			if (req.isPreflight) {
+				ctx.res = await this.handlePreflight(req);
+			} else if (!match) {
 				ctx.res = await this.handleNotFound(req);
 			} else {
 				// lmw = local middlewares
@@ -113,11 +111,15 @@ export abstract class ServerAbstract implements ServerInterface {
 			if (gmwor instanceof CResponse) {
 				return gmwor;
 			}
-
-			return ctx.res;
 		} catch (err) {
-			return await this.handleError(err as Error);
+			ctx.res = await this.handleError(err as Error);
 		}
+
+		if (router.cors) {
+			await router.cors.handler(ctx);
+		}
+
+		return ctx.res;
 	}
 
 	protected handleBeforeListen: Func<[], MaybePromise<void>> | undefined;

@@ -17,7 +17,7 @@ import {
 export class XCors extends MiddlewareAbstract {
 	constructor(private readonly opts: CorsOptions | undefined) {
 		super();
-		$routerStore.get().addMiddleware(this);
+		// $routerStore.get().addMiddleware(this);
 		$routerStore.get().cors = this;
 	}
 
