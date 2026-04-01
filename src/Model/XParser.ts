@@ -156,11 +156,7 @@ export class XParser {
 		const body: UnknownObject = {};
 
 		for (const [key, value] of entries) {
-			if (value instanceof File) {
-				body[key] = value;
-			} else {
-				objAppendEntry(body, key, value);
-			}
+			objAppendEntry(body, key, value);
 		}
 
 		return body;

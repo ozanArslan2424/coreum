@@ -1,25 +1,31 @@
 import type { CRequest } from "@/CRequest/CRequest";
 import type { RouterReturnData } from "@/Router/types/RouterReturnData";
 import type { RouterRouteData } from "@/Router/types/RouterRouteData";
-import { objGetKeys } from "@/utils/objGetKeys";
 import type { Func } from "@/utils/types/Func";
 import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
-import { strIsEqual } from "@/utils/strIsEqual";
+import type { Method } from "@/CRequest/enums/Method";
+
+type Store = Map<Method, RouterRouteData>;
 
 type ParamBranch = {
 	paramName: string;
-	store: RouterRouteData | null;
-	wildcardStore: RouterRouteData | null;
+	store: Store | null;
+	wildcardStore: Store | null;
 	branch: Branch | null;
 };
 
 type Branch = {
 	part: string;
-	store: RouterRouteData | null;
-	wildcardStore: RouterRouteData | null;
+	store: Store | null;
+	wildcardStore: Store | null;
 	paramBranch: ParamBranch | null;
 	children: Map<number, Branch> | null;
 };
+
+type FindRouteReturn = {
+	store: Store;
+	params: Record<string, string>;
+} | null;
 
 /**
  * Massive props to the medleyjs team for this incredible URL router implementation.
@@ -47,20 +53,22 @@ type Branch = {
  */
 export class BranchAdapter implements RouterAdapterInterface {
 	private _root: Branch = this.createBranch("/", null);
-	private storeFactory: Func<[], RouterRouteData> = () => Object.create(null);
+	private storeFactory: Func<[], Store> = () => new Map();
 
 	find(req: CRequest): RouterReturnData | null {
-		const method = req.method;
+		const method = req.method.toUpperCase() as Method;
 		const pathname = req.urlObject.pathname;
 		const pathlength = pathname.length;
 		const searchParams = req.urlObject.searchParams;
 
 		const result = this.findRoute(pathname, pathlength, this._root, 0);
 		if (!result) return null;
-		if (!strIsEqual(method, result.store.method, "lower")) return null;
+
+		const route = result.store.get(method);
+		if (!route) return null;
 
 		return {
-			route: result.store,
+			route,
 			params: result.params,
 			search: Object.fromEntries(searchParams),
 		};
@@ -68,26 +76,22 @@ export class BranchAdapter implements RouterAdapterInterface {
 
 	add(data: RouterRouteData): void {
 		const store = this.createBranchStore(data.endpoint);
-		const assign = <K extends keyof RouterRouteData>(key: K) => {
-			store[key] = data[key];
-		};
-		for (const key of objGetKeys<keyof RouterRouteData>(data)) {
-			assign(key);
-		}
+		store.set(data.method, data);
 	}
 
 	list: Func<[], Array<RouterRouteData>> | undefined = () => {
 		const routes: Array<RouterRouteData> = [];
 
 		const walk = (branch: Branch) => {
-			if (branch.store !== null) routes.push(branch.store);
-			if (branch.wildcardStore !== null) routes.push(branch.wildcardStore);
+			if (branch.store !== null) routes.push(...branch.store.values());
+			if (branch.wildcardStore !== null)
+				routes.push(...branch.wildcardStore.values());
 
 			if (branch.paramBranch !== null) {
 				if (branch.paramBranch.store !== null)
-					routes.push(branch.paramBranch.store);
+					routes.push(...branch.paramBranch.store.values());
 				if (branch.paramBranch.wildcardStore !== null)
-					routes.push(branch.paramBranch.wildcardStore);
+					routes.push(...branch.paramBranch.wildcardStore.values());
 				if (branch.paramBranch.branch !== null) walk(branch.paramBranch.branch);
 			}
 
@@ -272,10 +276,7 @@ export class BranchAdapter implements RouterAdapterInterface {
 		urlLength: number,
 		branch: Branch,
 		startIndex: number,
-	): {
-		store: RouterRouteData;
-		params: Record<string, string>;
-	} | null {
+	): FindRouteReturn {
 		const part = branch.part;
 		const pathPartLen = part.length;
 		const pathPartEndIndex = startIndex + pathPartLen;

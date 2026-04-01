@@ -1,7 +1,7 @@
 export function objAppendEntry(
 	data: Record<string, unknown>,
 	key: string,
-	value: string | boolean | number,
+	value: string | boolean | number | File,
 ) {
 	const existing = data[key];
 	if (existing !== undefined) {

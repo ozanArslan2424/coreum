@@ -31,14 +31,28 @@ export class RouterBenchmark {
 		let key: string;
 		let path: string;
 		let method: C.Method;
+		let methodIndex: number;
 		do {
 			method = methods[Math.floor(Math.random() * methods.length)] as C.Method;
+			methodIndex = methods.findIndex((m) => m === method);
 			const depth = 2 + Math.floor(Math.random() * 3);
 			path = "/" + Array.from({ length: depth }, () => this.rand()).join("/");
 			key = `${method}:${path}`;
 		} while (this.usedStaticPaths.has(key));
 		this.usedStaticPaths.add(key);
-		return new C.Route({ method, path }, async () => ({ ok: true }));
+		return [
+			new C.Route({ method, path }, async () => ({ ok: true })),
+			new C.Route(
+				{
+					method:
+						methods[methodIndex + 1] ??
+						methods[methodIndex - 1] ??
+						C.Method.GET,
+					path,
+				},
+				async () => ({ ok: true }),
+			),
+		];
 	}
 
 	private buildDynamicRoute() {
@@ -52,8 +66,10 @@ export class RouterBenchmark {
 		let shape: string;
 		let path: string;
 		let method: C.Method;
+		let methodIndex: number;
 		do {
 			method = methods[Math.floor(Math.random() * methods.length)] as C.Method;
+			methodIndex = methods.findIndex((m) => m === method);
 			const depth = 2 + Math.floor(Math.random() * 3);
 			const segments: string[] = [];
 			const shapeSegs: string[] = [];
@@ -74,16 +90,28 @@ export class RouterBenchmark {
 			shape = `/${shapeSegs.join("/")}`;
 		} while (this.usedDynamicShapes.has(shape));
 		this.usedDynamicShapes.add(shape);
-		return new C.Route({ method, path }, async () => ({ ok: true }));
+		return [
+			new C.Route({ method, path }, async () => ({ ok: true })),
+			new C.Route(
+				{
+					method:
+						methods[methodIndex + 1] ??
+						methods[methodIndex - 1] ??
+						C.Method.GET,
+					path,
+				},
+				async () => ({ ok: true }),
+			),
+		];
 	}
 
 	setupTime = "";
 
 	setup(staticCount = 150, dynamicCount = 150) {
 		for (let i = 0; i < staticCount; i++)
-			this.routes.push(this.buildStaticRoute());
+			this.routes.push(...this.buildStaticRoute());
 		for (let i = 0; i < dynamicCount; i++)
-			this.routes.push(this.buildDynamicRoute());
+			this.routes.push(...this.buildDynamicRoute());
 
 		const t0 = performance.now();
 		for (const route of this.routes) this.router.addRoute(route);

@@ -1,9 +1,10 @@
-import { log } from "@/utils/internalLogger";
+import { log as _log } from "@/utils/internalLogger";
 import { TEST_PORT } from "../utils/req";
 import { C } from "@/index";
 import { createTestServer } from "../utils/createTestServer";
 import { manualExpect } from "../utils/manual-expect";
 
+const log = process.argv[2] === "-s" ? _log.noop : _log;
 const server = createTestServer();
 
 log.info("🚀 Setting up WebSocket route...");
@@ -161,9 +162,6 @@ function makeClient(
 // ── test ─────────────────────────────────────────────────────────────────────
 
 async function run() {
-	log.info("🎬 Starting WebSocket tests...");
-	log.info("=".repeat(60));
-
 	// Three clients
 	log.info("📱 Creating three test clients...");
 	const { ws: alice, next: aliceNext } = await makeClient("alice");
@@ -331,18 +329,18 @@ async function run() {
 	log.success("✅ All clients closed successfully");
 }
 
-run()
-	.then(async () => {
-		log.success("🎉 All tests passed!");
-		log.info("=".repeat(60));
-		log.info("🛑 Shutting down server...");
-		await server.close();
-		log.success("✅ Server stopped");
-		process.exit(0);
-	})
-	.catch(async (err) => {
-		log.error("💥 Test suite failed:", err);
-		log.error("=".repeat(60));
-		await server.close();
-		process.exit(1);
-	});
+try {
+	_log.info("=".repeat(60));
+	_log.info("🎬 Starting WebSocket tests...");
+	_log.info("=".repeat(60));
+
+	await run();
+
+	_log.success("🎉 All WebSocket tests passed!");
+	await server.close();
+	process.exit(0);
+} catch (err) {
+	_log.error("💥 WebSocket Test suite failed:", err);
+	await server.close();
+	process.exit(1);
+}

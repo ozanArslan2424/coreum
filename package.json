@@ -31,9 +31,11 @@
 	"scripts": {
 		"fm": "bunx --bun prettier --write .",
 		"lint": "bunx oxlint -c ./.oxlintrc.json --fix",
-		"test:ws": "bun run test/other/ws-simulation.ts",
 		"build": "bun run build.ts",
-		"build:docs": "bun run build-docs.ts"
+		"build:docs": "bun run build-docs.ts",
+		"test:ws": "bun run test/other/ws-simulation.ts",
+		"test:benchmark": "bun run test/benchmark/benchmark.ts",
+		"tests": "bun test && bun test:ws -s && bun test:benchmark"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.3.11",

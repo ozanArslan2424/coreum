@@ -1,6 +1,7 @@
-type Log = typeof console & {
+export type Log = typeof console & {
 	success: (...args: any[]) => void;
 	fatal: (...args: any[]) => never;
+	noop: Log;
 };
 
 function makeLog(): Log {
@@ -12,6 +13,14 @@ function makeLog(): Log {
 		console.error("💀", ...args);
 		process.exit(1);
 	};
+	log.noop = {
+		info() {},
+		log() {},
+		debug() {},
+		warn() {},
+		error() {},
+		success() {},
+	} as Log;
 	return log;
 }
 
