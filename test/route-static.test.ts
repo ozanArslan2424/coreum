@@ -1,7 +1,9 @@
-import { TC, TX } from "./other/testing-modules";
-import { describe, expect, it } from "bun:test";
+import { $registryTesting, TC, TX } from "./other/testing-modules";
+import { afterEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
+
+afterEach(() => $registryTesting.reset());
 
 describe("C.StaticRoute", () => {
 	const s = createTestServer();

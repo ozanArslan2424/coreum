@@ -1,10 +1,10 @@
-import { TC, TX } from "./other/testing-modules";
-import { describe, expect, it } from "bun:test";
+import { $registryTesting, TC, TX } from "./other/testing-modules";
+import { beforeEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 
-describe("C.Middleware — lifecycle", () => {
-	const s = createTestServer();
+beforeEach(() => {
+	$registryTesting.reset();
 
 	// ── routes ────────────────────────────────────────────────────────────────
 
@@ -104,6 +104,10 @@ describe("C.Middleware — lifecycle", () => {
 			(c.data as any).sessionId = c.req.cookies.get("session-id") ?? null;
 		},
 	});
+});
+
+describe("C.Middleware — lifecycle", () => {
+	const s = createTestServer();
 
 	// ── tests ─────────────────────────────────────────────────────────────────
 

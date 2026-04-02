@@ -1,10 +1,10 @@
-import { TC, TX, $corsStoreTesting } from "./other/testing-modules";
+import { TC, TX, $registryTesting } from "./other/testing-modules";
 import { describe, expect, it, afterEach } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 import net from "node:net";
 
-afterEach(() => $corsStoreTesting.reset());
+afterEach(() => $registryTesting.reset());
 
 describe("C.Server", () => {
 	// ─── handle() - routing ───────────────────────────────────────

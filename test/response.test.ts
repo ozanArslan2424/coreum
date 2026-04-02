@@ -1,5 +1,7 @@
-import { TC } from "./other/testing-modules";
-import { describe, expect, it } from "bun:test";
+import { $registryTesting, TC } from "./other/testing-modules";
+import { afterEach, describe, expect, it } from "bun:test";
+
+afterEach(() => $registryTesting.reset());
 
 describe("C.Response", () => {
 	const ctHeader = TC.CommonHeaders.ContentType;

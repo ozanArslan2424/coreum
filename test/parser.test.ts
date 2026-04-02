@@ -1,11 +1,13 @@
-import { TC, TX } from "./other/testing-modules";
-import { describe, expect, it } from "bun:test";
+import { $registryTesting, TC, TX } from "./other/testing-modules";
+import { afterEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { type } from "arktype";
 import * as z from "zod";
 import type { StandardSchemaV1 } from "@/Model/types/StandardSchema";
 import { reqPath } from "./utils/req";
 import { joinPathSegments } from "@/utils/joinPathSegments";
+
+afterEach(() => $registryTesting.reset());
 
 const s = createTestServer();
 

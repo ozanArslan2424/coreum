@@ -1,5 +1,5 @@
 import {
-	$routerStoreTesting,
+	$registryTesting,
 	TC,
 	type TX,
 	RouterTesting,
@@ -15,7 +15,7 @@ export class RouterBenchmark {
 
 	constructor(private readonly adapter: TX.RouterAdapterInterface) {
 		this.router = new RouterTesting(adapter);
-		$routerStoreTesting.set(this.router);
+		$registryTesting.router = this.router;
 	}
 
 	private rand(len = 6): string {
@@ -118,7 +118,7 @@ export class RouterBenchmark {
 			this.routes.push(...this.buildDynamicRoute());
 
 		const t0 = performance.now();
-		for (const route of this.routes) this.router.addRoute(route);
+		for (const route of this.routes) this.router.add(route);
 		this.setupTime = (performance.now() - t0).toFixed(2);
 
 		for (const route of this.routes) {
@@ -149,7 +149,7 @@ export class RouterBenchmark {
 		for (let iter = 0; iter < iterations; iter++) {
 			for (const { request, expectedId } of this.requests) {
 				const t0 = performance.now();
-				const result = this.router.findRoute(request);
+				const result = this.router.find(request);
 				times.push(performance.now() - t0);
 				if (result) {
 					hits++;
@@ -167,7 +167,7 @@ export class RouterBenchmark {
 		const rps = (total / (sum / 1000)).toFixed(0);
 
 		return `-------------------------------------------------
-${this.adapter.constructor.name} results: (${this.router.getRouteList().length} routes)
+${this.adapter.constructor.name} results: (${this.router.list().length} routes)
 Setup Time: ${this.setupTime}
 Lookups:    ${total.toLocaleString()}
 Hit rate:   ${((hits / total) * 100).toFixed(2)}%

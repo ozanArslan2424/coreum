@@ -9,13 +9,13 @@ import { Status } from "@/CResponse/enums/Status";
 import { CommonHeaders } from "@/CHeaders/enums/CommonHeaders";
 import type { RequestHandler } from "@/Server/types/RequestHandler";
 import { boolToString } from "@/utils/boolToString";
-import { $corsStore } from "@/index";
+import { $registry } from "@/index";
 
 /** Simple cors helper to set CORS headers. Also provides a preflight handler for the Server. */
 export class XCors extends MiddlewareAbstract {
 	constructor(private readonly opts: CorsOptions | undefined) {
 		super();
-		$corsStore.set(this);
+		$registry.cors = this;
 	}
 
 	override variant: MiddlewareVariant = MiddlewareVariant.outbound;

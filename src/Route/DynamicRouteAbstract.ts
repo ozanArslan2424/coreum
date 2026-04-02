@@ -1,9 +1,11 @@
 import type { Context } from "@/Context/Context";
 import { Method } from "@/CRequest/enums/Method";
+import { $registry } from "@/index";
 import { RouteVariant } from "@/Route/enums/RouteVariant";
 import { RouteAbstract } from "@/Route/RouteAbstract";
 import type { DynamicRouteCallback } from "@/Route/types/DynamicRouteCallback";
 import type { DynamicRouteDefinition } from "@/Route/types/DynamicRouteDefinition";
+import { joinPathSegments } from "@/utils/joinPathSegments";
 import type { Func } from "@/utils/types/Func";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
 
@@ -23,9 +25,12 @@ export abstract class DynamicRouteAbstract<
 	readonly variant: RouteVariant = RouteVariant.dynamic;
 
 	get endpoint(): E {
-		return typeof this.definition === "string"
-			? this.definition
-			: this.definition.path;
+		return joinPathSegments(
+			$registry.prefix,
+			typeof this.definition === "string"
+				? this.definition
+				: this.definition.path,
+		);
 	}
 
 	get method(): Method {

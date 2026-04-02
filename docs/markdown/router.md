@@ -1,6 +1,6 @@
 # Router
 
-The `Router` class is NOT part of the public Corpus API. It is automatically created by the [Server module](/docs/server) and each [Route](/docs/route), [StaticRoute](/docs/route-static), [WebSocketRoute](/docs/route-websocket), [Controller](/docs/controller), and [Middleware](/docs/middleware) object will register itself into the global router. Even though it is not part of the public API, if you really need to, you can still access the global instance by importing `$routerStore` and calling the `.get()` method.
+The `Router` class is NOT part of the public Corpus API. It is automatically created by the [Server module](/docs/server) and each [Route](/docs/route), [StaticRoute](/docs/route-static), [WebSocketRoute](/docs/route-websocket), [Controller](/docs/controller), and [Middleware](/docs/middleware) object will register itself into the global router. Even though it is not part of the public API, if you really need to, you can still access the global instance by importing `$registry.router`.
 
 <section class="table-of-contents">
 
@@ -48,23 +48,23 @@ You can implement a custom router adapter by satisfying the `RouterAdapterInterf
 import { C } from "@ozanarslan/corpus";
 import type {
 	RouterAdapterInterface,
-	RouterReturnData,
-	RouterRouteData,
+	RouterReturn,
+	RouterData,
 } from "@ozanarslan/corpus";
 
 class MyAdapter implements RouterAdapterInterface {
-	add(data: RouterRouteData): void {
+	add(data: RouterData): void {
 		// register a route
 	}
 
-	find(req: C.Request): RouterReturnData | null {
+	find(req: C.Request): RouterReturn | null {
 		// return matched route data, or null if not found
 		// You can also throw in here and it will be handled by
 		// the Server.handleError method.
 	}
 
 	// optionally return all registered routes
-	list: () => Array<RouterRouteData> | undefined;
+	list: () => Array<RouterData> | undefined;
 }
 
 const server = new C.Server({

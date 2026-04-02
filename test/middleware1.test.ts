@@ -1,20 +1,26 @@
-import { TC, TX } from "./other/testing-modules";
+import { $registryTesting, TC, TX } from "./other/testing-modules";
 import { describe, expect, it, spyOn, beforeEach } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { createTestController } from "./utils/createTestController";
 import { req } from "./utils/req";
 import { log } from "@/utils/log";
 
-describe("C.Middleware using constructor", () => {
-	const s = createTestServer();
-	const middlewareData = "Hello";
-	const overrideData = "world";
-	const logSpy = spyOn(log, "log");
-	beforeEach(() => logSpy.mockClear());
+const s = createTestServer();
+const middlewareData = "Hello";
+const overrideData = "world";
+const logSpy = spyOn(log, "log");
+
+beforeEach(() => {
+	$registryTesting.reset();
+	logSpy.mockClear();
 
 	const r1 = new TC.Route("/r1", (c) => c.data);
 	new TC.Route("r2", (c) => c.data);
+	const r3 = new TC.Route("/r3", (c) => c.data);
+	const r4 = new TC.Route("/r4", (c) => c.data);
+	const r5 = new TC.Route("/r5", (c) => c.data);
 	const c1 = createTestController("c1");
+
 	new TC.Middleware({
 		useOn: [r1, c1.cr1],
 		handler: (c) => {
@@ -22,7 +28,6 @@ describe("C.Middleware using constructor", () => {
 		},
 	});
 
-	const r3 = new TC.Route("/r3", (c) => c.data);
 	new TC.Middleware({
 		useOn: [r3],
 		handler: (c) => {
@@ -30,13 +35,13 @@ describe("C.Middleware using constructor", () => {
 		},
 	});
 
-	const r4 = new TC.Route("/r4", (c) => c.data);
 	new TC.Middleware({
 		useOn: [r4],
 		handler: (c) => {
 			c.data = { user: "john", role: "admin", count: 1 };
 		},
 	});
+
 	new TC.Middleware({
 		useOn: [r4],
 		handler: (c) => {
@@ -52,6 +57,15 @@ describe("C.Middleware using constructor", () => {
 		},
 	});
 
+	new TC.Middleware({
+		useOn: [r5],
+		handler: (c) => {
+			c.data = overrideData;
+		},
+	});
+});
+
+describe("C.Middleware using constructor", () => {
 	it("ROUTE - APPLIES TO REGISTERED ROUTE", async () => {
 		const res = await s.handle(req("/r1"));
 		const data = await TX.Parser.parseBody<string>(res);
@@ -81,13 +95,7 @@ describe("C.Middleware using constructor", () => {
 	});
 
 	it("ROUTE - OVERRIDES PREVIOUS MIDDLEWARE DATA", async () => {
-		new TC.Middleware({
-			useOn: [r1],
-			handler: (c) => {
-				c.data = overrideData;
-			},
-		});
-		const res = await s.handle(req("/r1"));
+		const res = await s.handle(req("/r5"));
 		const data = await TX.Parser.parseBody<string>(res);
 		expect(data).toBe(overrideData);
 		expect(logSpy).toBeCalled();

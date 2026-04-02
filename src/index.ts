@@ -1,14 +1,11 @@
-import { Router } from "@/Router/Router";
-import { Store } from "@/utils/Store";
+import { Registry } from "@/Registry/Registry";
 
 import * as C from "@/C";
 import * as X from "@/X";
 
 export { Router } from "@/Router/Router";
 
-export const $prefixStore = new Store("");
-export const $routerStore = new Store(new Router());
-export const $corsStore = new Store<X.Cors | null>(null);
+export const $registry = new Registry();
 
 export type * from "./types.d.ts";
 export * from "@/C";

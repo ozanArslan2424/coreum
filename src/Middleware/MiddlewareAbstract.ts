@@ -1,4 +1,4 @@
-import { $routerStore } from "@/index";
+import { $registry } from "@/index";
 import { MiddlewareVariant } from "@/Middleware/enums/MiddlewareVariant";
 import type { MiddlewareInterface } from "@/Middleware/MiddlwareInterface";
 import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";
@@ -12,6 +12,6 @@ export abstract class MiddlewareAbstract implements MiddlewareInterface {
 	abstract handler: MiddlewareHandler;
 
 	register(): void {
-		$routerStore.get().addMiddleware(this);
+		$registry.middlewares.add(this);
 	}
 }

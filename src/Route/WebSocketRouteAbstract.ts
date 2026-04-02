@@ -6,6 +6,8 @@ import { Method } from "@/CRequest/enums/Method";
 import type { WebSocketOnOpen } from "@/Route/types/WebSocketOnOpen";
 import type { WebSocketOnClose } from "@/Route/types/WebSocketOnClose";
 import type { WebSocketOnMessage } from "@/Route/types/WebSocketOnMessage";
+import { joinPathSegments } from "@/utils/joinPathSegments";
+import { $registry } from "@/index";
 
 type R = WebSocketRouteAbstract;
 
@@ -25,7 +27,7 @@ export abstract class WebSocketRouteAbstract<
 	variant: RouteVariant = RouteVariant.websocket;
 
 	get endpoint(): string {
-		return this.path;
+		return joinPathSegments($registry.prefix, this.path);
 	}
 
 	get method(): Method {

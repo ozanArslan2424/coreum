@@ -4,7 +4,7 @@ import type { CRequest } from "@/CRequest/CRequest";
 import { CResponse } from "@/CResponse/CResponse";
 import { XParser } from "@/Model/XParser";
 import type { ContextDataInterface } from "@/types.d.ts";
-import type { RouterReturnData } from "@/Router/types/RouterReturnData";
+import type { RouterReturn } from "@/Router/types/RouterReturn";
 
 /**
  * The context object used in Route "callback" parameter.
@@ -50,7 +50,7 @@ export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
 		S = unknown,
 		P = unknown,
 		R = unknown,
-	>(ctx: Context<B, S, P, R>, req: CRequest, data: RouterReturnData<B, S, P>) {
+	>(ctx: Context<B, S, P, R>, req: CRequest, data: RouterReturn) {
 		ctx.body = await XParser.parseBody(req, data.route.model?.body);
 		ctx.params = await XParser.parseUrlData(
 			data.params,

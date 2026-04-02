@@ -1,7 +1,9 @@
-import { TC, TX } from "./other/testing-modules";
-import { describe, expect, it } from "bun:test";
+import { $registryTesting, TC, TX } from "./other/testing-modules";
+import { afterEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
+
+afterEach(() => $registryTesting.reset());
 
 describe("X.RateLimiter", () => {
 	const makeIpReq = (path: string, ip = "1.2.3.4") =>

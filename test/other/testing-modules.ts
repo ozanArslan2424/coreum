@@ -1,8 +1,6 @@
 export {
 	C as TC,
 	X as TX,
-	$routerStore as $routerStoreTesting,
-	$prefixStore as $prefixStoreTesting,
-	$corsStore as $corsStoreTesting,
+	$registry as $registryTesting,
 	Router as RouterTesting,
 } from "../../dist";

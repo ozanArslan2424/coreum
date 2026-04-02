@@ -1,7 +1,7 @@
 import Memoirist from "memoirist";
 import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
-import type { RouterRouteData } from "@/Router/types/RouterRouteData";
-import type { RouterReturnData } from "@/Router/types/RouterReturnData";
+import type { RouterData } from "@/Router/types/RouterData";
+import type { RouterReturn } from "@/Router/types/RouterReturn";
 import type { CRequest } from "@/CRequest/CRequest";
 import type { Func } from "@/utils/types/Func";
 
@@ -28,9 +28,9 @@ import type { Func } from "@/utils/types/Func";
  * RPS:           17088409
  */
 export class MemoiristAdapter implements RouterAdapterInterface {
-	private router = new Memoirist<RouterRouteData>();
+	private router = new Memoirist<RouterData>();
 
-	find(req: CRequest): RouterReturnData | null {
+	find(req: CRequest): RouterReturn | null {
 		const method = req.method;
 		const pathname = req.urlObject.pathname;
 		const searchParams = req.urlObject.searchParams;
@@ -44,11 +44,11 @@ export class MemoiristAdapter implements RouterAdapterInterface {
 		};
 	}
 
-	list: Func<[], Array<RouterRouteData>> | undefined = () => {
+	list: Func<[], Array<RouterData>> | undefined = () => {
 		return this.router.history.map((v) => v[2]);
 	};
 
-	add(data: RouterRouteData): void {
+	add(data: RouterData): void {
 		this.router.add(data.method, data.endpoint, data);
 	}
 }

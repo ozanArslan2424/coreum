@@ -5,9 +5,8 @@ import type { RouteInterface } from "@/Route/RouteInterface";
 import type { Context } from "@/Context/Context";
 import type { Func } from "@/utils/types/Func";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
-import { $prefixStore, $routerStore } from "@/index";
-import type { RouterRouteData } from "@/Router/types/RouterRouteData";
-import { joinPathSegments } from "@/utils/joinPathSegments";
+import { $registry } from "@/index";
+import type { RouterData } from "@/Router/types/RouterData";
 
 export abstract class RouteAbstract<
 	B = unknown,
@@ -31,20 +30,16 @@ export abstract class RouteAbstract<
 	abstract readonly model?: RouteModel<B, S, P, R>;
 
 	register(): void {
-		$routerStore.get().addRoute(this);
+		$registry.router.add(this);
 	}
 
-	toRouterData(): RouterRouteData {
-		const data: RouterRouteData<any, any, any> = {
+	toRouterData(): RouterData {
+		return {
 			id: this.id,
-			endpoint:
-				this.variant !== RouteVariant.static
-					? joinPathSegments($prefixStore.get(), this.endpoint)
-					: this.endpoint,
+			endpoint: this.endpoint,
 			method: this.method,
 			handler: this.handler,
 			variant: this.variant,
 		};
-		return data;
 	}
 }

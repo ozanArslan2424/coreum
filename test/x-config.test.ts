@@ -1,6 +1,8 @@
-import { TX } from "./other/testing-modules";
-import { describe, expect, it, spyOn } from "bun:test";
+import { $registryTesting, TX } from "./other/testing-modules";
+import { afterEach, describe, expect, it, spyOn } from "bun:test";
 import { log } from "@/utils/log";
+
+afterEach(() => $registryTesting.reset());
 
 describe("X.Config", () => {
 	const undefinedKey = "undefined_env_var_key";

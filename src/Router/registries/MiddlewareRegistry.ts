@@ -4,6 +4,7 @@ import { compile } from "@/utils/compile";
 import type { MiddlewareInterface } from "@/Middleware/MiddlwareInterface";
 import { MiddlewareVariant } from "@/Middleware/enums/MiddlewareVariant";
 import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";
+import type { MiddlewareRegistryReturn } from "@/Router/types/MiddlewareRegistryReturn";
 
 export class MiddlewareRegistry {
 	private inboundMiddlewares = new Map<string, Array<MiddlewareHandler>>();
@@ -28,10 +29,7 @@ export class MiddlewareRegistry {
 		}
 	}
 
-	find(routeId: string): {
-		inbound: MiddlewareHandler;
-		outbound: MiddlewareHandler;
-	} {
+	find(routeId: string): MiddlewareRegistryReturn {
 		return {
 			inbound: compile(this.inboundMiddlewares.get(routeId) ?? []),
 			outbound: compile(this.outboundMiddlewares.get(routeId) ?? []),

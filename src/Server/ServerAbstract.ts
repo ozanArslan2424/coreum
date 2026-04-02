@@ -1,6 +1,6 @@
 import { Context } from "@/Context/Context";
 import { Status } from "@/CResponse/enums/Status";
-import { $corsStore, $prefixStore, $routerStore } from "@/index";
+import { $registry } from "@/index";
 import { CError } from "@/CError/CError";
 import { CRequest } from "@/CRequest/CRequest";
 import { CResponse } from "@/CResponse/CResponse";
@@ -14,7 +14,7 @@ import type { Func } from "@/utils/types/Func";
 import type { ServerOptions } from "@/Server/types/ServerOptions";
 import { log, logFatal } from "@/utils/log";
 import { WebSocketRoute } from "@/Route/WebSocketRoute";
-import type { RouterRouteData } from "@/Router/types/RouterRouteData";
+import type { RouterData } from "@/Router/types/RouterData";
 import { RouteVariant } from "@/Route/enums/RouteVariant";
 
 export abstract class ServerAbstract implements ServerInterface {
@@ -22,15 +22,15 @@ export abstract class ServerAbstract implements ServerInterface {
 	abstract close(closeActiveConnections?: boolean): Promise<void>;
 
 	constructor(protected readonly opts?: ServerOptions) {
-		$routerStore.set(new Router(opts?.adapter));
+		$registry.router = new Router(opts?.adapter);
 	}
 
-	get routes(): Array<RouterRouteData> {
-		return $routerStore.get().getRouteList();
+	get routes(): Array<RouterData> {
+		return $registry.router.list();
 	}
 
 	setGlobalPrefix(value: string): void {
-		$prefixStore.set(value);
+		$registry.prefix = value;
 	}
 
 	async listen(
@@ -67,18 +67,17 @@ export abstract class ServerAbstract implements ServerInterface {
 		req: CRequest,
 		onUpgrade: Func<[WebSocketRoute], undefined>,
 	): Promise<CResponse | undefined> {
-		const router = $routerStore.get();
-		const cors = $corsStore.get();
 		const ctx = new Context(req);
+
 		// gmw = global middlewares
-		const gmw = router.findMiddleware("*");
+		const gmw = $registry.middlewares.find("*");
 
 		try {
 			const gmwir = await gmw.inbound(ctx);
 			if (gmwir instanceof CResponse) {
 				return gmwir;
 			}
-			const match = router.findRoute(req);
+			const match = $registry.router.find(req);
 
 			if (req.isPreflight) {
 				ctx.res = await this.handlePreflight(req);
@@ -86,7 +85,7 @@ export abstract class ServerAbstract implements ServerInterface {
 				ctx.res = await this.handleNotFound(req);
 			} else {
 				// lmw = local middlewares
-				const lmw = router.findMiddleware(match.route.id);
+				const lmw = $registry.middlewares.find(match.route.id);
 
 				const lmwir = await lmw.inbound(ctx);
 				if (lmwir instanceof CResponse) {
@@ -117,9 +116,7 @@ export abstract class ServerAbstract implements ServerInterface {
 			ctx.res = await this.handleError(err as Error);
 		}
 
-		if (cors) {
-			await cors.handler(ctx);
-		}
+		await $registry.cors?.handler(ctx);
 
 		return ctx.res;
 	}
@@ -164,11 +161,10 @@ export abstract class ServerAbstract implements ServerInterface {
 	};
 
 	protected handlePreflight: RequestHandler = async (req) => {
-		const cors = $corsStore.get();
-		if (!cors) {
+		if (!$registry.cors) {
 			return new CResponse(undefined, { status: Status.NO_CONTENT });
 		}
-		const handler = cors.getPreflightHandler();
+		const handler = $registry.cors.getPreflightHandler();
 		return await handler(req);
 	};
 }

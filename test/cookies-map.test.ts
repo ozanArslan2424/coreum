@@ -1,6 +1,9 @@
 import CookiesUsingMap from "@/Cookies/Cookies.node";
 import type { CookieOptions } from "@/Cookies/types/CookieOptions";
-import { describe, expect, it } from "bun:test";
+import { afterEach, describe, expect, it } from "bun:test";
+import { $registryTesting } from "./other/testing-modules";
+
+afterEach(() => $registryTesting.reset());
 
 describe("CookiesUsingMap", () => {
 	const firstName = "firstCookie";

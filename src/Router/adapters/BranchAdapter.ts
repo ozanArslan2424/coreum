@@ -1,11 +1,11 @@
 import type { CRequest } from "@/CRequest/CRequest";
-import type { RouterReturnData } from "@/Router/types/RouterReturnData";
-import type { RouterRouteData } from "@/Router/types/RouterRouteData";
+import type { RouterReturn } from "@/Router/types/RouterReturn";
+import type { RouterData } from "@/Router/types/RouterData";
 import type { Func } from "@/utils/types/Func";
 import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
 import type { Method } from "@/CRequest/enums/Method";
 
-type Store = Map<Method, RouterRouteData>;
+type Store = Map<Method, RouterData>;
 
 type ParamBranch = {
 	paramName: string;
@@ -55,7 +55,7 @@ export class BranchAdapter implements RouterAdapterInterface {
 	private _root: Branch = this.createBranch("/", null);
 	private storeFactory: Func<[], Store> = () => new Map();
 
-	find(req: CRequest): RouterReturnData | null {
+	find(req: CRequest): RouterReturn | null {
 		const method = req.method.toUpperCase() as Method;
 		const pathname = req.urlObject.pathname;
 		const pathlength = pathname.length;
@@ -74,13 +74,13 @@ export class BranchAdapter implements RouterAdapterInterface {
 		};
 	}
 
-	add(data: RouterRouteData): void {
+	add(data: RouterData): void {
 		const store = this.createBranchStore(data.endpoint);
 		store.set(data.method, data);
 	}
 
-	list: Func<[], Array<RouterRouteData>> | undefined = () => {
-		const routes: Array<RouterRouteData> = [];
+	list: Func<[], Array<RouterData>> | undefined = () => {
+		const routes: Array<RouterData> = [];
 
 		const walk = (branch: Branch) => {
 			if (branch.store !== null) routes.push(...branch.store.values());
