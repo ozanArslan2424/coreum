@@ -9,7 +9,7 @@ import { RateLimiterFileStore } from "@/XRateLimiter/stores/RateLimiterFileStore
 import { RateLimiterMemoryStore } from "@/XRateLimiter/stores/RateLimiterMemoryStore";
 import { Status } from "@/CResponse/enums/Status";
 import { CommonHeaders } from "@/CHeaders/enums/CommonHeaders";
-import { logFatal } from "@/utils/internalLogger";
+import { logFatal } from "@/utils/log";
 import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
 import { MiddlewareVariant } from "@/Middleware/enums/MiddlewareVariant";
 import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";

@@ -1,11 +1,11 @@
-import { C } from "@/index";
+import { TC } from "./other/testing-modules";
 import { describe, expect, it } from "bun:test";
 
 describe("C.Response", () => {
-	const ctHeader = C.CommonHeaders.ContentType;
+	const ctHeader = TC.CommonHeaders.ContentType;
 	const otherHeader = "other-header";
 	const otherHeaderValue = "other-header-value";
-	const locHeader = C.CommonHeaders.Location;
+	const locHeader = TC.CommonHeaders.Location;
 	const locUrl = "/hello";
 
 	async function expectData({
@@ -14,10 +14,10 @@ describe("C.Response", () => {
 		data,
 		expectedBody = "",
 		expectedCtHeader = "text/plain",
-		expectedStatus = C.Status.OK,
+		expectedStatus = TC.Status.OK,
 		expectedOK = true,
 	}: {
-		res: C.Response;
+		res: TC.Response;
 		response: Response;
 		data: any;
 		expectedBody?: any;
@@ -26,8 +26,8 @@ describe("C.Response", () => {
 		expectedOK?: boolean;
 	}) {
 		// types and instances
-		expect(res.headers).toBeInstanceOf(C.Headers);
-		expect(res.cookies).toBeInstanceOf(C.Cookies);
+		expect(res.headers).toBeInstanceOf(TC.Headers);
+		expect(res.cookies).toBeInstanceOf(TC.Cookies);
 		expect(res.status).toBeTypeOf("number");
 		expect(res.statusText).toBeTypeOf("string");
 
@@ -45,7 +45,7 @@ describe("C.Response", () => {
 	}
 
 	it("EMPTY BODY", async () => {
-		const res = new C.Response();
+		const res = new TC.Response();
 		const response = res.response;
 		const data = await response.text();
 		await expectData({
@@ -56,7 +56,7 @@ describe("C.Response", () => {
 	});
 
 	it("NULL BODY", async () => {
-		const res = new C.Response(null);
+		const res = new TC.Response(null);
 		const response = res.response;
 		const data = await response.text();
 		await expectData({
@@ -67,7 +67,7 @@ describe("C.Response", () => {
 	});
 
 	it("UNDEFINED BODY", async () => {
-		const res = new C.Response(undefined);
+		const res = new TC.Response(undefined);
 		const response = res.response;
 		const data = await response.text();
 		await expectData({
@@ -78,7 +78,7 @@ describe("C.Response", () => {
 	});
 
 	it("REDIRECT BY INIT HEADERS", async () => {
-		const res = new C.Response(undefined, { headers: [[locHeader, locUrl]] });
+		const res = new TC.Response(undefined, { headers: [[locHeader, locUrl]] });
 		expect(res.headers.get(locHeader)).toBe(locUrl);
 		const response = res.response;
 		expect(response.headers.get(locHeader)).toBe(locUrl);
@@ -88,12 +88,12 @@ describe("C.Response", () => {
 			response,
 			data,
 			expectedOK: false,
-			expectedStatus: C.Status.FOUND,
+			expectedStatus: TC.Status.FOUND,
 		});
 	});
 
 	it("REDIRECT BY STATIC METHOD - REDIRECT", async () => {
-		const res = C.Response.redirect(locUrl);
+		const res = TC.Response.redirect(locUrl);
 		expect(res.headers.get(locHeader)).toBe(locUrl);
 		const response = res.response;
 		expect(response.headers.get(locHeader)).toBe(locUrl);
@@ -103,12 +103,12 @@ describe("C.Response", () => {
 			response,
 			data,
 			expectedOK: false,
-			expectedStatus: C.Status.FOUND,
+			expectedStatus: TC.Status.FOUND,
 		});
 	});
 
 	it("REDIRECT BY STATIC METHOD - REDIRECT - WITH EXTRA HEADERS", async () => {
-		const res = C.Response.redirect(locUrl, {
+		const res = TC.Response.redirect(locUrl, {
 			headers: [[otherHeader, otherHeaderValue]],
 		});
 		expect(res.headers.get(locHeader)).toBe(locUrl);
@@ -122,12 +122,12 @@ describe("C.Response", () => {
 			response,
 			data,
 			expectedOK: false,
-			expectedStatus: C.Status.FOUND,
+			expectedStatus: TC.Status.FOUND,
 		});
 	});
 
 	it("REDIRECT BY STATIC METHOD - PERMANENT REDIRECT", async () => {
-		const res = C.Response.permanentRedirect(locUrl);
+		const res = TC.Response.permanentRedirect(locUrl);
 		expect(res.headers.get(locHeader)).toBe(locUrl);
 		const response = res.response;
 		expect(response.headers.get(locHeader)).toBe(locUrl);
@@ -137,12 +137,12 @@ describe("C.Response", () => {
 			response,
 			data,
 			expectedOK: false,
-			expectedStatus: C.Status.MOVED_PERMANENTLY,
+			expectedStatus: TC.Status.MOVED_PERMANENTLY,
 		});
 	});
 
 	it("REDIRECT BY STATIC METHOD - TEMPORARY REDIRECT", async () => {
-		const res = C.Response.temporaryRedirect(locUrl);
+		const res = TC.Response.temporaryRedirect(locUrl);
 		expect(res.headers.get(locHeader)).toBe(locUrl);
 		const response = res.response;
 		expect(response.headers.get(locHeader)).toBe(locUrl);
@@ -152,12 +152,12 @@ describe("C.Response", () => {
 			response,
 			data,
 			expectedOK: false,
-			expectedStatus: C.Status.TEMPORARY_REDIRECT,
+			expectedStatus: TC.Status.TEMPORARY_REDIRECT,
 		});
 	});
 
 	it("REDIRECT BY STATIC METHOD - SEE OTHER", async () => {
-		const res = C.Response.seeOther(locUrl);
+		const res = TC.Response.seeOther(locUrl);
 		expect(res.headers.get(locHeader)).toBe(locUrl);
 		const response = res.response;
 		expect(response.headers.get(locHeader)).toBe(locUrl);
@@ -167,30 +167,30 @@ describe("C.Response", () => {
 			response,
 			data,
 			expectedOK: false,
-			expectedStatus: C.Status.SEE_OTHER,
+			expectedStatus: TC.Status.SEE_OTHER,
 		});
 	});
 
 	it("SSE - RETURNS STREAM WITH CORRECT HEADERS", async () => {
-		const res = C.Response.sse((send) => {
+		const res = TC.Response.sse((send) => {
 			send({ event: "ping", data: { time: 1 } });
 		});
 		const response = res.response;
 
-		expect(res.status).toBe(C.Status.OK);
+		expect(res.status).toBe(TC.Status.OK);
 		expect(res.body).toBeInstanceOf(ReadableStream);
-		expect(res.headers.get(C.CommonHeaders.ContentType)).toBe(
+		expect(res.headers.get(TC.CommonHeaders.ContentType)).toBe(
 			"text/event-stream",
 		);
-		expect(res.headers.get(C.CommonHeaders.CacheControl)).toBe("no-cache");
-		expect(res.headers.get(C.CommonHeaders.Connection)).toBe("keep-alive");
-		expect(response.headers.get(C.CommonHeaders.ContentType)).toBe(
+		expect(res.headers.get(TC.CommonHeaders.CacheControl)).toBe("no-cache");
+		expect(res.headers.get(TC.CommonHeaders.Connection)).toBe("keep-alive");
+		expect(response.headers.get(TC.CommonHeaders.ContentType)).toBe(
 			"text/event-stream",
 		);
 	});
 
 	it("SSE - STREAM EMITS CORRECT CHUNKS", async () => {
-		const res = C.Response.sse((send) => {
+		const res = TC.Response.sse((send) => {
 			send({ event: "ping", data: { time: 1 } });
 			send({ id: "2", event: "pong", data: { time: 2 } });
 		});
@@ -204,7 +204,7 @@ describe("C.Response", () => {
 	});
 
 	it("SSE - RETRY FIELD IS INCLUDED WHEN SET", async () => {
-		const res = C.Response.sse(
+		const res = TC.Response.sse(
 			(send) => {
 				send({ data: "ok" });
 			},
@@ -218,7 +218,7 @@ describe("C.Response", () => {
 
 	it("SSE - CLEANUP IS CALLED ON CANCEL", async () => {
 		let cleaned = false;
-		const res = C.Response.sse(() => {
+		const res = TC.Response.sse(() => {
 			return () => {
 				cleaned = true;
 			};
@@ -231,23 +231,23 @@ describe("C.Response", () => {
 
 	it("ARRAYBUFFER BODY", async () => {
 		const buffer = new TextEncoder().encode("hello").buffer;
-		const res = new C.Response(buffer);
+		const res = new TC.Response(buffer);
 		const response = res.response;
 
 		expect(res.body).toBeInstanceOf(ArrayBuffer);
 		expect(res.headers.get(ctHeader)).toBe("application/octet-stream");
-		expect(res.status).toBe(C.Status.OK);
+		expect(res.status).toBe(TC.Status.OK);
 		const text = await response.text();
 		expect(text).toBe("hello");
 	});
 
 	it("BLOB BODY", async () => {
 		const blob = new Blob(["hello"], { type: "text/html" });
-		const res = new C.Response(blob);
+		const res = new TC.Response(blob);
 		const response = res.response;
 
 		expect(res.body).toBeInstanceOf(Blob);
-		expect(res.status).toBe(C.Status.OK);
+		expect(res.status).toBe(TC.Status.OK);
 		const text = await response.text();
 		expect(text).toBe("hello");
 		expect(response.headers.get(ctHeader)).toContain("text/html");
@@ -256,11 +256,11 @@ describe("C.Response", () => {
 	it("FORMDATA BODY", async () => {
 		const form = new FormData();
 		form.append("name", "corpus");
-		const res = new C.Response(form);
+		const res = new TC.Response(form);
 		const response = res.response;
 
 		expect(res.body).toBeInstanceOf(FormData);
-		expect(res.status).toBe(C.Status.OK);
+		expect(res.status).toBe(TC.Status.OK);
 		const text = await response.text();
 		expect(text).toContain("corpus");
 		expect(response.headers.get(ctHeader)).toContain("multipart/form-data");
@@ -268,11 +268,11 @@ describe("C.Response", () => {
 
 	it("URLSEARCHPARAMS BODY", async () => {
 		const params = new URLSearchParams({ name: "corpus" });
-		const res = new C.Response(params);
+		const res = new TC.Response(params);
 		const response = res.response;
 
 		expect(res.body).toBeInstanceOf(URLSearchParams);
-		expect(res.status).toBe(C.Status.OK);
+		expect(res.status).toBe(TC.Status.OK);
 		const text = await response.text();
 		expect(text).toBe("name=corpus");
 		expect(response.headers.get(ctHeader)).toContain(
@@ -281,19 +281,19 @@ describe("C.Response", () => {
 	});
 
 	it("NDJSON - RETURNS STREAM WITH CORRECT HEADERS", async () => {
-		const res = C.Response.ndjson((send) => {
+		const res = TC.Response.ndjson((send) => {
 			send({ id: 1 });
 		});
 		const response = res.response;
 
-		expect(res.status).toBe(C.Status.OK);
+		expect(res.status).toBe(TC.Status.OK);
 		expect(res.body).toBeInstanceOf(ReadableStream);
 		expect(res.headers.get(ctHeader)).toBe("application/x-ndjson");
 		expect(response.headers.get(ctHeader)).toBe("application/x-ndjson");
 	});
 
 	it("NDJSON - STREAM EMITS CORRECT CHUNKS", async () => {
-		const res = C.Response.ndjson((send) => {
+		const res = TC.Response.ndjson((send) => {
 			send({ id: 1, name: "alice" });
 			send({ id: 2, name: "bob" });
 		});
@@ -310,7 +310,7 @@ describe("C.Response", () => {
 
 	it("NDJSON - CLEANUP IS CALLED ON CANCEL", async () => {
 		let cleaned = false;
-		const res = C.Response.ndjson(() => {
+		const res = TC.Response.ndjson(() => {
 			return () => {
 				cleaned = true;
 			};
@@ -324,12 +324,12 @@ describe("C.Response", () => {
 	// ─── streamFile ───────────────────────────────────────────────────────────────
 
 	it("STREAM FILE - RETURNS STREAM WITH CORRECT HEADERS FOR TXT", async () => {
-		const res = await C.Response.streamFile("test/fixtures/sample.txt");
+		const res = await TC.Response.streamFile("test/fixtures/sample.txt");
 
-		expect(res.status).toBe(C.Status.OK);
+		expect(res.status).toBe(TC.Status.OK);
 		expect(res.body).toBeInstanceOf(ReadableStream);
 		expect(res.headers.get(ctHeader)).toBe("text/plain");
-		expect(res.headers.get(C.CommonHeaders.ContentDisposition)).toBe(
+		expect(res.headers.get(TC.CommonHeaders.ContentDisposition)).toBe(
 			'attachment; filename="sample.txt"',
 		);
 	});
@@ -344,29 +344,29 @@ describe("C.Response", () => {
 		];
 
 		for (const [path, expectedMime] of cases) {
-			const res = await C.Response.streamFile(path);
+			const res = await TC.Response.streamFile(path);
 			expect(res.headers.get(ctHeader)).toBe(expectedMime);
 		}
 	});
 
 	it("STREAM FILE - INLINE DISPOSITION", async () => {
-		const res = await C.Response.streamFile(
+		const res = await TC.Response.streamFile(
 			"test/fixtures/sample.txt",
 			"inline",
 		);
-		expect(res.headers.get(C.CommonHeaders.ContentDisposition)).toBe(
+		expect(res.headers.get(TC.CommonHeaders.ContentDisposition)).toBe(
 			'inline; filename="sample.txt"',
 		);
 	});
 
 	it("STREAM FILE - THROWS NOT FOUND FOR MISSING FILE", async () => {
 		expect(
-			C.Response.streamFile("test/fixtures/does-not-exist.txt"),
+			TC.Response.streamFile("test/fixtures/does-not-exist.txt"),
 		).rejects.toThrow();
 	});
 
 	it("STREAM FILE - BODY CONTAINS FILE CONTENT", async () => {
-		const res = await C.Response.streamFile("test/fixtures/sample.txt");
+		const res = await TC.Response.streamFile("test/fixtures/sample.txt");
 		const text = await res.response.text();
 		expect(text.length).toBeGreaterThan(0);
 	});

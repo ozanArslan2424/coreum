@@ -1,6 +1,6 @@
-import { X } from "@/index";
+import { TX } from "./other/testing-modules";
 import { describe, expect, it, spyOn } from "bun:test";
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 
 describe("X.Config", () => {
 	const undefinedKey = "undefined_env_var_key";
@@ -12,52 +12,52 @@ describe("X.Config", () => {
 	const val = "CONFIG_TEST_VAR_VALUE";
 
 	it("SET", () => {
-		X.Config.set(key, val);
-		expect(X.Config.env[key]).toBe(val);
-		expect(X.Config.get<string>(key)).toBe(val);
+		TX.Config.set(key, val);
+		expect(TX.Config.env[key]).toBe(val);
+		expect(TX.Config.get<string>(key)).toBe(val);
 		expect(process.env[key]).toBe(val);
 		expect(Bun.env[key]).toBe(val);
 	});
 
 	it("NODE_ENV", () => {
-		const value = X.Config.nodeEnv;
+		const value = TX.Config.nodeEnv;
 		expect(value).toBe("test");
 		expect(process.env.NODE_ENV === value).toBeTrue();
 	});
 
 	it("GET - DEFINED", () => {
-		expect(X.Config.get<string>(key)).toBe(val);
+		expect(TX.Config.get<string>(key)).toBe(val);
 	});
 
 	it("GET - DEFINED PARSE NUMBER", () => {
-		X.Config.set(numberKey, numberVal);
+		TX.Config.set(numberKey, numberVal);
 
-		expect(X.Config.get(numberKey, { parser: parseInt })).toBe(numberVal);
-		expect(X.Config.get(numberKey, { parser: Number })).toBe(numberVal);
+		expect(TX.Config.get(numberKey, { parser: parseInt })).toBe(numberVal);
+		expect(TX.Config.get(numberKey, { parser: Number })).toBe(numberVal);
 	});
 
 	it("GET - DEFINED PARSE BOOLEAN", () => {
-		X.Config.set(booleanKey, booleanVal);
+		TX.Config.set(booleanKey, booleanVal);
 
-		expect(X.Config.get(booleanKey, { parser: (v) => v === "true" })).toBe(
+		expect(TX.Config.get(booleanKey, { parser: (v) => v === "true" })).toBe(
 			booleanVal,
 		);
-		expect(X.Config.get(booleanKey, { parser: Boolean })).toBe(booleanVal);
+		expect(TX.Config.get(booleanKey, { parser: Boolean })).toBe(booleanVal);
 	});
 
 	it("GET - UNDEFINED", () => {
 		const logSpy = spyOn(log, "warn");
-		expect(X.Config.get(undefinedKey)).toBeUndefined();
+		expect(TX.Config.get(undefinedKey)).toBeUndefined();
 		expect(logSpy).toBeCalled();
 	});
 
 	it("GET - UNDEFINED WITH FALLBACK", () => {
 		const fallback = "fallback_value";
-		expect(X.Config.get(undefinedKey, { fallback })).toBe(fallback);
+		expect(TX.Config.get(undefinedKey, { fallback })).toBe(fallback);
 	});
 
 	it("RUNTIME", () => {
 		// The tests are using bun.
-		expect(X.Config.runtime).toBe("bun");
+		expect(TX.Config.runtime).toBe("bun");
 	});
 });

@@ -1,5 +1,5 @@
 import type { Env } from "@/types.d.ts";
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 import { strIsDefined } from "@/utils/strIsDefined";
 import type { Func } from "@/utils/types/Func";
 import type { OrString } from "@/utils/types/OrString";

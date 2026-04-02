@@ -1,20 +1,19 @@
 import { createTestServer } from "./utils/createTestServer";
-import { C } from "@/index";
+import { TC, TX } from "./other/testing-modules";
 import { describe, expect, it } from "bun:test";
-import { BranchAdapter } from "@/Router/adapters/BranchAdapter";
 
 describe("BranchAdapter - Route Collision Detection", () => {
 	createTestServer({
-		adapter: new BranchAdapter(),
+		adapter: new TX.BranchAdapter(),
 	});
 
 	function makeRoutes(
-		r1: ConstructorParameters<typeof C.Route>[0],
-		r2: ConstructorParameters<typeof C.Route>[0],
+		r1: ConstructorParameters<typeof TC.Route>[0],
+		r2: ConstructorParameters<typeof TC.Route>[0],
 	) {
 		return () => {
-			new C.Route(r1, () => "ok");
-			new C.Route(r2, () => "ok");
+			new TC.Route(r1, () => "ok");
+			new TC.Route(r2, () => "ok");
 		};
 	}
 
@@ -26,8 +25,8 @@ describe("BranchAdapter - Route Collision Detection", () => {
 	it("STATIC - IDENTICAL ROUTES DIFFERENT METHOD - SHOULD NOT CLASH", () => {
 		expect(
 			makeRoutes(
-				{ path: "/b", method: C.Method.GET },
-				{ path: "/b", method: C.Method.POST },
+				{ path: "/b", method: TC.Method.GET },
+				{ path: "/b", method: TC.Method.POST },
 			),
 		).not.toThrow();
 	});
@@ -46,8 +45,8 @@ describe("BranchAdapter - Route Collision Detection", () => {
 	it("DYNAMIC - IDENTICAL PARAM ROUTES DIFFERENT METHOD - SHOULD NOT CLASH", () => {
 		expect(
 			makeRoutes(
-				{ path: "/g/:a", method: C.Method.GET },
-				{ path: "/g/:a", method: C.Method.DELETE },
+				{ path: "/g/:a", method: TC.Method.GET },
+				{ path: "/g/:a", method: TC.Method.DELETE },
 			),
 		).not.toThrow();
 	});

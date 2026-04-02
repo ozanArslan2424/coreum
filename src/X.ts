@@ -8,7 +8,10 @@ export { XFile as File } from "./XFile/XFile";
 export { XRepository as Repository } from "./XRepository/XRepository";
 
 export { MemoiristAdapter } from "./Router/adapters/MemoiristAdapter";
-export type { RouterAdapterInterface } from "./Router/adapters/RouterAdapterInterface";
+export { BranchAdapter } from "./Router/adapters/BranchAdapter";
+export type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
+export type { RouterReturnData } from "@/Router/types/RouterReturnData";
+export type { RouterRouteData } from "@/Router/types/RouterRouteData";
 
 export { XRateLimiter as RateLimiter } from "./XRateLimiter/XRateLimiter";
 export { RateLimiterFileStore } from "./XRateLimiter/stores/RateLimiterFileStore";

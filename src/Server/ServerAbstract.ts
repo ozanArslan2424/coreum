@@ -12,7 +12,7 @@ import type { ServerInterface } from "@/Server/ServerInterface";
 import { Router } from "@/Router/Router";
 import type { Func } from "@/utils/types/Func";
 import type { ServerOptions } from "@/Server/types/ServerOptions";
-import { log, logFatal } from "@/utils/internalLogger";
+import { log, logFatal } from "@/utils/log";
 import { WebSocketRoute } from "@/Route/WebSocketRoute";
 import type { RouterRouteData } from "@/Router/types/RouterRouteData";
 import { RouteVariant } from "@/Route/enums/RouteVariant";

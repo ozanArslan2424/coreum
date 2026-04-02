@@ -10,6 +10,7 @@ import type { Context } from "@/Context/Context";
 import type { Func } from "@/utils/types/Func";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
 import type { StaticRouteDefinition } from "@/Route/types/StaticRouteDefinition";
+import type { StaticRouteCallback } from "@/Route/types/StaticRouteCallback";
 
 type R = CResponse | string;
 
@@ -24,10 +25,7 @@ export abstract class StaticRouteAbstract<
 
 	abstract readonly definition: StaticRouteDefinition;
 
-	abstract readonly callback?: Func<
-		[context: Context<B, S, P, R>, content: string],
-		MaybePromise<R>
-	>;
+	abstract readonly callback?: StaticRouteCallback<B, S, P>;
 
 	protected get filePath(): string {
 		return typeof this.definition === "string"

@@ -1,4 +1,4 @@
-import { C, X } from "@/index";
+import { TC, TX } from "./other/testing-modules";
 import { describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
@@ -8,36 +8,36 @@ describe("C.Middleware — lifecycle", () => {
 
 	// ── routes ────────────────────────────────────────────────────────────────
 
-	const authRoute = new C.Route("/protected", (c) => ({
+	const authRoute = new TC.Route("/protected", (c) => ({
 		user: (c.data as any).user,
 	}));
-	const throwRoute = new C.Route("/throw-guarded", (c) => ({
+	const throwRoute = new TC.Route("/throw-guarded", (c) => ({
 		user: (c.data as any).user,
 	}));
-	const outboundHeaders = new C.Route("/outbound-headers", () => ({
+	const outboundHeaders = new TC.Route("/outbound-headers", () => ({
 		ok: true,
 	}));
-	const outboundCookies = new C.Route("/outbound-cookies", () => ({
+	const outboundCookies = new TC.Route("/outbound-cookies", () => ({
 		ok: true,
 	}));
-	new C.Route("/global-one", (c) => ({ traced: (c.data as any).traced }));
-	new C.Route("/global-two", (c) => ({ traced: (c.data as any).traced }));
-	const inboundHeaders = new C.Route("/inbound-headers", (c) => ({
+	new TC.Route("/global-one", (c) => ({ traced: (c.data as any).traced }));
+	new TC.Route("/global-two", (c) => ({ traced: (c.data as any).traced }));
+	const inboundHeaders = new TC.Route("/inbound-headers", (c) => ({
 		receivedToken: (c.data as any).token,
 	}));
-	const inboundCookies = new C.Route("/inbound-cookies", (c) => ({
+	const inboundCookies = new TC.Route("/inbound-cookies", (c) => ({
 		sessionId: (c.data as any).sessionId,
 	}));
 
 	// ── 1) return-response guard ───────────────────────────────────────────────
 	// Simulates an auth guard: if the Authorization header is missing/wrong,
 	// short-circuit with 401 before the route handler runs.
-	new C.Middleware({
+	new TC.Middleware({
 		useOn: [authRoute],
 		handler: (c) => {
 			const token = c.req.headers.get("authorization");
 			if (token !== "Bearer secret") {
-				return new C.Response({ error: "unauthorized" }, { status: 401 });
+				return new TC.Response({ error: "unauthorized" }, { status: 401 });
 			}
 			(c.data as any).user = "alice";
 		},
@@ -46,7 +46,7 @@ describe("C.Middleware — lifecycle", () => {
 	// ── 2) throw guard ────────────────────────────────────────────────────────
 	// Simulates a guard that throws (e.g. JWT verification failure).
 	// The framework should catch it and respond with 500 (or your error shape).
-	new C.Middleware({
+	new TC.Middleware({
 		useOn: [throwRoute],
 		handler: () => {
 			throw new Error("token signature invalid");
@@ -55,7 +55,7 @@ describe("C.Middleware — lifecycle", () => {
 
 	// ── 3a) outbound — append response headers ────────────────────────────────
 	// Simulates a CORS or cache-control interceptor running after the handler.
-	new C.Middleware({
+	new TC.Middleware({
 		variant: "outbound",
 		useOn: [outboundHeaders],
 		handler: (c) => {
@@ -66,7 +66,7 @@ describe("C.Middleware — lifecycle", () => {
 
 	// ── 3b) outbound — set cookies ────────────────────────────────────────────
 	// Simulates a session middleware that stamps a cookie on every response.
-	new C.Middleware({
+	new TC.Middleware({
 		variant: "outbound",
 		useOn: [outboundCookies],
 		handler: (c) => {
@@ -80,7 +80,7 @@ describe("C.Middleware — lifecycle", () => {
 
 	// ── 4) global middleware via useOn: "*" ───────────────────────────────────
 	// Simulates a request-id / tracing interceptor applied to every route.
-	new C.Middleware({
+	new TC.Middleware({
 		useOn: "*",
 		handler: (c) => {
 			(c.data as any).traced = true;
@@ -89,7 +89,7 @@ describe("C.Middleware — lifecycle", () => {
 
 	// ── 5a) inbound — read request header ─────────────────────────────────────
 	// Simulates an API-key extractor that normalises the token into (c.data as any).
-	new C.Middleware({
+	new TC.Middleware({
 		useOn: [inboundHeaders],
 		handler: (c) => {
 			(c.data as any).token = c.req.headers.get("x-api-key") ?? null;
@@ -98,7 +98,7 @@ describe("C.Middleware — lifecycle", () => {
 
 	// ── 5b) inbound — read request cookie ─────────────────────────────────────
 	// Simulates a session resolver that reads a cookie and exposes the id.
-	new C.Middleware({
+	new TC.Middleware({
 		useOn: [inboundCookies],
 		handler: (c) => {
 			(c.data as any).sessionId = c.req.cookies.get("session-id") ?? null;
@@ -110,7 +110,7 @@ describe("C.Middleware — lifecycle", () => {
 	it("GUARD — return response blocks route (wrong token)", async () => {
 		const res = await s.handle(req("/protected"));
 		expect(res.status).toBe(401);
-		const body = await X.Parser.parseBody<{ error: string }>(res);
+		const body = await TX.Parser.parseBody<{ error: string }>(res);
 		expect(body).toEqual({ error: "unauthorized" });
 	});
 
@@ -119,7 +119,7 @@ describe("C.Middleware — lifecycle", () => {
 			req("/protected", { headers: { authorization: "Bearer secret" } }),
 		);
 		expect(res.status).toBe(200);
-		const body = await X.Parser.parseBody<{ user: string }>(res);
+		const body = await TX.Parser.parseBody<{ user: string }>(res);
 		expect(body).toEqual({ user: "alice" });
 	});
 
@@ -144,8 +144,8 @@ describe("C.Middleware — lifecycle", () => {
 	it("GLOBAL — useOn '*' runs on every route", async () => {
 		const res1 = await s.handle(req("/global-one"));
 		const res2 = await s.handle(req("/global-two"));
-		const body1 = await X.Parser.parseBody<{ traced: boolean }>(res1);
-		const body2 = await X.Parser.parseBody<{ traced: boolean }>(res2);
+		const body1 = await TX.Parser.parseBody<{ traced: boolean }>(res1);
+		const body2 = await TX.Parser.parseBody<{ traced: boolean }>(res2);
 		expect(body1).toEqual({ traced: true });
 		expect(body2).toEqual({ traced: true });
 	});
@@ -154,7 +154,7 @@ describe("C.Middleware — lifecycle", () => {
 		const res = await s.handle(
 			req("/inbound-headers", { headers: { "x-api-key": "key-xyz" } }),
 		);
-		const body = await X.Parser.parseBody<{ receivedToken: string }>(res);
+		const body = await TX.Parser.parseBody<{ receivedToken: string }>(res);
 		expect(body).toEqual({ receivedToken: "key-xyz" });
 	});
 
@@ -162,7 +162,7 @@ describe("C.Middleware — lifecycle", () => {
 		const res = await s.handle(
 			req("/inbound-cookies", { headers: { cookie: "session-id=sess-99" } }),
 		);
-		const body = await X.Parser.parseBody<{ sessionId: string }>(res);
+		const body = await TX.Parser.parseBody<{ sessionId: string }>(res);
 		expect(body).toEqual({ sessionId: "sess-99" });
 	});
 });

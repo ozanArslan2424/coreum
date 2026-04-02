@@ -1,5 +1,5 @@
 import { joinPathSegments } from "@/utils/joinPathSegments";
-import { $prefixStore } from "@/index";
+import { $prefixStoreTesting } from "../other/testing-modules";
 
 export const TEST_PORT = 4444;
 
@@ -9,7 +9,7 @@ export function req(addr: string, init?: RequestInit) {
 
 export function reqPath(addr: string): string {
 	return `http://localhost:${TEST_PORT}${joinPathSegments(
-		$prefixStore.get(),
+		$prefixStoreTesting.get(),
 		addr,
 	)}`;
 }

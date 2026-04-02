@@ -13,7 +13,7 @@ The `Router` class is NOT part of the public Corpus API. It is automatically cre
 
 ## Router Adapters
 
-When instantiating a new `Server`, you may optionally provide a supported adapter inside the ServerOptions.
+When instantiating a new `Server`, you may optionally provide a supported adapter inside the ServerOptions. Provided adapters are part of the X module.
 
 <section>
 
@@ -31,10 +31,10 @@ The default router adapter, based on [@medley/router](https://github.com/medleyj
 An alternative adapter layer for [memoirist](https://github.com/SaltyAom/memoirist) by [SaltyAom](https://github.com/SaltyAom). This is the router used in ElysiaJS. Requires the optional `memoirist` dependency. Also extremely fast.
 
 ```ts
-import { C, MemoiristAdapter } from "@ozanarslan/corpus";
+import { C, X } from "@ozanarslan/corpus";
 
 const server = new C.Server({
-	adapter: new MemoiristAdapter(),
+	adapter: new X.MemoiristAdapter(),
 });
 ```
 

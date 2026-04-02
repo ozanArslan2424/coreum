@@ -1,55 +1,54 @@
-import { C, X } from "@/index";
+import { TC, TX } from "./other/testing-modules";
 import { describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
-import { RouteVariant } from "@/Route/enums/RouteVariant";
-import type { RouteModel } from "@/Model/types/RouteModel";
-import type { Func } from "@/utils/types/Func";
-import type { MaybePromise } from "@/utils/types/MaybePromise";
-import type { StaticRouteDefinition } from "@/Route/types/StaticRouteDefinition";
-
-const s = createTestServer();
-
-const f = (file: string) => X.Config.resolvePath("test", "fixtures", file);
 
 describe("C.StaticRoute", () => {
+	const s = createTestServer();
+	const f = (file: string) => TX.Config.resolvePath("test", "fixtures", file);
+
 	// ─── constructor ──────────────────────────────────────────────
 
 	it("STATIC ROUTE - VARIANT IS STATIC", () => {
-		const route = new C.StaticRoute("/sr1", f("sample.html"));
-		expect(route.variant).toBe(RouteVariant.static);
+		const route = new TC.StaticRoute("/sr1", f("sample.html"));
+		expect(route.variant).toBe("static");
 	});
 
 	it("STATIC ROUTE - METHOD IS ALWAYS GET", () => {
-		const route = new C.StaticRoute("/sr2", f("sample.html"));
-		expect(route.method).toBe(C.Method.GET);
+		const route = new TC.StaticRoute("/sr2", f("sample.html"));
+		expect(route.method).toBe(TC.Method.GET);
 	});
 
 	it("STATIC ROUTE - ENDPOINT IS SET", () => {
-		const route = new C.StaticRoute("/sr3", f("sample.html"));
+		const route = new TC.StaticRoute("/sr3", f("sample.html"));
 		expect(route.endpoint).toBe("/sr3");
 	});
 
 	it("STATIC ROUTE - ID IS SET", () => {
-		const route = new C.StaticRoute("/sr4", f("sample.html"));
-		expect(route.id).toBe(`${C.Method.GET} ${"/sr4"}`);
+		const route = new TC.StaticRoute("/sr4", f("sample.html"));
+		expect(route.id).toBe(`${TC.Method.GET} ${"/sr4"}`);
 	});
 
 	it("STATIC ROUTE - WITH MODEL", () => {
 		const model = { response: undefined };
-		const route = new C.StaticRoute("/sr6", f("sample.html"), undefined, model);
+		const route = new TC.StaticRoute(
+			"/sr6",
+			f("sample.html"),
+			undefined,
+			model,
+		);
 		expect(route.model).toBe(model);
 	});
 
 	it("STATIC ROUTE - WITHOUT MODEL", () => {
-		const route = new C.StaticRoute("/sr7", f("sample.html"));
+		const route = new TC.StaticRoute("/sr7", f("sample.html"));
 		expect(route.model).toBeUndefined();
 	});
 
 	// ─── mime types & content ─────────────────────────────────────
 
 	it("SERVES HTML WITH CORRECT CONTENT TYPE", async () => {
-		new C.StaticRoute("/sr-html", f("sample.html"));
+		new TC.StaticRoute("/sr-html", f("sample.html"));
 		const res = await s.handle(req("/sr-html"));
 		expect(res.status).toBe(200);
 		expect(res.headers.get("Content-Type")).toBe("text/html");
@@ -58,7 +57,7 @@ describe("C.StaticRoute", () => {
 	});
 
 	it("SERVES CSS WITH CORRECT CONTENT TYPE", async () => {
-		new C.StaticRoute("/sr-css", f("sample.css"));
+		new TC.StaticRoute("/sr-css", f("sample.css"));
 		const res = await s.handle(req("/sr-css"));
 		expect(res.status).toBe(200);
 		expect(res.headers.get("Content-Type")).toBe("text/css");
@@ -67,7 +66,7 @@ describe("C.StaticRoute", () => {
 	});
 
 	it("SERVES JS WITH CORRECT CONTENT TYPE", async () => {
-		new C.StaticRoute("/sr-js", f("sample.js"));
+		new TC.StaticRoute("/sr-js", f("sample.js"));
 		const res = await s.handle(req("/sr-js"));
 		expect(res.status).toBe(200);
 		expect(res.headers.get("Content-Type")).toBe("application/javascript");
@@ -88,7 +87,7 @@ describe("C.StaticRoute", () => {
 	// });
 
 	it("SERVES TXT WITH CORRECT CONTENT TYPE", async () => {
-		new C.StaticRoute("/sr-txt", f("sample.txt"));
+		new TC.StaticRoute("/sr-txt", f("sample.txt"));
 		const res = await s.handle(req("/sr-txt"));
 		expect(res.status).toBe(200);
 		expect(res.headers.get("Content-Type")).toBe("text/plain");
@@ -97,7 +96,7 @@ describe("C.StaticRoute", () => {
 	});
 
 	it("SERVES JSON WITH CORRECT CONTENT TYPE", async () => {
-		new C.StaticRoute("/sr-json", f("sample.json"));
+		new TC.StaticRoute("/sr-json", f("sample.json"));
 		const res = await s.handle(req("/sr-json"));
 		expect(res.status).toBe(200);
 		expect(res.headers.get("Content-Type")).toBe("application/json");
@@ -108,7 +107,7 @@ describe("C.StaticRoute", () => {
 	// ─── content length ───────────────────────────────────────────
 
 	it("SETS CONTENT LENGTH HEADER", async () => {
-		new C.StaticRoute("/sr-content-length", f("sample.txt"));
+		new TC.StaticRoute("/sr-content-length", f("sample.txt"));
 		const res = await s.handle(req("/sr-content-length"));
 		const contentLength = res.headers.get("Content-Length");
 		expect(contentLength).not.toBeNull();
@@ -118,7 +117,7 @@ describe("C.StaticRoute", () => {
 	// ─── not found ────────────────────────────────────────────────
 
 	it("RETURNS 404 WHEN FILE DOES NOT EXIST", async () => {
-		new C.StaticRoute("/sr-missing", f("does-not-exist.html"));
+		new TC.StaticRoute("/sr-missing", f("does-not-exist.html"));
 		const res = await s.handle(req("/sr-missing"));
 		expect(res.status).toBe(404);
 	});
@@ -126,7 +125,7 @@ describe("C.StaticRoute", () => {
 	// ─── custom handler ───────────────────────────────────────────
 
 	it("CUSTOM HANDLER RECEIVES CONTENT AND CAN MODIFY IT", async () => {
-		new C.StaticRoute("/sr-custom", f("sample.txt"), (c, content) => {
+		new TC.StaticRoute("/sr-custom", f("sample.txt"), (c, content) => {
 			// trim for trailing \n
 			return content.trim() + " " + (c.search as any).hello;
 		});
@@ -137,7 +136,7 @@ describe("C.StaticRoute", () => {
 	});
 
 	it("CUSTOM HANDLER CAN SET RESPONSE STATUS", async () => {
-		new C.StaticRoute("/sr-custom-status", f("sample.txt"), (c, content) => {
+		new TC.StaticRoute("/sr-custom-status", f("sample.txt"), (c, content) => {
 			c.res.status = 202;
 			return content;
 		});
@@ -149,7 +148,7 @@ describe("C.StaticRoute", () => {
 
 	it("UNKNOWN EXTENSION FALLS BACK TO OCTET STREAM", async () => {
 		// manually test mime fallback via a route pointing to a fake extension
-		new C.StaticRoute("/sr-bin", f("sample.xyz"));
+		new TC.StaticRoute("/sr-bin", f("sample.xyz"));
 		const res = await s.handle(req("/sr-bin"));
 		expect(res.headers.get("Content-Type")).toBe("application/octet-stream");
 	});
@@ -157,7 +156,7 @@ describe("C.StaticRoute", () => {
 	it("USING EXTENDED ABSTRACT METHOD", async () => {
 		const path = "/sr-extended";
 
-		class MyRoute extends C.StaticRouteAbstract {
+		class MyRoute extends TC.StaticRouteAbstract {
 			constructor() {
 				super();
 				this.register();
@@ -165,15 +164,19 @@ describe("C.StaticRoute", () => {
 
 			path: string = path;
 
-			definition: C.StaticRouteDefinition = f("sample.txt");
+			definition: TC.StaticRouteDefinition = f("sample.txt");
 
-			callback: Func<
-				[C.Context<unknown, unknown, unknown, string | C.Response<unknown>>],
-				MaybePromise<string | C.Response<unknown>>
-			> = () => "";
+			override callback?:
+				| TC.StaticRouteCallback<unknown, unknown, unknown>
+				| undefined = () => "";
 
-			model?:
-				| RouteModel<unknown, unknown, unknown, string | C.Response<unknown>>
+			override model?:
+				| TC.RouteModel<
+						unknown,
+						unknown,
+						unknown,
+						string | TC.Response<unknown>
+				  >
 				| undefined;
 		}
 

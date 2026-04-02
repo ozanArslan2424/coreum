@@ -1,14 +1,14 @@
-import { C } from "@/index";
+import { TC } from "./other/testing-modules";
 import { describe, expect, it } from "bun:test";
 
 describe("C.Headers", () => {
-	const authHeader = C.CommonHeaders.Authorization;
+	const authHeader = TC.CommonHeaders.Authorization;
 	const authValue = "Bearer 1827381273";
-	const contHeader = C.CommonHeaders.ContentType;
+	const contHeader = TC.CommonHeaders.ContentType;
 	const contValue = "application/json";
 
 	function expectMethods(
-		headers: C.Headers,
+		headers: TC.Headers,
 		count: number = 1,
 		value: string = authValue,
 		obj: Record<string, string> = { [authHeader.toLowerCase()]: authValue },
@@ -29,43 +29,43 @@ describe("C.Headers", () => {
 	}
 
 	it("INIT - OBJECT", () => {
-		const headers = new C.Headers({ [authHeader]: authValue });
+		const headers = new TC.Headers({ [authHeader]: authValue });
 		expectMethods(headers);
 	});
 
 	it("INIT - TUPLE ARRAY", () => {
-		const headers = new C.Headers([[authHeader, authValue]]);
+		const headers = new TC.Headers([[authHeader, authValue]]);
 		expectMethods(headers);
 	});
 
 	it("INIT - C.HEADERS - INNER INIT OBJECT", () => {
-		const headers = new C.Headers(new C.Headers({ [authHeader]: authValue }));
+		const headers = new TC.Headers(new TC.Headers({ [authHeader]: authValue }));
 		expectMethods(headers);
 	});
 
 	it("INIT - C.HEADERS - INNER INIT TUPLE ARRAY", () => {
-		const headers = new C.Headers(new C.Headers([[authHeader, authValue]]));
+		const headers = new TC.Headers(new TC.Headers([[authHeader, authValue]]));
 		expectMethods(headers);
 	});
 
 	it("INIT - HEADERS - INNER INIT OBJECT", () => {
-		const headers = new C.Headers(new Headers({ [authHeader]: authValue }));
+		const headers = new TC.Headers(new Headers({ [authHeader]: authValue }));
 		expectMethods(headers);
 	});
 
 	it("INIT - HEADERS - INNER INIT TUPLE ARRAY", () => {
-		const headers = new C.Headers(new Headers([[authHeader, authValue]]));
+		const headers = new TC.Headers(new Headers([[authHeader, authValue]]));
 		expectMethods(headers);
 	});
 
 	it("SET", () => {
-		const headers = new C.Headers();
+		const headers = new TC.Headers();
 		headers.set(authHeader, authValue);
 		expectMethods(headers);
 	});
 
 	it("APPEND - EMPTY", () => {
-		const headers = new C.Headers();
+		const headers = new TC.Headers();
 		headers.append(authHeader, authValue);
 		expectMethods(headers);
 	});
@@ -73,7 +73,7 @@ describe("C.Headers", () => {
 	it("APPEND - EXISTING", () => {
 		const initialValue = "initial value";
 		const expectedValue = `${initialValue}, ${authValue}`;
-		const headers = new C.Headers();
+		const headers = new TC.Headers();
 		headers.set(authHeader, initialValue);
 		headers.append(authHeader, authValue);
 		expectMethods(headers, 1, expectedValue, {
@@ -82,7 +82,7 @@ describe("C.Headers", () => {
 	});
 
 	it("SETMANY - OBJECT INIT", () => {
-		const headers = new C.Headers();
+		const headers = new TC.Headers();
 		headers.setMany({
 			[authHeader]: authValue,
 			[contHeader]: contValue,
@@ -94,7 +94,7 @@ describe("C.Headers", () => {
 	});
 
 	it("SETMANY - TUPLE ARRAY INIT", () => {
-		const headers = new C.Headers();
+		const headers = new TC.Headers();
 		headers.setMany([
 			[authHeader, authValue],
 			[contHeader, contValue],
@@ -106,16 +106,16 @@ describe("C.Headers", () => {
 	});
 
 	it("COMBINE - WITH EMPTY", () => {
-		const source = new C.Headers({ [authHeader]: authValue });
-		const target = new C.Headers();
-		const combined = C.Headers.combine(source, target);
+		const source = new TC.Headers({ [authHeader]: authValue });
+		const target = new TC.Headers();
+		const combined = TC.Headers.combine(source, target);
 		expectMethods(combined);
 	});
 
 	it("COMBINE - WITH ADDITION", () => {
-		const source = new C.Headers({ [authHeader]: authValue });
-		const target = new C.Headers({ [contHeader]: contValue });
-		const combined = C.Headers.combine(source, target);
+		const source = new TC.Headers({ [authHeader]: authValue });
+		const target = new TC.Headers({ [contHeader]: contValue });
+		const combined = TC.Headers.combine(source, target);
 		expectMethods(combined, 2, authValue, {
 			[authHeader.toLowerCase()]: authValue,
 			[contHeader.toLowerCase()]: contValue,
@@ -125,24 +125,24 @@ describe("C.Headers", () => {
 	const overrideValue = "override";
 
 	it("COMBINE - WITH OVERRIDE", () => {
-		const source = new C.Headers({ [authHeader]: overrideValue });
-		const target = new C.Headers({ [authHeader]: authValue });
-		const combined = C.Headers.combine(source, target);
+		const source = new TC.Headers({ [authHeader]: overrideValue });
+		const target = new TC.Headers({ [authHeader]: authValue });
+		const combined = TC.Headers.combine(source, target);
 		expectMethods(combined, 1, overrideValue, {
 			[authHeader.toLowerCase()]: overrideValue,
 		});
 	});
 
 	it("INNERCOMBINE - WITH EMPTY", () => {
-		const source = new C.Headers({ [authHeader]: authValue });
-		const target = new C.Headers();
+		const source = new TC.Headers({ [authHeader]: authValue });
+		const target = new TC.Headers();
 		target.innerCombine(source);
 		expectMethods(target);
 	});
 
 	it("INNERCOMBINE - WITH ADDITION", () => {
-		const source = new C.Headers({ [authHeader]: authValue });
-		const target = new C.Headers({ [contHeader]: contValue });
+		const source = new TC.Headers({ [authHeader]: authValue });
+		const target = new TC.Headers({ [contHeader]: contValue });
 		target.innerCombine(source);
 		expectMethods(target, 2, authValue, {
 			[authHeader.toLowerCase()]: authValue,
@@ -151,8 +151,8 @@ describe("C.Headers", () => {
 	});
 
 	it("INNERCOMBINE - WITH OVERRIDE", () => {
-		const source = new C.Headers({ [authHeader]: overrideValue });
-		const target = new C.Headers({ [authHeader]: authValue });
+		const source = new TC.Headers({ [authHeader]: overrideValue });
+		const target = new TC.Headers({ [authHeader]: authValue });
 		target.innerCombine(source);
 		expectMethods(target, 1, overrideValue, {
 			[authHeader.toLowerCase()]: overrideValue,

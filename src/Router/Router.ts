@@ -12,7 +12,7 @@ import type { Middleware } from "@/Middleware/Middleware";
 import type { RouteInterface } from "@/Route/RouteInterface";
 import { objGetKeys } from "@/utils/objGetKeys";
 import { BranchAdapter } from "@/Router/adapters/BranchAdapter";
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 
 export class Router {
 	constructor(private adapter: RouterAdapterInterface = new BranchAdapter()) {}

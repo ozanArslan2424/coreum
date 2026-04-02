@@ -20,10 +20,6 @@ const pageCache = new X.CacheMap(async (page) => {
 });
 
 function addr(...path: string[]) {
-	// if (X.Config.nodeEnv === "production") {
-	// 	console.log(X.Config.cwd());
-	// 	return X.Config.resolvePath(X.Config.cwd(), ...path);
-	// }
 	return X.Config.resolvePath(X.Config.cwd(), "docs", ...path);
 }
 

@@ -4,7 +4,7 @@ import { Method } from "@/CRequest/enums/Method";
 import { CWebSocketNode } from "@/CWebSocket/CWebSocket.node";
 import { ServerAbstract } from "@/Server/ServerAbstract";
 import type { ServeArgs } from "@/Server/types/ServeArgs";
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 import http from "node:http";
 import https from "node:https";
 import type Stream from "node:stream";

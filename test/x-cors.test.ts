@@ -1,4 +1,4 @@
-import { C, X } from "@/index";
+import { TC, TX } from "./other/testing-modules";
 import { describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
@@ -11,8 +11,8 @@ describe("X.Cors", () => {
 
 	it("ORIGIN - SETS HEADER WHEN ORIGIN IS ALLOWED", async () => {
 		const s = createTestServer();
-		new X.Cors({ allowedOrigins: [allowedOrigin] });
-		new C.Route("/cors-origin-allowed", () => "ok");
+		new TX.Cors({ allowedOrigins: [allowedOrigin] });
+		new TC.Route("/cors-origin-allowed", () => "ok");
 
 		const res = await s.handle(
 			req("/cors-origin-allowed", { headers: { origin: allowedOrigin } }),
@@ -22,8 +22,8 @@ describe("X.Cors", () => {
 
 	it("ORIGIN - DOES NOT SET HEADER WHEN ORIGIN IS DISALLOWED", async () => {
 		const s = createTestServer();
-		new X.Cors({ allowedOrigins: [allowedOrigin] });
-		new C.Route("/cors-origin-disallowed", () => "ok");
+		new TX.Cors({ allowedOrigins: [allowedOrigin] });
+		new TC.Route("/cors-origin-disallowed", () => "ok");
 
 		const res = await s.handle(
 			req("/cors-origin-disallowed", { headers: { origin: disallowedOrigin } }),
@@ -33,8 +33,8 @@ describe("X.Cors", () => {
 
 	it("ORIGIN - DOES NOT SET HEADER WHEN NO ORIGIN IN REQUEST", async () => {
 		const s = createTestServer();
-		new X.Cors({ allowedOrigins: [allowedOrigin] });
-		new C.Route("/cors-origin-missing", () => "ok");
+		new TX.Cors({ allowedOrigins: [allowedOrigin] });
+		new TC.Route("/cors-origin-missing", () => "ok");
 
 		const res = await s.handle(req("/cors-origin-missing"));
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBeNull();
@@ -42,8 +42,8 @@ describe("X.Cors", () => {
 
 	it("ORIGIN - DOES NOT SET HEADER WHEN ALLOWED ORIGINS IS EMPTY", async () => {
 		const s = createTestServer();
-		new X.Cors({ allowedOrigins: [] });
-		new C.Route("/cors-origin-empty", () => "ok");
+		new TX.Cors({ allowedOrigins: [] });
+		new TC.Route("/cors-origin-empty", () => "ok");
 
 		const res = await s.handle(
 			req("/cors-origin-empty", { headers: { origin: allowedOrigin } }),
@@ -54,8 +54,8 @@ describe("X.Cors", () => {
 	it("ORIGIN - REFLECTS CORRECT ORIGIN WHEN MULTIPLE ARE ALLOWED", async () => {
 		const s = createTestServer();
 		const secondOrigin = "https://other.com";
-		new X.Cors({ allowedOrigins: [allowedOrigin, secondOrigin] });
-		new C.Route("/cors-origin-multi", () => "ok");
+		new TX.Cors({ allowedOrigins: [allowedOrigin, secondOrigin] });
+		new TC.Route("/cors-origin-multi", () => "ok");
 
 		const res = await s.handle(
 			req("/cors-origin-multi", { headers: { origin: secondOrigin } }),
@@ -67,8 +67,8 @@ describe("X.Cors", () => {
 
 	it("METHODS - SETS HEADER WHEN METHODS ARE PROVIDED", async () => {
 		const s = createTestServer();
-		new X.Cors({ allowedMethods: ["GET", "POST"] });
-		new C.Route("/cors-methods", () => "ok");
+		new TX.Cors({ allowedMethods: ["GET", "POST"] });
+		new TC.Route("/cors-methods", () => "ok");
 
 		const res = await s.handle(req("/cors-methods"));
 		expect(res.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST");
@@ -76,8 +76,8 @@ describe("X.Cors", () => {
 
 	it("METHODS - DOES NOT SET HEADER WHEN METHODS ARE EMPTY", async () => {
 		const s = createTestServer();
-		new X.Cors({ allowedMethods: [] });
-		new C.Route("/cors-methods-empty", () => "ok");
+		new TX.Cors({ allowedMethods: [] });
+		new TC.Route("/cors-methods-empty", () => "ok");
 
 		const res = await s.handle(req("/cors-methods-empty"));
 		expect(res.headers.get("Access-Control-Allow-Methods")).toBeNull();
@@ -85,8 +85,8 @@ describe("X.Cors", () => {
 
 	it("METHODS - DOES NOT SET HEADER WHEN METHODS ARE UNDEFINED", async () => {
 		const s = createTestServer();
-		new X.Cors({});
-		new C.Route("/cors-methods-undefined", () => "ok");
+		new TX.Cors({});
+		new TC.Route("/cors-methods-undefined", () => "ok");
 
 		const res = await s.handle(req("/cors-methods-undefined"));
 		expect(res.headers.get("Access-Control-Allow-Methods")).toBeNull();
@@ -96,8 +96,8 @@ describe("X.Cors", () => {
 
 	it("HEADERS - SETS HEADER WHEN HEADERS ARE PROVIDED", async () => {
 		const s = createTestServer();
-		new X.Cors({ allowedHeaders: ["Content-Type", "Authorization"] });
-		new C.Route("/cors-headers", () => "ok");
+		new TX.Cors({ allowedHeaders: ["Content-Type", "Authorization"] });
+		new TC.Route("/cors-headers", () => "ok");
 
 		const res = await s.handle(req("/cors-headers"));
 		expect(res.headers.get("Access-Control-Allow-Headers")).toBe(
@@ -107,8 +107,8 @@ describe("X.Cors", () => {
 
 	it("HEADERS - DOES NOT SET HEADER WHEN HEADERS ARE EMPTY", async () => {
 		const s = createTestServer();
-		new X.Cors({ allowedHeaders: [] });
-		new C.Route("/cors-headers-empty", () => "ok");
+		new TX.Cors({ allowedHeaders: [] });
+		new TC.Route("/cors-headers-empty", () => "ok");
 
 		const res = await s.handle(req("/cors-headers-empty"));
 		expect(res.headers.get("Access-Control-Allow-Headers")).toBeNull();
@@ -118,8 +118,8 @@ describe("X.Cors", () => {
 
 	it("CREDENTIALS - SETS TRUE WHEN ENABLED", async () => {
 		const s = createTestServer();
-		new X.Cors({ credentials: true });
-		new C.Route("/cors-credentials-true", () => "ok");
+		new TX.Cors({ credentials: true });
+		new TC.Route("/cors-credentials-true", () => "ok");
 
 		const res = await s.handle(req("/cors-credentials-true"));
 		expect(res.headers.get("Access-Control-Allow-Credentials")).toBe("true");
@@ -127,8 +127,8 @@ describe("X.Cors", () => {
 
 	it("CREDENTIALS - SETS FALSE WHEN DISABLED", async () => {
 		const s = createTestServer();
-		new X.Cors({ credentials: false });
-		new C.Route("/cors-credentials-false", () => "ok");
+		new TX.Cors({ credentials: false });
+		new TC.Route("/cors-credentials-false", () => "ok");
 
 		const res = await s.handle(req("/cors-credentials-false"));
 		expect(res.headers.get("Access-Control-Allow-Credentials")).toBe("false");
@@ -136,8 +136,8 @@ describe("X.Cors", () => {
 
 	it("CREDENTIALS - SETS FALSE WHEN UNDEFINED", async () => {
 		const s = createTestServer();
-		new X.Cors({});
-		new C.Route("/cors-credentials-undefined", () => "ok");
+		new TX.Cors({});
+		new TC.Route("/cors-credentials-undefined", () => "ok");
 
 		const res = await s.handle(req("/cors-credentials-undefined"));
 		expect(res.headers.get("Access-Control-Allow-Credentials")).toBe("false");
@@ -147,13 +147,13 @@ describe("X.Cors", () => {
 
 	it("COMBINED - ALL OPTIONS SET TOGETHER", async () => {
 		const s = createTestServer();
-		new X.Cors({
+		new TX.Cors({
 			allowedOrigins: [allowedOrigin],
 			allowedMethods: ["GET", "POST"],
 			allowedHeaders: ["Content-Type"],
 			credentials: true,
 		});
-		new C.Route("/cors-combined", () => "ok");
+		new TC.Route("/cors-combined", () => "ok");
 
 		const res = await s.handle(
 			req("/cors-combined", { headers: { origin: allowedOrigin } }),

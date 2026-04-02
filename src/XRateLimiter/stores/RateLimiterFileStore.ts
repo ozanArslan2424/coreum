@@ -1,4 +1,4 @@
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 import type { RateLimitStoreInterface } from "@/XRateLimiter/stores/RateLimitStoreInterface";
 import type { RateLimitEntry } from "@/XRateLimiter/types/RateLimitEntry";
 import crypto from "crypto";

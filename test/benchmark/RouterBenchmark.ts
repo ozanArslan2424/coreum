@@ -1,17 +1,21 @@
-import { $routerStore, C, type RouterAdapterInterface } from "@/index";
-import { Router } from "@/Router/Router";
+import {
+	$routerStoreTesting,
+	TC,
+	type TX,
+	RouterTesting,
+} from "../other/testing-modules";
 
 export class RouterBenchmark {
-	private router: Router;
-	private routes: C.Route<any, any, any, any, any>[] = [];
-	private requests: Array<{ request: C.Request; expectedId: string }> = [];
+	private router: RouterTesting;
+	private routes: TC.Route<any, any, any, any, any>[] = [];
+	private requests: Array<{ request: TC.Request; expectedId: string }> = [];
 
 	private usedStaticPaths = new Set<string>();
 	private usedDynamicShapes = new Set<string>(); // "GET:/static/*/static" - no param names, includes method
 
-	constructor(private readonly adapter: RouterAdapterInterface) {
-		this.router = new Router(adapter);
-		$routerStore.set(this.router);
+	constructor(private readonly adapter: TX.RouterAdapterInterface) {
+		this.router = new RouterTesting(adapter);
+		$routerStoreTesting.set(this.router);
 	}
 
 	private rand(len = 6): string {
@@ -22,18 +26,18 @@ export class RouterBenchmark {
 
 	private buildStaticRoute() {
 		const methods = [
-			C.Method.GET,
-			C.Method.POST,
-			C.Method.PUT,
-			C.Method.DELETE,
-			C.Method.PATCH,
+			TC.Method.GET,
+			TC.Method.POST,
+			TC.Method.PUT,
+			TC.Method.DELETE,
+			TC.Method.PATCH,
 		];
 		let key: string;
 		let path: string;
-		let method: C.Method;
+		let method: TC.Method;
 		let methodIndex: number;
 		do {
-			method = methods[Math.floor(Math.random() * methods.length)] as C.Method;
+			method = methods[Math.floor(Math.random() * methods.length)] as TC.Method;
 			methodIndex = methods.findIndex((m) => m === method);
 			const depth = 2 + Math.floor(Math.random() * 3);
 			path = "/" + Array.from({ length: depth }, () => this.rand()).join("/");
@@ -41,13 +45,13 @@ export class RouterBenchmark {
 		} while (this.usedStaticPaths.has(key));
 		this.usedStaticPaths.add(key);
 		return [
-			new C.Route({ method, path }, async () => ({ ok: true })),
-			new C.Route(
+			new TC.Route({ method, path }, async () => ({ ok: true })),
+			new TC.Route(
 				{
 					method:
 						methods[methodIndex + 1] ??
 						methods[methodIndex - 1] ??
-						C.Method.GET,
+						TC.Method.GET,
 					path,
 				},
 				async () => ({ ok: true }),
@@ -57,18 +61,18 @@ export class RouterBenchmark {
 
 	private buildDynamicRoute() {
 		const methods = [
-			C.Method.GET,
-			C.Method.POST,
-			C.Method.PUT,
-			C.Method.DELETE,
-			C.Method.PATCH,
+			TC.Method.GET,
+			TC.Method.POST,
+			TC.Method.PUT,
+			TC.Method.DELETE,
+			TC.Method.PATCH,
 		];
 		let shape: string;
 		let path: string;
-		let method: C.Method;
+		let method: TC.Method;
 		let methodIndex: number;
 		do {
-			method = methods[Math.floor(Math.random() * methods.length)] as C.Method;
+			method = methods[Math.floor(Math.random() * methods.length)] as TC.Method;
 			methodIndex = methods.findIndex((m) => m === method);
 			const depth = 2 + Math.floor(Math.random() * 3);
 			const segments: string[] = [];
@@ -91,13 +95,13 @@ export class RouterBenchmark {
 		} while (this.usedDynamicShapes.has(shape));
 		this.usedDynamicShapes.add(shape);
 		return [
-			new C.Route({ method, path }, async () => ({ ok: true })),
-			new C.Route(
+			new TC.Route({ method, path }, async () => ({ ok: true })),
+			new TC.Route(
 				{
 					method:
 						methods[methodIndex + 1] ??
 						methods[methodIndex - 1] ??
-						C.Method.GET,
+						TC.Method.GET,
 					path,
 				},
 				async () => ({ ok: true }),
@@ -120,7 +124,7 @@ export class RouterBenchmark {
 		for (const route of this.routes) {
 			let url = route.endpoint.replace(/:([^/]+)/g, () => this.rand(8));
 			this.requests.push({
-				request: new C.Request(`http://localhost:4000${url}`, {
+				request: new TC.Request(`http://localhost:4000${url}`, {
 					method: route.method,
 				}),
 				expectedId: route.id,

@@ -1,13 +1,13 @@
-import { C } from "@/index";
-import { log } from "@/utils/internalLogger";
+import { TC } from "../other/testing-modules";
+import { log } from "@/utils/log";
 
 export function createTestServer(
-	opts?: C.ServerOptions & { withLogging?: boolean },
+	opts?: TC.ServerOptions & { withLogging?: boolean },
 ) {
 	const { withLogging, ...serverOpts } = opts ?? {
 		withLogging: false,
 	};
-	const s = new C.Server(serverOpts);
+	const s = new TC.Server(serverOpts);
 
 	if (withLogging === true) {
 		s.setOnError((err) => {

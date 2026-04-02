@@ -1,9 +1,9 @@
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 import { RouterBenchmark } from "./RouterBenchmark";
-import { MemoiristAdapter, BranchAdapter } from "@/index";
+import { TX } from "../other/testing-modules";
 
 async function main() {
-	const adapters = [new MemoiristAdapter(), new BranchAdapter()];
+	const adapters = [new TX.MemoiristAdapter(), new TX.BranchAdapter()];
 	const results: string[] = [];
 	for (const adapter of adapters) {
 		const bench = new RouterBenchmark(adapter);

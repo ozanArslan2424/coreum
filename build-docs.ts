@@ -1,3 +1,4 @@
+// builds only the required stuff
 async function buildPackage() {
 	const result = await Bun.build({
 		entrypoints: ["./src/index.ts"],

@@ -6,7 +6,7 @@ import { strAfterMark } from "@/utils/strAfterMark";
 import { strBeforeMark } from "@/utils/strBeforeMark";
 import { strCapitalize } from "@/utils/strCapitalize";
 import { strSplit } from "@/utils/strSplit";
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 import type { CookiesInterface } from "@/Cookies/CookiesInterface";
 
 export default class CookiesUsingMap extends CookiesAbstract {

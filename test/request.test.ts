@@ -1,4 +1,4 @@
-import { C } from "@/index";
+import { TC } from "./other/testing-modules";
 import { describe, expect, it } from "bun:test";
 
 describe("C.Request", () => {
@@ -7,26 +7,26 @@ describe("C.Request", () => {
 	const expectedUrlString = `${urlString}/`;
 	const expectedUrlObject = new URL(expectedUrlString);
 
-	function expectEmpty(req: C.Request) {
+	function expectEmpty(req: TC.Request) {
 		expect(req.init).toBeUndefined();
 		expect(req.method).toBe("GET");
 		expect(req.body).toBeNull();
 		expect(req.url).toBe(expectedUrlString);
 		expect(req.urlObject).toEqual(expectedUrlObject);
-		expect(req.headers).toBeInstanceOf(C.Headers);
-		expect(req.cookies).toBeInstanceOf(C.Cookies);
+		expect(req.headers).toBeInstanceOf(TC.Headers);
+		expect(req.cookies).toBeInstanceOf(TC.Cookies);
 		expect(req.isPreflight).toBeFalse();
 	}
 
 	it("EMPTY REQUEST - STRING URL INPUT", () => {
-		const req = new C.Request(urlString);
+		const req = new TC.Request(urlString);
 		expect(req.info).toBe(urlString);
 		expect(req.info).toBeTypeOf("string");
 		expectEmpty(req);
 	});
 
 	it("EMPTY REQUEST - URL OBJECT INPUT", () => {
-		const req = new C.Request(urlObject);
+		const req = new TC.Request(urlObject);
 		expect(req.info).toBe(urlObject);
 		expect(req.info).toBeInstanceOf(URL);
 		expectEmpty(req);
@@ -34,76 +34,131 @@ describe("C.Request", () => {
 
 	it("EMPTY REQUEST - REQUEST OBJECT INPUT", () => {
 		const request = new Request(urlObject);
-		const req = new C.Request(request);
+		const req = new TC.Request(request);
 		expect(req.info).toEqual(request);
 		expect(req.info).toBeInstanceOf(Request);
 		expectEmpty(req);
 	});
 
-	it.each(Object.values(C.Method))("METHOD %s - STRING URL INPUT", (method) => {
-		expect(new C.Request(urlString, { method }).method).toBe(method);
-	});
+	it.each(Object.values(TC.Method))(
+		"METHOD %s - STRING URL INPUT",
+		(method) => {
+			expect(new TC.Request(urlString, { method }).method).toBe(method);
+		},
+	);
 
-	it.each(Object.values(C.Method))("METHOD %s - URL OBJECT INPUT", (method) => {
-		expect(new C.Request(urlObject, { method }).method).toBe(method);
-	});
+	it.each(Object.values(TC.Method))(
+		"METHOD %s - URL OBJECT INPUT",
+		(method) => {
+			expect(new TC.Request(urlObject, { method }).method).toBe(method);
+		},
+	);
 
-	it.each(Object.values(C.Method))(
+	it.each(Object.values(TC.Method))(
 		"METHOD %s - REQUEST OBJECT INPUT",
 		(method) => {
-			expect(new C.Request(new Request(urlObject, { method })).method).toBe(
+			expect(new TC.Request(new Request(urlObject, { method })).method).toBe(
 				method,
 			);
 		},
 	);
 
 	it("METHODS - REQUEST OBJECT INPUT OVERRIDE", () => {
-		const values = Object.values(C.Method);
+		const values = Object.values(TC.Method);
 		for (const [i, method] of values.entries()) {
 			const nextMethod = i === values.length - 1 ? values[0] : values[i + 1];
 			expect(
-				new C.Request(new Request(urlObject, { method }), {
+				new TC.Request(new Request(urlObject, { method }), {
 					method: nextMethod,
 				}).method,
 			).toBe(nextMethod as string);
 		}
 	});
 
-	const acrmHeader = C.CommonHeaders.AccessControlRequestMethod;
+	const acrmHeader = TC.CommonHeaders.AccessControlRequestMethod;
 
 	it("PREFLIGHT - INIT HEADERS OBJECT", () => {
-		const req = new C.Request(urlString, {
-			method: C.Method.OPTIONS,
+		const req = new TC.Request(urlString, {
+			method: TC.Method.OPTIONS,
 			headers: {
-				[acrmHeader]: C.Method.GET,
+				[acrmHeader]: TC.Method.GET,
 			},
 		});
 		expect(req.isPreflight).toBe(true);
-		expect(req.headers.get(acrmHeader)).toBe(C.Method.GET);
+		expect(req.headers.get(acrmHeader)).toBe(TC.Method.GET);
 	});
 
 	it("PREFLIGHT - INIT HEADERS C.HEADERS", () => {
-		const headers = new C.Headers();
-		headers.set(acrmHeader, C.Method.GET);
-		const req = new C.Request(urlString, { method: C.Method.OPTIONS, headers });
+		const headers = new TC.Headers();
+		headers.set(acrmHeader, TC.Method.GET);
+		const req = new TC.Request(urlString, {
+			method: TC.Method.OPTIONS,
+			headers,
+		});
 		expect(req.isPreflight).toBe(true);
-		expect(req.headers.get(acrmHeader)).toBe(C.Method.GET);
+		expect(req.headers.get(acrmHeader)).toBe(TC.Method.GET);
 	});
 
 	it("PREFLIGHT - INIT HEADERS HEADERS", () => {
 		const headers = new Headers();
-		headers.set(acrmHeader, C.Method.GET);
-		const req = new C.Request(urlString, { method: C.Method.OPTIONS, headers });
+		headers.set(acrmHeader, TC.Method.GET);
+		const req = new TC.Request(urlString, {
+			method: TC.Method.OPTIONS,
+			headers,
+		});
 		expect(req.isPreflight).toBe(true);
-		expect(req.headers.get(acrmHeader)).toBe(C.Method.GET);
+		expect(req.headers.get(acrmHeader)).toBe(TC.Method.GET);
 	});
 
 	it("PREFLIGHT - INIT HEADERS TUPLE ARRAY", () => {
-		const req = new C.Request(urlString, {
-			method: C.Method.OPTIONS,
-			headers: [[acrmHeader, C.Method.GET]],
+		const req = new TC.Request(urlString, {
+			method: TC.Method.OPTIONS,
+			headers: [[acrmHeader, TC.Method.GET]],
 		});
 		expect(req.isPreflight).toBe(true);
-		expect(req.headers.get(acrmHeader)).toBe(C.Method.GET);
+		expect(req.headers.get(acrmHeader)).toBe(TC.Method.GET);
+	});
+
+	it("IS WEBSOCKET - TRUE WHEN UPGRADE HEADERS PRESENT", () => {
+		const req = new TC.Request(urlString, {
+			headers: {
+				[TC.CommonHeaders.Connection]: "upgrade",
+				[TC.CommonHeaders.Upgrade]: "websocket",
+			},
+		});
+		expect(req.isWebsocket).toBeTrue();
+	});
+
+	it("IS WEBSOCKET - FALSE WITHOUT UPGRADE HEADER", () => {
+		const req = new TC.Request(urlString, {
+			headers: {
+				[TC.CommonHeaders.Upgrade]: "websocket",
+			},
+		});
+		expect(req.isWebsocket).toBeFalse();
+	});
+
+	it("IS WEBSOCKET - FALSE WITHOUT WEBSOCKET HEADER", () => {
+		const req = new TC.Request(urlString, {
+			headers: {
+				[TC.CommonHeaders.Connection]: "upgrade",
+			},
+		});
+		expect(req.isWebsocket).toBeFalse();
+	});
+
+	it("IS WEBSOCKET - CASE INSENSITIVE", () => {
+		const req = new TC.Request(urlString, {
+			headers: {
+				[TC.CommonHeaders.Connection]: "Upgrade",
+				[TC.CommonHeaders.Upgrade]: "WebSocket",
+			},
+		});
+		expect(req.isWebsocket).toBeTrue();
+	});
+
+	it("IS WEBSOCKET - FALSE ON EMPTY REQUEST", () => {
+		const req = new TC.Request(urlString);
+		expect(req.isWebsocket).toBeFalse();
 	});
 });

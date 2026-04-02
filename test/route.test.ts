@@ -1,11 +1,7 @@
-import { C } from "@/index";
+import { TC } from "./other/testing-modules";
 import { describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
-import { RouteVariant } from "@/Route/enums/RouteVariant";
-import type { Func } from "@/utils/types/Func";
-import type { RouteModel } from "@/Model/types/RouteModel";
-import type { DynamicRouteDefinition } from "@/Route/types/DynamicRouteDefinition";
 
 const s = createTestServer();
 
@@ -14,26 +10,26 @@ describe("C.Route", () => {
 
 	it("STRING DEFINITION DEFAULTS TO GET", () => {
 		const path = "/r1";
-		const route = new C.Route(path, handler);
+		const route = new TC.Route(path, handler);
 
-		expect(route.variant).toBe(RouteVariant.dynamic);
-		expect(route.method).toBe(C.Method.GET);
+		expect(route.variant).toBe("dynamic");
+		expect(route.method).toBe(TC.Method.GET);
 		expect(route.endpoint).toBe(path);
-		expect(route.id).toBe(`${C.Method.GET} ${path}`);
+		expect(route.id).toBe(`${TC.Method.GET} ${path}`);
 	});
 
 	it("OBJECT DEFINITION WITH METHOD", () => {
 		const path = "/r2";
-		const route = new C.Route({ method: C.Method.POST, path }, handler);
+		const route = new TC.Route({ method: TC.Method.POST, path }, handler);
 
-		expect(route.method).toBe(C.Method.POST);
+		expect(route.method).toBe(TC.Method.POST);
 		expect(route.endpoint).toBe(path);
-		expect(route.id).toBe(`${C.Method.POST} ${path}`);
+		expect(route.id).toBe(`${TC.Method.POST} ${path}`);
 	});
 
 	it("REGISTERS TO ROUTER", async () => {
 		const path = "/r5";
-		new C.Route(path, async () => "registered");
+		new TC.Route(path, async () => "registered");
 
 		const res = await s.handle(req(path));
 		expect(res.status).toBe(200);
@@ -41,7 +37,7 @@ describe("C.Route", () => {
 
 	it("REGISTERS WITH CORRECT METHOD", async () => {
 		const path = "/r6";
-		new C.Route({ method: C.Method.POST, path }, async () => "posted");
+		new TC.Route({ method: TC.Method.POST, path }, async () => "posted");
 
 		const res = await s.handle(req(path, { method: "POST" }));
 		expect(res.status).toBe(200);
@@ -50,42 +46,41 @@ describe("C.Route", () => {
 	it("WITH MODEL", () => {
 		const path = "/r8";
 		const model = { response: undefined, body: undefined };
-		const route = new C.Route(path, handler, model);
+		const route = new TC.Route(path, handler, model);
 
 		expect(route.model).toBe(model);
 	});
 
 	it("WITHOUT MODEL", () => {
 		const path = "/r9";
-		const route = new C.Route(path, handler);
+		const route = new TC.Route(path, handler);
 
 		expect(route.model).toBeUndefined();
 	});
 
-	it.each(Object.values(C.Method))("METHOD %s RESOLVES CORRECTLY", (method) => {
-		const path = `/${method.toLowerCase()}-method-test`;
-		const route = new C.Route({ method, path }, handler);
+	it.each(Object.values(TC.Method))(
+		"METHOD %s RESOLVES CORRECTLY",
+		(method) => {
+			const path = `/${method.toLowerCase()}-method-test`;
+			const route = new TC.Route({ method, path }, handler);
 
-		expect(route.method).toBe(method);
-		expect(route.id).toBe(`${method} ${path}`);
-	});
+			expect(route.method).toBe(method);
+			expect(route.id).toBe(`${method} ${path}`);
+		},
+	);
 
 	it("USING EXTENDED ABSTRACT METHOD", async () => {
 		const path = "/r-extended";
 
-		class MyRoute extends C.RouteAbstract {
+		class MyRoute extends TC.RouteAbstract {
 			constructor() {
 				super();
 				this.register();
 			}
 
-			definition: DynamicRouteDefinition<string> = path;
-			callback: Func<
-				[context: C.Context<unknown, unknown, unknown, unknown>],
-				unknown
-			> = () => "extended";
-
-			model?: RouteModel<unknown, unknown, unknown, unknown> | undefined =
+			definition: TC.RouteDefinition<string> = path;
+			callback: TC.RouteCallback = () => "extended";
+			model?: TC.RouteModel<unknown, unknown, unknown, unknown> | undefined =
 				undefined;
 		}
 

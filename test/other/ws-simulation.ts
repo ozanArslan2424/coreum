@@ -1,4 +1,4 @@
-import { log as _log } from "@/utils/internalLogger";
+import { log as _log } from "@/utils/log";
 import { TEST_PORT } from "../utils/req";
 import { createTestServer } from "../utils/createTestServer";
 import { manualExpect } from "../utils/manual-expect";

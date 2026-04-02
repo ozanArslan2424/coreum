@@ -17,15 +17,26 @@ export class CRequest extends Request {
 		this.urlObject = this.resolveUrlObject();
 		this.headers = this.resolveHeaders();
 		this.cookies = this.resolveCookies();
-		this.isPreflight = this.resolveIsPreflight();
-		this.isWebsocket = this.resolveIsWebsocketUpgrade();
 	}
 
 	readonly urlObject: URL;
-	readonly isPreflight: boolean;
-	readonly isWebsocket: boolean;
 	readonly cookies: Cookies;
 	override headers: CHeaders;
+
+	get isPreflight(): boolean {
+		return (
+			this.method === Method.OPTIONS &&
+			this.headers.has(CommonHeaders.AccessControlRequestMethod)
+		);
+	}
+
+	get isWebsocket(): boolean {
+		const isUpgrade =
+			this.headers.get(CommonHeaders.Connection)?.toLowerCase() === "upgrade";
+		const isWebsocket =
+			this.headers.get(CommonHeaders.Upgrade)?.toLowerCase() === "websocket";
+		return isUpgrade && isWebsocket;
+	}
 
 	private resolveUrlObject(): URL {
 		let urlObject: URL;
@@ -82,20 +93,5 @@ export class CRequest extends Request {
 		}
 
 		return jar;
-	}
-
-	private resolveIsPreflight() {
-		return (
-			this.method === Method.OPTIONS &&
-			this.headers.has(CommonHeaders.AccessControlRequestMethod)
-		);
-	}
-
-	private resolveIsWebsocketUpgrade() {
-		const isUpgrade =
-			this.headers.get(CommonHeaders.Connection)?.toLowerCase() === "upgrade";
-		const isWebsocket =
-			this.headers.get(CommonHeaders.Upgrade)?.toLowerCase() === "websocket";
-		return isUpgrade && isWebsocket;
 	}
 }

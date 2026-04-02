@@ -1,9 +1,9 @@
-import { C, X } from "@/index";
+import { TC, TX } from "./other/testing-modules";
 import { describe, expect, it, spyOn, beforeEach } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { createTestController } from "./utils/createTestController";
 import { req } from "./utils/req";
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 
 describe("C.Middleware using constructor", () => {
 	const s = createTestServer();
@@ -12,32 +12,32 @@ describe("C.Middleware using constructor", () => {
 	const logSpy = spyOn(log, "log");
 	beforeEach(() => logSpy.mockClear());
 
-	const r1 = new C.Route("/r1", (c) => c.data);
-	new C.Route("r2", (c) => c.data);
+	const r1 = new TC.Route("/r1", (c) => c.data);
+	new TC.Route("r2", (c) => c.data);
 	const c1 = createTestController("c1");
-	new C.Middleware({
+	new TC.Middleware({
 		useOn: [r1, c1.cr1],
 		handler: (c) => {
 			c.data = middlewareData;
 		},
 	});
 
-	const r3 = new C.Route("/r3", (c) => c.data);
-	new C.Middleware({
+	const r3 = new TC.Route("/r3", (c) => c.data);
+	new TC.Middleware({
 		useOn: [r3],
 		handler: (c) => {
 			c.data = { user: "john", role: "admin", count: 1 };
 		},
 	});
 
-	const r4 = new C.Route("/r4", (c) => c.data);
-	new C.Middleware({
+	const r4 = new TC.Route("/r4", (c) => c.data);
+	new TC.Middleware({
 		useOn: [r4],
 		handler: (c) => {
 			c.data = { user: "john", role: "admin", count: 1 };
 		},
 	});
-	new C.Middleware({
+	new TC.Middleware({
 		useOn: [r4],
 		handler: (c) => {
 			(c.data as Record<string, unknown>).role = "superadmin";
@@ -45,7 +45,7 @@ describe("C.Middleware using constructor", () => {
 		},
 	});
 
-	new C.Middleware({
+	new TC.Middleware({
 		useOn: "*",
 		handler: (c) => {
 			log.log(c.url.pathname);
@@ -54,55 +54,55 @@ describe("C.Middleware using constructor", () => {
 
 	it("ROUTE - APPLIES TO REGISTERED ROUTE", async () => {
 		const res = await s.handle(req("/r1"));
-		const data = await X.Parser.parseBody<string>(res);
+		const data = await TX.Parser.parseBody<string>(res);
 		expect(data).toBe(middlewareData);
 		expect(logSpy).toBeCalled();
 	});
 
 	it("ROUTE - DOES NOT APPLY TO UNREGISTERED ROUTE", async () => {
 		const res = await s.handle(req("/r2"));
-		const data = await X.Parser.parseBody(res);
+		const data = await TX.Parser.parseBody(res);
 		expect(data).toBeEmptyObject();
 		expect(logSpy).toBeCalled();
 	});
 
 	it("CONTROLLER - APPLIES TO REGISTERED CONTROLLER ROUTE", async () => {
 		const res = await s.handle(req("/c1/cr1"));
-		const data = await X.Parser.parseBody<string>(res);
+		const data = await TX.Parser.parseBody<string>(res);
 		expect(data).toBe(middlewareData);
 		expect(logSpy).toBeCalled();
 	});
 
 	it("CONTROLLER - DOES NOT APPLY TO UNREGISTERED CONTROLLER ROUTE", async () => {
 		const res = await s.handle(req("/c1/cr2"));
-		const data = await X.Parser.parseBody(res);
+		const data = await TX.Parser.parseBody(res);
 		expect(data).toBeEmptyObject();
 		expect(logSpy).toBeCalled();
 	});
 
 	it("ROUTE - OVERRIDES PREVIOUS MIDDLEWARE DATA", async () => {
-		new C.Middleware({
+		new TC.Middleware({
 			useOn: [r1],
 			handler: (c) => {
 				c.data = overrideData;
 			},
 		});
 		const res = await s.handle(req("/r1"));
-		const data = await X.Parser.parseBody<string>(res);
+		const data = await TX.Parser.parseBody<string>(res);
 		expect(data).toBe(overrideData);
 		expect(logSpy).toBeCalled();
 	});
 
 	it("ROUTE - SETS OBJECT DATA", async () => {
 		const res = await s.handle(req("/r3"));
-		const data = await X.Parser.parseBody<Record<string, unknown>>(res);
+		const data = await TX.Parser.parseBody<Record<string, unknown>>(res);
 		expect(data).toEqual({ user: "john", role: "admin", count: 1 });
 		expect(logSpy).toBeCalled();
 	});
 
 	it("ROUTE - MUTATES OBJECT DATA KEYS IN SUBSEQUENT MIDDLEWARE", async () => {
 		const res = await s.handle(req("/r4"));
-		const data = await X.Parser.parseBody<Record<string, unknown>>(res);
+		const data = await TX.Parser.parseBody<Record<string, unknown>>(res);
 		expect(data.user).toBe("john");
 		expect(data.role).toBe("superadmin");
 		expect(data.count).toBe(2);

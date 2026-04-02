@@ -1,7 +1,7 @@
-import { C } from "@/index";
+import { TC } from "../other/testing-modules";
 
 export function createTestController(prefix: string) {
-	class TestController extends C.Controller {
+	class TestController extends TC.Controller {
 		constructor() {
 			super({ prefix });
 		}

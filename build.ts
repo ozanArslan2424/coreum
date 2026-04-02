@@ -1,4 +1,4 @@
-import { log } from "@/utils/internalLogger";
+import { log } from "@/utils/log";
 import type { BuildConfig } from "bun";
 import dts from "bun-plugin-dts";
 

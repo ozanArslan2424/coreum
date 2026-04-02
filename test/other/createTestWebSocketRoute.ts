@@ -1,12 +1,9 @@
-import type { CWebSocketInterface } from "@/CWebSocket/CWebSocketInterface";
-import { C } from "@/index";
-import type { Log } from "@/utils/internalLogger";
-import type { Func } from "@/utils/types/Func";
-import type { MaybePromise } from "@/utils/types/MaybePromise";
+import { TC } from "./testing-modules";
+import type { Log } from "@/utils/log";
 
 export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 	if (withAbstract) {
-		class WSR extends C.WebSocketRouteAbstract {
+		class WSR extends TC.WebSocketRouteAbstract {
 			constructor() {
 				super();
 				this.register();
@@ -14,39 +11,26 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 
 			path: string = "/ws";
 
-			onOpen?: Func<[ws: CWebSocketInterface], MaybePromise<void>> | undefined =
-				(ws) => {
-					log.info(
-						`[ws] New connection opened — remoteAddress: ${ws.remoteAddress}`,
-					);
-					ws.send(
-						JSON.stringify({
-							event: "connected",
-							data: { remoteAddress: ws.remoteAddress },
-						}),
-					);
-					log.debug(`[ws] Sent connected greeting to ${ws.remoteAddress}`);
-				};
+			onOpen?: TC.WebSocketOnOpen | undefined = (ws) => {
+				log.info(
+					`[ws] New connection opened — remoteAddress: ${ws.remoteAddress}`,
+				);
+				ws.send(
+					JSON.stringify({
+						event: "connected",
+						data: { remoteAddress: ws.remoteAddress },
+					}),
+				);
+				log.debug(`[ws] Sent connected greeting to ${ws.remoteAddress}`);
+			};
 
-			onClose?:
-				| Func<
-						[
-							ws: CWebSocketInterface,
-							code?: number | undefined,
-							reason?: string | undefined,
-						],
-						MaybePromise<void>
-				  >
-				| undefined = (_ws, code, reason) => {
+			onClose?: TC.WebSocketOnClose | undefined = (_ws, code, reason) => {
 				log.info(
 					`[ws] Connection closed — code=${code} reason=${reason || "no reason provided"}`,
 				);
 			};
 
-			onMessage: Func<
-				[ws: CWebSocketInterface, message: string | Buffer<ArrayBufferLike>],
-				MaybePromise<void>
-			> = (ws, message) => {
+			onMessage: TC.WebSocketOnMessage = (ws, message) => {
 				// oxlint-disable-next-line typescript/restrict-template-expressions
 				log.debug(`[ws] Received message: ${message}`);
 				const msg = JSON.parse(message as string) as {
@@ -131,7 +115,7 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 
 		new WSR();
 	} else {
-		new C.WebSocketRoute("/ws", {
+		new TC.WebSocketRoute("/ws", {
 			onOpen: (ws) => {
 				log.info(
 					`[ws] New connection opened — remoteAddress: ${ws.remoteAddress}`,
