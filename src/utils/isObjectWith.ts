@@ -1,5 +1,5 @@
-import type { OrString } from "@/utils/types/OrString";
-import type { UnknownObject } from "@/utils/types/UnknownObject";
+import type { OrString } from "@/Utils/types/OrString";
+import type { UnknownObject } from "@/Utils/types/UnknownObject";
 
 export function isObjectWith<T extends UnknownObject>(
 	item: unknown,

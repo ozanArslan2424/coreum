@@ -1,6 +1,6 @@
 import { $registryTesting, TX } from "./_modules";
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
-import { log } from "@/utils/log";
+import { log } from "@/Utils/log";
 
 afterEach(() => $registryTesting.reset());
 

@@ -1,5 +1,5 @@
 import { TC } from "../_modules";
-import type { Log } from "@/utils/log";
+import type { Log } from "@/Utils/log";
 
 export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 	if (withAbstract) {

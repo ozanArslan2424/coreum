@@ -1,4 +1,4 @@
-import { assert } from "@/utils/assert";
+import { assert } from "@/Utils/assert";
 
 export function strSplit(
 	mark: string,

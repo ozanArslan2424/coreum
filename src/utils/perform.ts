@@ -1,5 +1,5 @@
-import { log } from "@/utils/log";
-import type { Func } from "@/utils/types/Func";
+import { log } from "@/Utils/log";
+import type { Func } from "@/Utils/types/Func";
 
 export async function perform<F extends Func>(
 	fn: F,

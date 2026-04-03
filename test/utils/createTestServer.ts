@@ -1,5 +1,5 @@
 import { TC } from "../_modules";
-import { log } from "@/utils/log";
+import { log } from "@/Utils/log";
 
 export function createTestServer(
 	opts?: TC.ServerOptions & { withLogging?: boolean },

@@ -1,4 +1,4 @@
-import { joinPathSegments } from "@/utils/joinPathSegments";
+import { joinPathSegments } from "@/Utils/joinPathSegments";
 import { $registryTesting } from "../_modules";
 
 export const TEST_PORT = 4444;

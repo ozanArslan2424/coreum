@@ -1,5 +1,5 @@
 import { createTestServer } from "../utils/createTestServer";
-import { log } from "@/utils/log";
+import { log } from "@/Utils/log";
 import { C } from "../../dist";
 import { TEST_PORT } from "../utils/req";
 

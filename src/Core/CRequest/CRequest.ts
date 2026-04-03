@@ -1,0 +1,97 @@
+import { Method } from "@/Core/CRequest/Method";
+import { CommonHeaders } from "@/Core/CHeaders/CommonHeaders";
+import { Cookies } from "@/Core/Cookies/Cookies";
+import { CHeaders } from "@/Core/CHeaders/CHeaders";
+import type { CRequestInfo } from "@/Core/CRequest/CRequestInfo";
+import type { CRequestInit } from "@/Core/CRequest/CRequestInit";
+import { strSplit } from "@/Utils/strSplit";
+
+/** CRequest includes a cookie jar, better headers, and some utilities. */
+
+export class CRequest extends Request {
+	constructor(
+		readonly info: CRequestInfo,
+		readonly init?: CRequestInit,
+	) {
+		super(info, init);
+		this.urlObject = this.resolveUrlObject();
+		this.headers = this.resolveHeaders();
+		this.cookies = this.resolveCookies();
+	}
+
+	readonly urlObject: URL;
+	readonly cookies: Cookies;
+	override headers: CHeaders;
+
+	get isPreflight(): boolean {
+		return (
+			this.method === Method.OPTIONS &&
+			this.headers.has(CommonHeaders.AccessControlRequestMethod)
+		);
+	}
+
+	get isWebsocket(): boolean {
+		const isUpgrade =
+			this.headers.get(CommonHeaders.Connection)?.toLowerCase() === "upgrade";
+		const isWebsocket =
+			this.headers.get(CommonHeaders.Upgrade)?.toLowerCase() === "websocket";
+		return isUpgrade && isWebsocket;
+	}
+
+	private resolveUrlObject(): URL {
+		let urlObject: URL;
+
+		switch (true) {
+			case this.info instanceof URL:
+				urlObject = this.info;
+				break;
+
+			case this.info instanceof CRequest:
+				urlObject = this.info.urlObject;
+				break;
+
+			case this.info instanceof Request:
+				urlObject = new URL(this.info.url);
+				break;
+
+			default: // string
+				urlObject = new URL(this.info);
+				break;
+		}
+
+		if (!urlObject.pathname) {
+			urlObject.pathname += "/";
+		}
+
+		return urlObject;
+	}
+
+	private resolveHeaders(): CHeaders {
+		if (this.init?.headers !== undefined) {
+			return new CHeaders(this.init.headers);
+		}
+		if (this.info instanceof Request || this.info instanceof CRequest) {
+			return new CHeaders(this.info.headers);
+		}
+		return new CHeaders();
+	}
+
+	/** Gets cookie header and collects cookies for the jar */
+	private resolveCookies(): Cookies {
+		const jar = new Cookies();
+
+		const cookieHeader = this.headers.get(CommonHeaders.Cookie);
+
+		if (cookieHeader) {
+			const pairs = strSplit(";", cookieHeader);
+
+			for (const pair of pairs) {
+				const [name, value] = strSplit("=", pair);
+				if (!name || !value) continue;
+				jar.set({ name, value });
+			}
+		}
+
+		return jar;
+	}
+}

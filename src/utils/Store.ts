@@ -1,4 +1,4 @@
-import type { Func } from "@/utils/types/Func";
+import type { Func } from "@/Utils/types/Func";
 
 export class Store<T> {
 	constructor(protected readonly init: T) {

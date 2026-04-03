@@ -5,6 +5,7 @@ node_modules
 out
 cli
 dist
+docs
 *.tgz
 
 # code coverage

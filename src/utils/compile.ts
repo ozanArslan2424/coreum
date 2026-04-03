@@ -1,5 +1,5 @@
-import type { Func } from "@/utils/types/Func";
-import type { MaybePromise } from "@/utils/types/MaybePromise";
+import type { Func } from "@/Utils/types/Func";
+import type { MaybePromise } from "@/Utils/types/MaybePromise";
 
 export function compile<F extends Func>(
 	fns: Array<F | undefined>,

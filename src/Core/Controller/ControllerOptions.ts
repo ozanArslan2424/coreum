@@ -1,0 +1,8 @@
+import type { Context } from "@/Core/Context/Context";
+import type { Func } from "@/Utils/types/Func";
+import type { MaybePromise } from "@/Utils/types/MaybePromise";
+
+export type ControllerOptions = {
+	prefix?: string;
+	beforeEach?: Func<[context: Context], MaybePromise<void>>;
+};

@@ -52,19 +52,14 @@
 		"memoirist": "^0.4.0",
 		"oxlint": "^1.57.0",
 		"prettier": "^3.8.1",
-		"redis": "^5.11.0",
 		"zod": "^4.3.6"
 	},
 	"peerDependencies": {
 		"memoirist": "^0.4.0",
-		"redis": "^5.11.0",
 		"typescript": "^6.0.2"
 	},
 	"peerDependenciesMeta": {
 		"memoirist": {
-			"optional": true
-		},
-		"redis": {
 			"optional": true
 		}
 	}

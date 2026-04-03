@@ -1,9 +1,9 @@
-import { $registryTesting, TC, TX } from "./_modules";
+import { $registryTesting, TC } from "./_modules";
 import { describe, expect, it, spyOn, beforeEach } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { createTestController } from "./utils/createTestController";
 import { req } from "./utils/req";
-import { log } from "@/utils/log";
+import { log } from "@/Utils/log";
 
 class M1 extends TC.MiddlewareAbstract {
 	constructor(readonly useOn: TC.MiddlewareUseOn) {
@@ -91,49 +91,49 @@ beforeEach(() => {
 describe("C.Middleware using constructor", () => {
 	it("ROUTE - APPLIES TO REGISTERED ROUTE", async () => {
 		const res = await s.handle(req("/r1"));
-		const data = await TX.Parser.parseBody<string>(res);
+		const data = await TC.Parser.parseBody<string>(res);
 		expect(data).toBe(middlewareData);
 		expect(logSpy).toBeCalled();
 	});
 
 	it("ROUTE - DOES NOT APPLY TO UNREGISTERED ROUTE", async () => {
 		const res = await s.handle(req("/r2"));
-		const data = await TX.Parser.parseBody(res);
+		const data = await TC.Parser.parseBody(res);
 		expect(data).toBeEmptyObject();
 		expect(logSpy).toBeCalled();
 	});
 
 	it("CONTROLLER - APPLIES TO REGISTERED CONTROLLER ROUTE", async () => {
 		const res = await s.handle(req("/c1/cr1"));
-		const data = await TX.Parser.parseBody<string>(res);
+		const data = await TC.Parser.parseBody<string>(res);
 		expect(data).toBe(middlewareData);
 		expect(logSpy).toBeCalled();
 	});
 
 	it("CONTROLLER - DOES NOT APPLY TO UNREGISTERED CONTROLLER ROUTE", async () => {
 		const res = await s.handle(req("/c1/cr2"));
-		const data = await TX.Parser.parseBody(res);
+		const data = await TC.Parser.parseBody(res);
 		expect(data).toBeEmptyObject();
 		expect(logSpy).toBeCalled();
 	});
 
 	it("ROUTE - OVERRIDES PREVIOUS MIDDLEWARE DATA", async () => {
 		const res = await s.handle(req("/r5"));
-		const data = await TX.Parser.parseBody<string>(res);
+		const data = await TC.Parser.parseBody<string>(res);
 		expect(data).toBe(overrideData);
 		expect(logSpy).toBeCalled();
 	});
 
 	it("ROUTE - SETS OBJECT DATA", async () => {
 		const res = await s.handle(req("/r3"));
-		const data = await TX.Parser.parseBody<Record<string, unknown>>(res);
+		const data = await TC.Parser.parseBody<Record<string, unknown>>(res);
 		expect(data).toEqual({ user: "john", role: "admin", count: 1 });
 		expect(logSpy).toBeCalled();
 	});
 
 	it("ROUTE - MUTATES OBJECT DATA KEYS IN SUBSEQUENT MIDDLEWARE", async () => {
 		const res = await s.handle(req("/r4"));
-		const data = await TX.Parser.parseBody<Record<string, unknown>>(res);
+		const data = await TC.Parser.parseBody<Record<string, unknown>>(res);
 		expect(data.user).toBe("john");
 		expect(data.role).toBe("superadmin");
 		expect(data.count).toBe(2);

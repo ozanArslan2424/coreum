@@ -1,12 +1,12 @@
 import { createTestServer } from "./utils/createTestServer";
-import { $registryTesting, TC, TX } from "./_modules";
+import { $registryTesting, TC } from "./_modules";
 import { afterEach, describe, expect, it } from "bun:test";
 
 afterEach(() => $registryTesting.reset());
 
 describe("BranchAdapter - Route Collision Detection", () => {
 	createTestServer({
-		adapter: new TX.BranchAdapter(),
+		adapter: new TC.BranchAdapter(),
 	});
 
 	function makeRoutes(

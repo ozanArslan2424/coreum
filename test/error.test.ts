@@ -1,4 +1,4 @@
-import { $registryTesting, TC, TX } from "./_modules";
+import { $registryTesting, TC } from "./_modules";
 import { afterEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
@@ -50,7 +50,7 @@ describe("C.Error", () => {
 	it("TO RESPONSE - WITHOUT DATA USES ERROR TRUE", async () => {
 		const err = new TC.Error("bad request", 400);
 		const res = err.toResponse();
-		const data = await TX.Parser.parseBody<{ error: boolean; message: string }>(
+		const data = await TC.Parser.parseBody<{ error: boolean; message: string }>(
 			res,
 		);
 		expect(data.error).toBe(true);
@@ -60,7 +60,7 @@ describe("C.Error", () => {
 	it("TO RESPONSE - WITH DATA USES ERROR DATA", async () => {
 		const err = new TC.Error("invalid", 422, { field: "email" });
 		const res = err.toResponse();
-		const data = await TX.Parser.parseBody<{ error: unknown; message: string }>(
+		const data = await TC.Parser.parseBody<{ error: unknown; message: string }>(
 			res,
 		);
 		expect(data.error).toEqual({ field: "email" });
@@ -84,7 +84,7 @@ describe("C.Error", () => {
 		});
 
 		const res = await s.handle(req("/error-422"));
-		const data = await TX.Parser.parseBody<{ error: boolean; message: string }>(
+		const data = await TC.Parser.parseBody<{ error: boolean; message: string }>(
 			res,
 		);
 		expect(res.status).toBe(422);

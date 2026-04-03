@@ -1,43 +1,66 @@
-// builds only the required stuff
-async function buildPackage() {
-	const result = await Bun.build({
+function ms(start: number) {
+	const elapsed = performance.now() - start;
+	return elapsed >= 1000
+		? `\x1b[31m${(elapsed / 1000).toFixed(2)}s\x1b[0m`
+		: `\x1b[33m${elapsed.toFixed(2)}ms\x1b[0m`;
+}
+
+function step(label: string) {
+	console.log(` > ${label}`);
+	return performance.now();
+}
+
+function done(label: string, start: number) {
+	console.log(` ✓ ${label} ${ms(start)}`);
+}
+
+async function build() {
+	let t: number;
+
+	t = step("building corpus package");
+	const b1 = await Bun.build({
 		entrypoints: ["./src/index.ts"],
 		outdir: "./dist",
 		target: "bun",
 		tsconfig: "./tsconfig.build.json",
 	});
-
-	if (!result.success) {
-		result.logs.forEach((l) => console.error(l));
+	if (!b1.success) {
+		b1.logs.forEach((l) => console.error(l));
 		process.exit(1);
 	}
-}
+	done("built corpus package", t);
 
-async function buildDocs() {
-	// Copy static directories
+	t = step("making dist dir");
 	await Bun.$`mkdir -p ./docs/dist`.quiet();
-	await Bun.$`cp -r ./docs/css ./docs/dist/`.quiet();
-	await Bun.$`cp -r ./docs/html ./docs/dist/`.quiet();
-	await Bun.$`cp -r ./docs/markdown ./docs/dist/`.quiet();
-	console.log("📁 Copied static directories");
+	done("made dist dir", t);
 
-	// Build TypeScript
-	await Bun.build({
-		entrypoints: ["./docs/index.ts", "./docs/convert-md.ts"],
+	t = step("copying static directories");
+	await Promise.all([
+		Bun.$`cp -r ./src/Docs/css ./docs/dist/`.quiet(),
+		Bun.$`cp -r ./src/Docs/html ./docs/dist/`.quiet(),
+		Bun.$`cp -r ./src/Docs/markdown ./docs/dist/`.quiet(),
+	]);
+	done("copied static directories", t);
+
+	t = step("building docs server");
+	const b2 = await Bun.build({
+		entrypoints: ["./src/Docs/index.ts", "./src/Docs/convert-md.ts"],
 		outdir: "./docs/dist",
 		target: "bun",
 		format: "esm",
 	});
-
-	console.log("⚡ Built TypeScript");
+	if (!b2.success) {
+		b2.logs.forEach((l) => console.error(l));
+		process.exit(1);
+	}
+	done("built docs server", t);
 }
 
 try {
-	const start = performance.now();
-	await buildPackage();
-	await buildDocs();
-	const end = performance.now();
-	console.log(`📚 Docs built in ${(end - start).toFixed(2)}ms`);
+	let t: number;
+	t = step("started");
+	await build();
+	done("done", t);
 } catch (err) {
 	console.error(err);
 	process.exit(1);

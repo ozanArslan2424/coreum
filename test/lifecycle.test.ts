@@ -1,4 +1,4 @@
-import { $registryTesting, TC, TX } from "./_modules";
+import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
@@ -114,7 +114,7 @@ describe("C.Middleware — lifecycle", () => {
 	it("GUARD — return response blocks route (wrong token)", async () => {
 		const res = await s.handle(req("/protected"));
 		expect(res.status).toBe(401);
-		const body = await TX.Parser.parseBody<{ error: string }>(res);
+		const body = await TC.Parser.parseBody<{ error: string }>(res);
 		expect(body).toEqual({ error: "unauthorized" });
 	});
 
@@ -123,7 +123,7 @@ describe("C.Middleware — lifecycle", () => {
 			req("/protected", { headers: { authorization: "Bearer secret" } }),
 		);
 		expect(res.status).toBe(200);
-		const body = await TX.Parser.parseBody<{ user: string }>(res);
+		const body = await TC.Parser.parseBody<{ user: string }>(res);
 		expect(body).toEqual({ user: "alice" });
 	});
 
@@ -148,8 +148,8 @@ describe("C.Middleware — lifecycle", () => {
 	it("GLOBAL — useOn '*' runs on every route", async () => {
 		const res1 = await s.handle(req("/global-one"));
 		const res2 = await s.handle(req("/global-two"));
-		const body1 = await TX.Parser.parseBody<{ traced: boolean }>(res1);
-		const body2 = await TX.Parser.parseBody<{ traced: boolean }>(res2);
+		const body1 = await TC.Parser.parseBody<{ traced: boolean }>(res1);
+		const body2 = await TC.Parser.parseBody<{ traced: boolean }>(res2);
 		expect(body1).toEqual({ traced: true });
 		expect(body2).toEqual({ traced: true });
 	});
@@ -158,7 +158,7 @@ describe("C.Middleware — lifecycle", () => {
 		const res = await s.handle(
 			req("/inbound-headers", { headers: { "x-api-key": "key-xyz" } }),
 		);
-		const body = await TX.Parser.parseBody<{ receivedToken: string }>(res);
+		const body = await TC.Parser.parseBody<{ receivedToken: string }>(res);
 		expect(body).toEqual({ receivedToken: "key-xyz" });
 	});
 
@@ -166,7 +166,7 @@ describe("C.Middleware — lifecycle", () => {
 		const res = await s.handle(
 			req("/inbound-cookies", { headers: { cookie: "session-id=sess-99" } }),
 		);
-		const body = await TX.Parser.parseBody<{ sessionId: string }>(res);
+		const body = await TC.Parser.parseBody<{ sessionId: string }>(res);
 		expect(body).toEqual({ sessionId: "sess-99" });
 	});
 });

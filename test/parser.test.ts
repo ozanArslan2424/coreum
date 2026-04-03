@@ -1,11 +1,11 @@
-import { $registryTesting, TC, TX } from "./_modules";
+import { $registryTesting, TC } from "./_modules";
 import { afterEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { type } from "arktype";
 import * as z from "zod";
-import type { StandardSchemaV1 } from "@/Model/types/StandardSchema";
+import type { StandardSchemaV1 } from "@/Core/Model/StandardSchema";
 import { reqPath } from "./utils/req";
-import { joinPathSegments } from "@/utils/joinPathSegments";
+import { joinPathSegments } from "@/Utils/joinPathSegments";
 
 afterEach(() => $registryTesting.reset());
 
@@ -131,50 +131,50 @@ const path = (...segments: (string | number)[]) =>
 
 describe("adaptive parsing based on library and schema definition", () => {
 	it("arkBasic - success", async () => {
-		expect(await TX.Parser.parse(successData, getValidator(arkBasic))).toEqual(
+		expect(await TC.Parser.parse(successData, getValidator(arkBasic))).toEqual(
 			successData,
 		);
 	});
 	it("zodBasic - success", async () => {
-		expect(await TX.Parser.parse(successData, getValidator(zodBasic))).toEqual(
+		expect(await TC.Parser.parse(successData, getValidator(zodBasic))).toEqual(
 			successData,
 		);
 	});
 	it("arkModelBasic - success", async () => {
 		expect(
-			await TX.Parser.parse(successData, getValidator(Model.arkModelBasic)),
+			await TC.Parser.parse(successData, getValidator(Model.arkModelBasic)),
 		).toEqual(successData);
 	});
 	it("zodModelBasic - success", async () => {
 		expect(
-			await TX.Parser.parse(successData, getValidator(Model.zodModelBasic)),
+			await TC.Parser.parse(successData, getValidator(Model.zodModelBasic)),
 		).toEqual(successData);
 	});
 	it("arkReferenced - success", async () => {
 		expect(
-			await TX.Parser.parse(successData, getValidator(Model.arkReferenced)),
+			await TC.Parser.parse(successData, getValidator(Model.arkReferenced)),
 		).toEqual(successData);
 	});
 	it("zodReferenced - success", async () => {
 		expect(
-			await TX.Parser.parse(successData, getValidator(Model.zodReferenced)),
+			await TC.Parser.parse(successData, getValidator(Model.zodReferenced)),
 		).toEqual(successData);
 	});
 	it("arkRoute - success", async () => {
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.params,
 				getValidator(Model.arkRoute.params),
 			),
 		).toEqual(successRouteData.params);
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.search,
 				getValidator(Model.arkRoute.search),
 			),
 		).toEqual(successRouteData.search);
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.body,
 				getValidator(Model.arkRoute.body),
 			),
@@ -182,19 +182,19 @@ describe("adaptive parsing based on library and schema definition", () => {
 	});
 	it("zodRoute - success", async () => {
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.params,
 				getValidator(Model.zodRoute.params),
 			),
 		).toEqual(successRouteData.params);
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.search,
 				getValidator(Model.zodRoute.search),
 			),
 		).toEqual(successRouteData.search);
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.body,
 				getValidator(Model.zodRoute.body),
 			),
@@ -202,19 +202,19 @@ describe("adaptive parsing based on library and schema definition", () => {
 	});
 	it("arkRouteReferenced - success", async () => {
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.params,
 				getValidator(Model.arkRouteReferenced.params),
 			),
 		).toEqual(successRouteData.params);
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.search,
 				getValidator(Model.arkRouteReferenced.search),
 			),
 		).toEqual(successRouteData.search);
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.body,
 				getValidator(Model.arkRouteReferenced.body),
 			),
@@ -222,19 +222,19 @@ describe("adaptive parsing based on library and schema definition", () => {
 	});
 	it("zodRouteReferenced - success", async () => {
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.params,
 				getValidator(Model.zodRouteReferenced.params),
 			),
 		).toEqual(successRouteData.params);
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.search,
 				getValidator(Model.zodRouteReferenced.search),
 			),
 		).toEqual(successRouteData.search);
 		expect(
-			await TX.Parser.parse(
+			await TC.Parser.parse(
 				successRouteData.body,
 				getValidator(Model.zodRouteReferenced.body),
 			),
@@ -257,7 +257,7 @@ describe("adaptive parsing based on library and schema definition", () => {
 				headers: { [TC.CommonHeaders.ContentType]: "application/json" },
 			}),
 		);
-		expect(await TX.Parser.parseBody<ST>(res)).toEqual(successRouteData);
+		expect(await TC.Parser.parseBody<ST>(res)).toEqual(successRouteData);
 	});
 	it("zodRoute - Real Request - success", async () => {
 		new TC.Route(
@@ -276,7 +276,7 @@ describe("adaptive parsing based on library and schema definition", () => {
 				headers: { [TC.CommonHeaders.ContentType]: "application/json" },
 			}),
 		);
-		expect(await TX.Parser.parseBody<ST>(res)).toEqual(successRouteData);
+		expect(await TC.Parser.parseBody<ST>(res)).toEqual(successRouteData);
 	});
 	it("arkRouteReferenced - Real Request - success", async () => {
 		new TC.Route(
@@ -300,7 +300,7 @@ describe("adaptive parsing based on library and schema definition", () => {
 				headers: { [TC.CommonHeaders.ContentType]: "application/json" },
 			}),
 		);
-		expect(await TX.Parser.parseBody<ST>(res)).toEqual(successRouteData);
+		expect(await TC.Parser.parseBody<ST>(res)).toEqual(successRouteData);
 	});
 	it("zodRouteReferenced - Real Request - success", async () => {
 		new TC.Route(
@@ -324,7 +324,7 @@ describe("adaptive parsing based on library and schema definition", () => {
 				headers: { [TC.CommonHeaders.ContentType]: "application/json" },
 			}),
 		);
-		expect(await TX.Parser.parseBody<ST>(res)).toEqual(successRouteData);
+		expect(await TC.Parser.parseBody<ST>(res)).toEqual(successRouteData);
 	});
 	it("combined - Real Request - success", async () => {
 		new TC.Route(
@@ -343,7 +343,7 @@ describe("adaptive parsing based on library and schema definition", () => {
 				headers: { [TC.CommonHeaders.ContentType]: "application/json" },
 			}),
 		);
-		expect(await TX.Parser.parseBody<ST>(res)).toEqual(successRouteData);
+		expect(await TC.Parser.parseBody<ST>(res)).toEqual(successRouteData);
 	});
 	it("Controller - Real Request - success", async () => {
 		const url = new URL(
@@ -357,61 +357,61 @@ describe("adaptive parsing based on library and schema definition", () => {
 				headers: { [TC.CommonHeaders.ContentType]: "application/json" },
 			}),
 		);
-		expect(await TX.Parser.parseBody<ST>(res)).toEqual(successRouteData);
+		expect(await TC.Parser.parseBody<ST>(res)).toEqual(successRouteData);
 	});
 
 	it("arkBasic - fail", () => {
 		expect(
-			async () => await TX.Parser.parse(failData, getValidator(arkBasic)),
+			async () => await TC.Parser.parse(failData, getValidator(arkBasic)),
 		).toThrow(TC.Error);
 	});
 	it("zodBasic - fail", () => {
 		expect(
-			async () => await TX.Parser.parse(failData, getValidator(zodBasic)),
+			async () => await TC.Parser.parse(failData, getValidator(zodBasic)),
 		).toThrow(TC.Error);
 	});
 	it("arkModelBasic - fail", () => {
 		expect(
 			async () =>
-				await TX.Parser.parse(failData, getValidator(Model.arkModelBasic)),
+				await TC.Parser.parse(failData, getValidator(Model.arkModelBasic)),
 		).toThrow(TC.Error);
 	});
 	it("zodModelBasic - fail", () => {
 		expect(
 			async () =>
-				await TX.Parser.parse(failData, getValidator(Model.zodModelBasic)),
+				await TC.Parser.parse(failData, getValidator(Model.zodModelBasic)),
 		).toThrow(TC.Error);
 	});
 	it("arkReferenced - fail", () => {
 		expect(
 			async () =>
-				await TX.Parser.parse(failData, getValidator(Model.arkReferenced)),
+				await TC.Parser.parse(failData, getValidator(Model.arkReferenced)),
 		).toThrow(TC.Error);
 	});
 	it("zodReferenced - fail", () => {
 		expect(
 			async () =>
-				await TX.Parser.parse(failData, getValidator(Model.zodReferenced)),
+				await TC.Parser.parse(failData, getValidator(Model.zodReferenced)),
 		).toThrow(TC.Error);
 	});
 	it("arkRoute - fail", () => {
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.params,
 					getValidator(Model.arkRoute.params),
 				),
 		).toThrow(TC.Error);
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.search,
 					getValidator(Model.arkRoute.search),
 				),
 		).toThrow(TC.Error);
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.body,
 					getValidator(Model.arkRoute.body),
 				),
@@ -420,21 +420,21 @@ describe("adaptive parsing based on library and schema definition", () => {
 	it("zodRoute - fail", () => {
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.params,
 					getValidator(Model.zodRoute.params),
 				),
 		).toThrow(TC.Error);
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.search,
 					getValidator(Model.zodRoute.search),
 				),
 		).toThrow(TC.Error);
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.body,
 					getValidator(Model.zodRoute.body),
 				),
@@ -443,21 +443,21 @@ describe("adaptive parsing based on library and schema definition", () => {
 	it("arkRouteReferenced - fail", () => {
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.params,
 					getValidator(Model.arkRouteReferenced.params),
 				),
 		).toThrow(TC.Error);
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.search,
 					getValidator(Model.arkRouteReferenced.search),
 				),
 		).toThrow(TC.Error);
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.body,
 					getValidator(Model.arkRouteReferenced.body),
 				),
@@ -466,21 +466,21 @@ describe("adaptive parsing based on library and schema definition", () => {
 	it("zodRouteReferenced - fail", () => {
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.params,
 					getValidator(Model.zodRouteReferenced.params),
 				),
 		).toThrow(TC.Error);
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.search,
 					getValidator(Model.zodRouteReferenced.search),
 				),
 		).toThrow(TC.Error);
 		expect(
 			async () =>
-				await TX.Parser.parse(
+				await TC.Parser.parse(
 					failRouteData.body,
 					getValidator(Model.zodRouteReferenced.body),
 				),
@@ -591,7 +591,7 @@ describe("adaptive parsing based on library and schema definition", () => {
 		const url = new URL(path("controller", "optional"));
 		url.searchParams.set("groupId", "8");
 		const res = await s.handle(new Request(url));
-		expect(await TX.Parser.parseBody<{ groupId: number }>(res)).toEqual({
+		expect(await TC.Parser.parseBody<{ groupId: number }>(res)).toEqual({
 			groupId: 8,
 		});
 	});
@@ -599,7 +599,7 @@ describe("adaptive parsing based on library and schema definition", () => {
 	it("optional - missing", async () => {
 		const url = new URL(path("controller", "optional"));
 		const res = await s.handle(new Request(url));
-		const body = await TX.Parser.parseBody<{}>(res);
+		const body = await TC.Parser.parseBody<{}>(res);
 		expect(body).toBeEmptyObject();
 	});
 

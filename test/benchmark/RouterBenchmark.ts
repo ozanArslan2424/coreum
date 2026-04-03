@@ -1,4 +1,4 @@
-import { $registryTesting, TC, type TX, RouterTesting } from "../_modules";
+import { $registryTesting, TC, RouterTesting } from "../_modules";
 
 export class RouterBenchmark {
 	private router: RouterTesting;
@@ -8,7 +8,7 @@ export class RouterBenchmark {
 	private usedStaticPaths = new Set<string>();
 	private usedDynamicShapes = new Set<string>(); // "GET:/static/*/static" - no param names, includes method
 
-	constructor(private readonly adapter: TX.RouterAdapterInterface) {
+	constructor(private readonly adapter: TC.RouterAdapterInterface) {
 		this.router = new RouterTesting(adapter);
 		$registryTesting.router = this.router;
 	}
