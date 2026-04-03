@@ -4,7 +4,7 @@ import type { RouteVariant } from "@/Route/enums/RouteVariant";
 import type { Context } from "@/Context/Context";
 import type { Func } from "@/utils/types/Func";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
-import type { RouterData } from "@/Router/types/RouterData";
+import type { RouterData } from "@/Registry/types/RouterData";
 
 export interface RouteInterface<
 	B = unknown,

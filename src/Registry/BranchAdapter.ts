@@ -1,8 +1,8 @@
 import type { CRequest } from "@/CRequest/CRequest";
-import type { RouterReturn } from "@/Router/types/RouterReturn";
-import type { RouterData } from "@/Router/types/RouterData";
+import type { RouterReturn } from "@/Registry/types/RouterReturn";
+import type { RouterData } from "@/Registry/types/RouterData";
 import type { Func } from "@/utils/types/Func";
-import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
+import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
 import type { Method } from "@/CRequest/enums/Method";
 
 type Store = Map<Method, RouterData>;
@@ -22,7 +22,7 @@ type Branch = {
 	children: Map<number, Branch> | null;
 };
 
-type FindRouteReturn = {
+type FindResultReturn = {
 	store: Store;
 	params: Record<string, string>;
 } | null;
@@ -61,7 +61,7 @@ export class BranchAdapter implements RouterAdapterInterface {
 		const pathlength = pathname.length;
 		const searchParams = req.urlObject.searchParams;
 
-		const result = this.findRoute(pathname, pathlength, this._root, 0);
+		const result = this.findResult(pathname, pathlength, this._root, 0);
 		if (!result) return null;
 
 		const route = result.store.get(method);
@@ -271,12 +271,12 @@ export class BranchAdapter implements RouterAdapterInterface {
 		};
 	}
 
-	private findRoute(
+	private findResult(
 		url: string,
 		urlLength: number,
 		branch: Branch,
 		startIndex: number,
-	): FindRouteReturn {
+	): FindResultReturn {
 		const part = branch.part;
 		const pathPartLen = part.length;
 		const pathPartEndIndex = startIndex + pathPartLen;
@@ -325,7 +325,7 @@ export class BranchAdapter implements RouterAdapterInterface {
 			const staticChild = branch.children.get(url.charCodeAt(startIndex));
 
 			if (staticChild !== undefined) {
-				const route = this.findRoute(url, urlLength, staticChild, startIndex);
+				const route = this.findResult(url, urlLength, staticChild, startIndex);
 
 				if (route !== null) {
 					return route;
@@ -349,7 +349,7 @@ export class BranchAdapter implements RouterAdapterInterface {
 						};
 					}
 				} else if (paramBranch.branch !== null) {
-					const route = this.findRoute(
+					const route = this.findResult(
 						url,
 						urlLength,
 						paramBranch.branch,

@@ -1,7 +1,7 @@
 import Memoirist from "memoirist";
-import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
-import type { RouterData } from "@/Router/types/RouterData";
-import type { RouterReturn } from "@/Router/types/RouterReturn";
+import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
+import type { RouterData } from "@/Registry/types/RouterData";
+import type { RouterReturn } from "@/Registry/types/RouterReturn";
 import type { CRequest } from "@/CRequest/CRequest";
 import type { Func } from "@/utils/types/Func";
 

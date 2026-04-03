@@ -1,9 +1,20 @@
-import { MiddlewareRegistry } from "@/Router/registries/MiddlewareRegistry";
-import type { Router } from "@/Router/Router";
+import { MiddlewareRegistry } from "@/Registry/MiddlewareRegistry";
+import type { Router } from "@/Registry/Router";
 import { logFatal } from "@/utils/log";
 import type { XCors } from "@/XCors/XCors";
 
 export class Registry {
+	private _docs: Record<string, { method: string; model: any }> = {};
+	public get docs(): Record<string, { method: string; model: any }> {
+		return this._docs;
+	}
+	public set docs(value: Record<string, { method: string; model: any }>) {
+		this._docs = value;
+	}
+	public appendDocs(key: string, value: { method: string; model: any }) {
+		this.docs = { ...this.docs, [key]: value };
+	}
+
 	// PREFIX
 	private _prefix: string = "";
 	public get prefix(): string {

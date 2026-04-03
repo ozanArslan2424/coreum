@@ -7,11 +7,11 @@ export { XFile as File } from "./XFile/XFile";
 
 export { XRepository as Repository } from "./XRepository/XRepository";
 
-export { MemoiristAdapter } from "./Router/adapters/MemoiristAdapter";
-export { BranchAdapter } from "./Router/adapters/BranchAdapter";
-export type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
-export type { RouterReturn } from "@/Router/types/RouterReturn";
-export type { RouterData } from "@/Router/types/RouterData";
+export { MemoiristAdapter } from "./Registry/MemoiristAdapter";
+export { BranchAdapter } from "./Registry/BranchAdapter";
+export type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
+export type { RouterReturn } from "@/Registry/types/RouterReturn";
+export type { RouterData } from "@/Registry/types/RouterData";
 
 export { XRateLimiter as RateLimiter } from "./XRateLimiter/XRateLimiter";
 export { RateLimiterFileStore } from "./XRateLimiter/stores/RateLimiterFileStore";

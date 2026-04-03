@@ -4,7 +4,7 @@ import type { CRequest } from "@/CRequest/CRequest";
 import { CResponse } from "@/CResponse/CResponse";
 import { XParser } from "@/Model/XParser";
 import type { ContextDataInterface } from "@/types.d.ts";
-import type { RouterReturn } from "@/Router/types/RouterReturn";
+import type { RouterReturn } from "@/Registry/types/RouterReturn";
 
 /**
  * The context object used in Route "callback" parameter.

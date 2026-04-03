@@ -6,7 +6,7 @@ import type { Context } from "@/Context/Context";
 import type { Func } from "@/utils/types/Func";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
 import { $registry } from "@/index";
-import type { RouterData } from "@/Router/types/RouterData";
+import type { RouterData } from "@/Registry/types/RouterData";
 
 export abstract class RouteAbstract<
 	B = unknown,

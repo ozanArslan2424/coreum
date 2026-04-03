@@ -1,20 +1,11 @@
 import { createTestServer } from "../utils/createTestServer";
-import { TEST_PORT } from "../utils/req";
 import { log } from "@/utils/log";
-import { createClient } from "redis";
-import { TC, TX } from "./testing-modules";
+import { C } from "../../dist";
+import { TEST_PORT } from "../utils/req";
 
 const server = createTestServer();
 
-const redis = createClient({ url: "redis://localhost:6379" });
-await redis.connect();
-
-new TX.RateLimiter({
-	storeType: "redis",
-	store: new TX.RateLimiterRedisStore(redis),
-});
-
-new TC.WebSocketRoute("/ws", {
+new C.WebSocketRoute("/ws", {
 	onOpen: (ws) => {
 		ws.send(
 			JSON.stringify({
@@ -81,5 +72,20 @@ new TC.WebSocketRoute("/ws", {
 		}
 	},
 });
+
+new C.Route("/:param1/:param2", () => "ok");
+new C.Route("hello/:param1/:param2", () => "ok");
+new C.Route("/world/:param1/:param2", () => "ok");
+new C.Route("/lalala/:param1/:param2", () => "ok");
+new C.Route("/yesyes/:param2", () => "ok");
+new C.Route("/okay/:param1/letsgo", () => "ok");
+new C.Route("/deneme/:param1/:param2", () => "ok");
+new C.Route("/we/got/this", () => "ok");
+new C.Route("/ohmyohmy", () => "ok");
+new C.Route("/2bros", () => "ok");
+new C.Route("/chillin/in/a/hottub", () => "ok");
+new C.Route("/5/feet/apart/cuz/theyre/not/gay", () => "ok");
+new C.Route("/verywild/*", () => "ok");
+new C.Route("/craaaazy/*", () => "ok");
 
 void server.listen(TEST_PORT);

@@ -4,7 +4,7 @@ import { compile } from "@/utils/compile";
 import type { MiddlewareInterface } from "@/Middleware/MiddlwareInterface";
 import { MiddlewareVariant } from "@/Middleware/enums/MiddlewareVariant";
 import type { MiddlewareHandler } from "@/Middleware/types/MiddlewareHandler";
-import type { MiddlewareRegistryReturn } from "@/Router/types/MiddlewareRegistryReturn";
+import type { MiddlewareRegistryReturn } from "@/Registry/types/MiddlewareRegistryReturn";
 
 export class MiddlewareRegistry {
 	private inboundMiddlewares = new Map<string, Array<MiddlewareHandler>>();

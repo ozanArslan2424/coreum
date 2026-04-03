@@ -9,12 +9,12 @@ import type { MaybePromise } from "@/utils/types/MaybePromise";
 import type { RequestHandler } from "@/Server/types/RequestHandler";
 import type { ServeArgs } from "@/Server/types/ServeArgs";
 import type { ServerInterface } from "@/Server/ServerInterface";
-import { Router } from "@/Router/Router";
+import { Router } from "@/Registry/Router";
 import type { Func } from "@/utils/types/Func";
 import type { ServerOptions } from "@/Server/types/ServerOptions";
 import { log, logFatal } from "@/utils/log";
 import { WebSocketRoute } from "@/Route/WebSocketRoute";
-import type { RouterData } from "@/Router/types/RouterData";
+import type { RouterData } from "@/Registry/types/RouterData";
 import { RouteVariant } from "@/Route/enums/RouteVariant";
 
 export abstract class ServerAbstract implements ServerInterface {

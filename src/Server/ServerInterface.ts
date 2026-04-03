@@ -3,7 +3,7 @@ import type { MaybePromise } from "@/utils/types/MaybePromise";
 import type { RequestHandler } from "@/Server/types/RequestHandler";
 import type { ServeArgs } from "@/Server/types/ServeArgs";
 import type { Func } from "@/utils/types/Func";
-import type { RouterData } from "@/Router/types/RouterData";
+import type { RouterData } from "@/Registry/types/RouterData";
 
 export interface ServerInterface {
 	get routes(): Array<RouterData>;

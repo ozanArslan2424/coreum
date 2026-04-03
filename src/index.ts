@@ -3,7 +3,7 @@ import { Registry } from "@/Registry/Registry";
 import * as C from "@/C";
 import * as X from "@/X";
 
-export { Router } from "@/Router/Router";
+export { Router } from "@/Registry/Router.js";
 
 export const $registry = new Registry();
 

@@ -1,15 +1,16 @@
 import type { CRequest } from "@/CRequest/CRequest";
-import type { RouterAdapterInterface } from "@/Router/adapters/RouterAdapterInterface";
-import type { RouterReturn } from "@/Router/types/RouterReturn";
-import type { RouterData } from "@/Router/types/RouterData";
+import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
+import type { RouterReturn } from "@/Registry/types/RouterReturn";
+import type { RouterData } from "@/Registry/types/RouterData";
 import type { RouteInterface } from "@/Route/RouteInterface";
-import { BranchAdapter } from "@/Router/adapters/BranchAdapter";
+import { BranchAdapter } from "@/Registry/BranchAdapter";
 import { log } from "@/utils/log";
 import { internFunc } from "@/utils/internFunc";
 import { objGetKeys } from "@/utils/objGetKeys";
 import type { RouteModel } from "@/Model/types/RouteModel";
 import { strRemoveWhitespace } from "@/utils/strRemoveWhitespace";
 import type { Func } from "@/utils/types/Func";
+import { $registry } from "@/index";
 
 export class Router {
 	constructor(private adapter: RouterAdapterInterface = new BranchAdapter()) {}
@@ -37,6 +38,10 @@ export class Router {
 			}
 		}
 		this.adapter.add(data);
+		$registry.appendDocs(route.endpoint, {
+			method: route.method,
+			model: route.model,
+		});
 	}
 
 	find(req: CRequest): RouterReturn | null {
