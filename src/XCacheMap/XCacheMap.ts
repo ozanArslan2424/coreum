@@ -1,3 +1,4 @@
+import { log } from "@/utils/log";
 import type { Func } from "@/utils/types/Func";
 import type { MaybePromise } from "@/utils/types/MaybePromise";
 
@@ -7,7 +8,11 @@ export class XCacheMap<K = string, V = unknown> {
 	constructor(private readonly getter: Func<[key: K], MaybePromise<V>>) {}
 
 	async get(key: K): Promise<V> {
-		if (this.map.has(key)) return this.map.get(key)!;
+		const cached = this.map.get(key);
+		if (cached) {
+			log.success("cache hit");
+			return cached;
+		}
 		const value = await this.getter(key);
 		this.map.set(key, value);
 		return value;
