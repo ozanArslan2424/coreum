@@ -1,4 +1,4 @@
-import { TC } from "../other/testing-modules";
+import { TC } from "../_modules";
 
 export function createTestController(prefix: string) {
 	class TestController extends TC.Controller {

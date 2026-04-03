@@ -1,4 +1,4 @@
-import { $registryTesting, TC } from "./other/testing-modules";
+import { $registryTesting, TC } from "./_modules";
 import { afterEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";

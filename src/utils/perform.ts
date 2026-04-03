@@ -1,3 +1,4 @@
+import { log } from "@/utils/log";
 import type { Func } from "@/utils/types/Func";
 
 export async function perform<F extends Func>(
@@ -10,7 +11,16 @@ export async function perform<F extends Func>(
 
 	const end = performance.now();
 	const startup = end - start;
-	console.log(`🚀 ${name ?? fn.name} function took ${startup.toFixed(2)}ms`);
+
+	const msg = `🚀 ${name ?? fn.name ?? "function"} took ${startup.toFixed(2)}ms`;
+
+	if (startup > 10) {
+		log.warn(msg);
+	} else if (startup > 20) {
+		log.error(msg);
+	} else {
+		log.log(msg);
+	}
 
 	return result;
 }

@@ -19,8 +19,8 @@ export class CHeaders extends Headers {
 		}
 	}
 
-	override set(name: CHeaderKey, value: string): void {
-		super.set(name, value);
+	override set(name: CHeaderKey, value: string | number | boolean): void {
+		super.set(name, String(value));
 	}
 
 	override get(name: CHeaderKey): string | null {

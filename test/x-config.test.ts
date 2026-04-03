@@ -1,4 +1,4 @@
-import { $registryTesting, TX } from "./other/testing-modules";
+import { $registryTesting, TX } from "./_modules";
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
 import { log } from "@/utils/log";
 

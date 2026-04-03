@@ -3,4 +3,4 @@ export {
 	X as TX,
 	$registry as $registryTesting,
 	Router as RouterTesting,
-} from "../../dist";
+} from "../dist";

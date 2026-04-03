@@ -1,9 +1,4 @@
-import {
-	$registryTesting,
-	TC,
-	type TX,
-	RouterTesting,
-} from "../other/testing-modules";
+import { $registryTesting, TC, type TX, RouterTesting } from "../_modules";
 
 export class RouterBenchmark {
 	private router: RouterTesting;

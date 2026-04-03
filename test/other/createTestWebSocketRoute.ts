@@ -1,4 +1,4 @@
-import { TC } from "./testing-modules";
+import { TC } from "../_modules";
 import type { Log } from "@/utils/log";
 
 export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {

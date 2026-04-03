@@ -1,4 +1,4 @@
-import { TC } from "../other/testing-modules";
+import { TC } from "../_modules";
 import { log } from "@/utils/log";
 
 export function createTestServer(

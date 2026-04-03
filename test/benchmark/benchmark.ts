@@ -1,6 +1,6 @@
 import { log } from "@/utils/log";
 import { RouterBenchmark } from "./RouterBenchmark";
-import { TX } from "../other/testing-modules";
+import { TX } from "../_modules";
 
 async function main() {
 	const adapters = [new TX.MemoiristAdapter(), new TX.BranchAdapter()];

@@ -1,5 +1,5 @@
 import { createTestServer } from "./utils/createTestServer";
-import { $registryTesting, TC, TX } from "./other/testing-modules";
+import { $registryTesting, TC, TX } from "./_modules";
 import { afterEach, describe, expect, it } from "bun:test";
 
 afterEach(() => $registryTesting.reset());
