@@ -1,9 +1,23 @@
-import type { ConstructorOf } from "@/utils/ConstructorOf";
-import type { XFileAbstract } from "@/XFile/XFileAbstract";
+import { XFileAbstract } from "@/XFile/XFileAbstract";
 import type { XFileInterface } from "@/XFile/XFileInterface";
 
-const Adapted = require(
-	typeof Bun !== "undefined" ? "./XFile.bun" : "./XFile.node",
-).default as ConstructorOf<typeof XFileAbstract, XFileInterface>;
+export class XFile extends XFileAbstract implements XFileInterface {
+	constructor(...args: ConstructorParameters<typeof XFileAbstract>) {
+		super(...args);
+		this.file = Bun.file(args[0]);
+	}
 
-export class XFile extends Adapted {}
+	file: Bun.BunFile;
+
+	async exists(): Promise<boolean> {
+		return await this.file.exists();
+	}
+
+	async text(): Promise<string> {
+		return await this.file.text();
+	}
+
+	stream(): ReadableStream {
+		return this.file.stream();
+	}
+}
