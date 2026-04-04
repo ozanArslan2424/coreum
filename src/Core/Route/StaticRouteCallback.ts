@@ -1,7 +1,7 @@
 import type { Context } from "@/Core/Context/Context";
 import type { CResponse } from "@/Core/CResponse/CResponse";
-import type { Func } from "@/Utils/types/Func";
-import type { MaybePromise } from "@/Utils/types/MaybePromise";
+import type { Func } from "@/Utils/Func";
+import type { MaybePromise } from "@/Utils/MaybePromise";
 
 type R = CResponse | string;
 

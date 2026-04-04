@@ -1,5 +1,5 @@
-import type { Func } from "@/Utils/types/Func";
-import type { MaybePromise } from "@/Utils/types/MaybePromise";
+import type { Func } from "@/Utils/Func";
+import type { MaybePromise } from "@/Utils/MaybePromise";
 
 export class XCacheMap<K = string, V = unknown> {
 	private map = new Map<K, V>();

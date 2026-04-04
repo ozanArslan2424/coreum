@@ -5,7 +5,7 @@ import { Method } from "@/Core/CRequest/Method";
 import type { WebSocketOnOpen } from "@/Core/Route/WebSocketOnOpen";
 import type { WebSocketOnClose } from "@/Core/Route/WebSocketOnClose";
 import type { WebSocketOnMessage } from "@/Core/Route/WebSocketOnMessage";
-import type { Func } from "@/Utils/types/Func";
+import type { Func } from "@/Utils/Func";
 import { joinPathSegments } from "@/Utils/joinPathSegments";
 import { $registry } from "@/index";
 

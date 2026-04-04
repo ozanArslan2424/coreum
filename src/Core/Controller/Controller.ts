@@ -3,9 +3,9 @@ import { StaticRoute } from "@/Core/Route/StaticRoute";
 import type { ControllerOptions } from "@/Core/Controller/ControllerOptions";
 import type { Context } from "@/Core/Context/Context";
 import { Method } from "@/Core/CRequest/Method";
-import type { MaybePromise } from "@/Utils/types/MaybePromise";
+import type { MaybePromise } from "@/Utils/MaybePromise";
 import { joinPathSegments } from "@/Utils/joinPathSegments";
-import type { Func } from "@/Utils/types/Func";
+import type { Func } from "@/Utils/Func";
 
 /**
  * Base class for grouping related routes under a shared prefix and optional middleware.

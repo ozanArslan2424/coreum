@@ -1,7 +1,7 @@
 import type { CRequest } from "@/Core/CRequest/CRequest";
 import type { CResponse } from "@/Core/CResponse/CResponse";
-import type { Func } from "@/Utils/types/Func";
-import type { MaybePromise } from "@/Utils/types/MaybePromise";
+import type { Func } from "@/Utils/Func";
+import type { MaybePromise } from "@/Utils/MaybePromise";
 
 export type RequestHandler<R = unknown> = Func<
 	[CRequest],

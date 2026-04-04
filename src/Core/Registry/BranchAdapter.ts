@@ -1,7 +1,7 @@
 import type { CRequest } from "@/Core/CRequest/CRequest";
 import type { RouterReturn } from "@/Core/Registry/RouterReturn";
 import type { RouterData } from "@/Core/Registry/RouterData";
-import type { Func } from "@/Utils/types/Func";
+import type { Func } from "@/Utils/Func";
 import type { RouterAdapterInterface } from "@/Core/Registry/RouterAdapterInterface";
 import type { Method } from "@/Core/CRequest/Method";
 

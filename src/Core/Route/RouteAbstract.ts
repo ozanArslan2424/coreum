@@ -4,8 +4,8 @@ import type { RouteModel } from "@/Core/Model/RouteModel";
 import type { RouteInterface } from "@/Core/Route/RouteInterface";
 import type { Context } from "@/Core/Context/Context";
 import type { RouterData } from "@/Core/Registry/RouterData";
-import type { Func } from "@/Utils/types/Func";
-import type { MaybePromise } from "@/Utils/types/MaybePromise";
+import type { Func } from "@/Utils/Func";
+import type { MaybePromise } from "@/Utils/MaybePromise";
 import { $registry } from "@/index";
 
 export abstract class RouteAbstract<

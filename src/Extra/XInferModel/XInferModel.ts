@@ -1,5 +1,5 @@
 import type { InferSchema } from "@/Core/Model/InferSchema";
-import type { Prettify } from "@/Utils/types/Prettify";
+import type { Prettify } from "@/Utils/Prettify";
 import type { RouteModel } from "@/Core/Model/RouteModel";
 import type { Schema } from "@/Core/Model/Schema";
 

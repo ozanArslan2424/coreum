@@ -1,4 +1,4 @@
-import type { Func } from "@/Utils/types/Func";
+import type { Func } from "@/Utils/Func";
 
 export type SseSource = Func<
 	[

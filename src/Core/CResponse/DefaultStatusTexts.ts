@@ -1,5 +1,5 @@
 import { Status } from "@/Core/CResponse/Status";
-import type { ValueOf } from "@/Utils/types/ValueOf";
+import type { ValueOf } from "@/Utils/ValueOf";
 
 export const DefaultStatusTexts = {
 	[Status.OK]: "OK",

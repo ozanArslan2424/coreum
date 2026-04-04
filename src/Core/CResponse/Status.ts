@@ -1,5 +1,5 @@
-import type { OrNumber } from "@/Utils/types/OrNumber";
-import type { ValueOf } from "@/Utils/types/ValueOf";
+import type { OrNumber } from "@/Utils/OrNumber";
+import type { ValueOf } from "@/Utils/ValueOf";
 
 /** Commonly used HTTP status codes. */
 

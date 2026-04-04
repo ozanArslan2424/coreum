@@ -1,4 +1,4 @@
-import type { ValueOf } from "@/Utils/types/ValueOf";
+import type { ValueOf } from "@/Utils/ValueOf";
 
 /** Just some common headers. */
 export const CommonHeaders = {

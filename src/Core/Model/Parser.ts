@@ -6,7 +6,7 @@ import type { CRequest } from "@/Core/CRequest/CRequest";
 import type { CResponse } from "@/Core/CResponse/CResponse";
 import type { StandardSchemaV1 } from "@/Core/Model/StandardSchema";
 import type { SchemaValidator } from "@/Core/Model/SchemaValidator";
-import type { UnknownObject } from "@/Utils/types/UnknownObject";
+import type { UnknownObject } from "@/Utils/UnknownObject";
 import { arrIncludes } from "@/Utils/arrIncludes";
 import { isObjectWith } from "@/Utils/isObjectWith";
 import { objAppendEntry } from "@/Utils/objAppendEntry";

@@ -1,8 +1,8 @@
 import type { Env } from "@/types.d.ts";
 import { log } from "@/Utils/log";
 import { strIsDefined } from "@/Utils/strIsDefined";
-import type { Func } from "@/Utils/types/Func";
-import type { OrString } from "@/Utils/types/OrString";
+import type { Func } from "@/Utils/Func";
+import type { OrString } from "@/Utils/OrString";
 import path from "path";
 
 export class XConfig {

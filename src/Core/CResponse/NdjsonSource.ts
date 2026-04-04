@@ -1,4 +1,4 @@
-import type { Func } from "@/Utils/types/Func";
+import type { Func } from "@/Utils/Func";
 
 export type NdjsonSource = Func<
 	[send: Func<[item: unknown], void>],

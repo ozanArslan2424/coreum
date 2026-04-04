@@ -3,8 +3,8 @@ import type { RouteModel } from "@/Core/Model/RouteModel";
 import type { RouteVariant } from "@/Core/Route/RouteVariant";
 import type { Context } from "@/Core/Context/Context";
 import type { RouterData } from "@/Core/Registry/RouterData";
-import type { Func } from "@/Utils/types/Func";
-import type { MaybePromise } from "@/Utils/types/MaybePromise";
+import type { Func } from "@/Utils/Func";
+import type { MaybePromise } from "@/Utils/MaybePromise";
 
 export interface RouteInterface<
 	B = unknown,

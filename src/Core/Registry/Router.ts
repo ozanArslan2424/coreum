@@ -9,7 +9,7 @@ import { log } from "@/Utils/log";
 import { internFunc } from "@/Utils/internFunc";
 import { objGetKeys } from "@/Utils/objGetKeys";
 import { strRemoveWhitespace } from "@/Utils/strRemoveWhitespace";
-import type { Func } from "@/Utils/types/Func";
+import type { Func } from "@/Utils/Func";
 import { $registry } from "@/index";
 
 export class Router {

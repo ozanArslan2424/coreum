@@ -6,8 +6,8 @@ import type { DynamicRouteCallback } from "@/Core/Route/DynamicRouteCallback";
 import type { DynamicRouteDefinition } from "@/Core/Route/DynamicRouteDefinition";
 import { $registry } from "@/index";
 import { joinPathSegments } from "@/Utils/joinPathSegments";
-import type { Func } from "@/Utils/types/Func";
-import type { MaybePromise } from "@/Utils/types/MaybePromise";
+import type { Func } from "@/Utils/Func";
+import type { MaybePromise } from "@/Utils/MaybePromise";
 
 export abstract class DynamicRouteAbstract<
 	B = unknown,

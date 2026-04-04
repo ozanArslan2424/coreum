@@ -1,8 +1,8 @@
 import type { ErrorHandler } from "@/Core/Server/ErrorHandler";
-import type { MaybePromise } from "@/Utils/types/MaybePromise";
+import type { MaybePromise } from "@/Utils/MaybePromise";
 import type { RequestHandler } from "@/Core/Server/RequestHandler";
 import type { ServeArgs } from "@/Core/Server/ServeArgs";
-import type { Func } from "@/Utils/types/Func";
+import type { Func } from "@/Utils/Func";
 import type { RouterData } from "@/Core/Registry/RouterData";
 
 export interface ServerInterface {

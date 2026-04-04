@@ -3,7 +3,7 @@ import type { RouterAdapterInterface } from "@/Core/Registry/RouterAdapterInterf
 import type { RouterData } from "@/Core/Registry/RouterData";
 import type { RouterReturn } from "@/Core/Registry/RouterReturn";
 import type { CRequest } from "@/Core/CRequest/CRequest";
-import type { Func } from "@/Utils/types/Func";
+import type { Func } from "@/Utils/Func";
 
 /**
  * Router adapter wrapping the "memoirist" package.
