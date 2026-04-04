@@ -10,17 +10,17 @@ async function build() {
 		process.exit(1);
 	}
 
-	await Bun.$`mkdir -p ./docs/dist`.quiet();
+	await Bun.$`mkdir -p ./docs-dist`.quiet();
 
 	await Promise.all([
-		Bun.$`cp -r ./src/Docs/css ./docs/dist/`.quiet(),
-		Bun.$`cp -r ./src/Docs/html ./docs/dist/`.quiet(),
-		Bun.$`cp -r ./src/Docs/markdown ./docs/dist/`.quiet(),
+		Bun.$`cp -r ./src/Docs/css ./docs-dist/`.quiet(),
+		Bun.$`cp -r ./src/Docs/html ./docs-dist/`.quiet(),
+		Bun.$`cp -r ./src/Docs/markdown ./docs-dist/`.quiet(),
 	]);
 
 	const b2 = await Bun.build({
 		entrypoints: ["./src/Docs/index.ts", "./src/Docs/convert-md.ts"],
-		outdir: "./docs/dist",
+		outdir: "./docs-dist",
 		target: "bun",
 		format: "esm",
 	});

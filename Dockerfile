@@ -14,7 +14,7 @@ RUN bun run build-docs.ts
 
 FROM base AS release
 WORKDIR /usr/src/app
-COPY --from=build /usr/src/app/docs/dist ./docs
+COPY --from=build /usr/src/app/docs-dist ./docs
 COPY --from=build /usr/src/app/dist ./docs/dist
 EXPOSE 3000
 ENV NODE_ENV=production
