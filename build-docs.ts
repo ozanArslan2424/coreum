@@ -3,7 +3,7 @@ async function build() {
 		entrypoints: ["./src/index.ts"],
 		outdir: "./dist",
 		target: "bun",
-		tsconfig: "./tsconfig.build.json",
+		tsconfig: "./tsconfig.json",
 	});
 	if (!b1.success) {
 		b1.logs.forEach((l) => console.error(l));
