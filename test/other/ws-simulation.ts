@@ -1,6 +1,6 @@
 import { log as _log } from "@/Utils/log";
 import { createTestWebSocketRoute } from "./createTestWebSocketRoute";
-import { TestHelper } from "./TestHelper";
+import { TestHelper } from "../utils/TestHelper";
 import { TC } from "../_modules";
 
 const PORT = 9876;

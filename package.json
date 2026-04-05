@@ -42,13 +42,16 @@
 		"test:http": "bun run test/other/http-simulation.ts",
 		"test:ws": "bun run test/other/ws-simulation.ts",
 		"test:benchmark": "bun run test/benchmark/benchmark.ts",
-		"tests": "bun run build && bun test && bun test:http -s && bun test:ws -s && bun test:benchmark"
+		"test:cli": "bun run src/CLI/index.ts -s -p ../_modules -m ./test/other/test-server.ts -o ./test/other/generated.ts && bun run test/other/cli-test.ts",
+		"test:all": "bun run build && bun test --only-failures && bun test:http -s && bun test:ws -s && bun test:cli -s && bun test:benchmark"
 	},
 	"packageManager": "pnpm@10.33.0",
 	"devDependencies": {
+		"@standard-schema/spec": "^1.1.0",
 		"@types/bun": "^1.3.11",
 		"arktype": "^2.2.0",
 		"bun-plugin-dts": "^0.4.0",
+		"json-schema-to-typescript": "^15.0.4",
 		"marked": "^17.0.5",
 		"memoirist": "^0.4.0",
 		"oxlint": "^1.57.0",

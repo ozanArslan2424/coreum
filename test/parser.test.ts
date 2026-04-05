@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it } from "bun:test";
 import { createTestServer } from "./utils/createTestServer";
 import { type } from "arktype";
 import * as z from "zod";
-import type { StandardSchemaV1 } from "@/Core/Model/StandardSchema";
 import { reqPath } from "./utils/req";
 import { joinPathSegments } from "@/Utils/joinPathSegments";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 afterEach(() => $registryTesting.reset());
 

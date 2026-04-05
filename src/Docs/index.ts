@@ -22,7 +22,7 @@ async function main() {
 
 	function addr(...path: string[]) {
 		if (X.Config.nodeEnv === "development") {
-			return X.Config.resolvePath(X.Config.cwd(), "src", "Docs", ...path)
+			return X.Config.resolvePath(X.Config.cwd(), "src", "Docs", ...path);
 		}
 		return X.Config.resolvePath(X.Config.cwd(), "docs", ...path);
 	}

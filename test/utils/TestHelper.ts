@@ -8,24 +8,16 @@ export class TestHelper {
 	failures: string[] = [];
 
 	logResults(title: string) {
-		const line = "═".repeat(58);
-		alwaysLog.bold(line);
-
 		alwaysLog.bold(title);
 
-		alwaysLog.bold(line);
-
-		alwaysLog.success(`${this.passed} passed`);
-
 		if (this.failed > 0) {
+			alwaysLog.success(`${this.passed} passed`);
 			alwaysLog.error(`${this.failed} failed`);
 			alwaysLog.bold("Failures:");
 			for (const f of this.failures) alwaysLog.step(f);
 		} else {
 			alwaysLog.success(`All ${this.passed} assertions passed 🔥`);
 		}
-
-		alwaysLog.bold(line);
 	}
 
 	stringify(input: any) {

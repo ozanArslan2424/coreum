@@ -2,17 +2,25 @@ import { MiddlewareRegistry } from "@/Core/Registry/MiddlewareRegistry";
 import type { Router } from "@/Core/Registry/Router";
 import { logFatal } from "@/Utils/log";
 import type { XCors } from "@/Extra/XCors/XCors";
+import type { RouteModel } from "@/Core/Model/RouteModel";
+
+type DocEntry = {
+	id: string;
+	endpoint: string;
+	method: string;
+	model: RouteModel<any, any, any, any> | undefined;
+};
 
 export class Registry {
-	private _docs: Record<string, { method: string; model: any }> = {};
-	public get docs(): Record<string, { method: string; model: any }> {
+	private _docs: Record<string, DocEntry> = {};
+	public get docs(): Record<string, DocEntry> {
 		return this._docs;
 	}
-	public set docs(value: Record<string, { method: string; model: any }>) {
+	public set docs(value: Record<string, DocEntry>) {
 		this._docs = value;
 	}
-	public appendDocs(key: string, value: { method: string; model: any }) {
-		this.docs = { ...this.docs, [key]: value };
+	public appendDocs(id: string, value: DocEntry) {
+		this.docs = { ...this.docs, [id]: value };
 	}
 
 	// PREFIX

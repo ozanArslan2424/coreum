@@ -1,7 +1,7 @@
 import { type } from "arktype";
 import { TC } from "../_modules";
 import { log as _log } from "@/Utils/log";
-import { TestHelper } from "./TestHelper";
+import { TestHelper } from "../utils/TestHelper";
 
 // ── config ────────────────────────────────────────────────────────────────────
 

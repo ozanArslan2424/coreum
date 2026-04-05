@@ -4,6 +4,7 @@ export {
 	C as TC,
 	X as TX,
 	$registry as $registryTesting,
+	$registry,
 	Router as RouterTesting,
 } from "../dist";
 
