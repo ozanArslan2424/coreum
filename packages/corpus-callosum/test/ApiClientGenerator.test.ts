@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeAll } from "bun:test";
-import { Generator } from "../src/Generator";
+import { ApiClientGenerator } from "../src/generate/ApiClientGenerator";
 
-const generator = new Generator({}, {});
+const generator = new ApiClientGenerator({}, {});
 beforeAll(() => generator.readConfig());
 
 describe("toCamelCaseKey", () => {

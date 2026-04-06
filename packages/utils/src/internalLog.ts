@@ -59,6 +59,10 @@ function makeLog(): Log {
 export const log = makeLog();
 
 export function logFatal(...args: any[]): never {
-	console.error("\x1b[31m✗\x1b[0m", ...args);
-	process.exit(1);
+	if (process.env.NODE_ENV === "test") {
+		throw new Error(JSON.stringify(args));
+	} else {
+		log.error(...args);
+		process.exit(1);
+	}
 }

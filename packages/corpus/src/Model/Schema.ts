@@ -1,13 +1,6 @@
-import type {
-	StandardJSONSchemaV1,
-	StandardSchemaV1,
-} from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
-export interface Schema<T = unknown> extends StandardSchemaV1<unknown, T> {
-	"~standard": StandardSchemaV1<unknown, T>["~standard"] & {
-		readonly jsonSchema: StandardJSONSchemaV1.Converter;
-	};
-}
+export interface Schema<T = unknown> extends StandardSchemaV1<unknown, T> {}
 
 export type InferSchema<T extends Schema> = StandardSchemaV1.InferOutput<T>;
 

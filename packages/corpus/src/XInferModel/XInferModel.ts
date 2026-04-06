@@ -5,7 +5,12 @@ import type { Prettify } from "corpus-utils/Prettify";
 
 /** If you prefer to put all schemas into a single object, this will be helpful */
 export type XInferModel<T extends Record<string, any>> = {
-	[K in keyof T]: T[K] extends RouteModel<any, any, any, any>
+	[K in keyof T as K extends "prototype" ? never : K]: T[K] extends RouteModel<
+		any,
+		any,
+		any,
+		any
+	>
 		? Prettify<
 				(T[K]["body"] extends Schema
 					? { body: InferSchema<T[K]["body"]> }

@@ -42,13 +42,13 @@ export type GeneratorConfig = Partial<{
 	exportClientAs: string;
 
 	/**
-	 * Options passed to `schema["~standard"].jsonSchema.output()` for each route model.
+	 * Options passed to "@standard-community/standard-json".toJsonSchema for each route model.
 	 * Use this to configure how your schema library handles types that don't have
 	 * JSON Schema equivalents (e.g. Date, morph, predicate).
 	 *
 	 * @example
 	 * // arktype — "just make it work"
-	 * { jsonSchemaOptions: { target: "draft-07", libraryOptions: { fallback: ctx => ctx.base } } }
+	 * { jsonSchemaOptions: { fallback: ctx => ctx.base } }
 	 */
-	jsonSchemaOptions: StandardJSONSchemaV1.Options;
+	jsonSchemaOptions: StandardJSONSchemaV1.Options["libraryOptions"];
 }>;

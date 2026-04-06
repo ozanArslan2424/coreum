@@ -28,25 +28,25 @@ interface Verywild_GetModel{search?:Record<string, unknown>;params:{"*":Primitiv
 const makeVerywild_GetRequest=(args:ExtractArgs<Verywild_GetModel>)=>({endpoint:`/verywild/${String(args.params["*"])}`,method:"GET",search:args.search})
 interface Craaaazy_GetModel{search?:Record<string, unknown>;params:{"*":Primitive};response:unknown;};
 const makeCraaaazy_GetRequest=(args:ExtractArgs<Craaaazy_GetModel>)=>({endpoint:`/craaaazy/${String(args.params["*"])}`,method:"GET",search:args.search})
-interface UsersPostModel{body:{address:{city:string;country:string;zip?:string;};age:number;name:string;role:("admin"|"editor"|"viewer");tags:string[];};search?:Record<string, unknown>;response:{age:number;createdAt:string;id:string;name:string;role:("admin"|"editor"|"viewer");status:("active"|"banned"|"inactive");tags:string[];updatedAt:string;};};
+interface UsersPostModel{body:{[k:string]:unknown;};search?:Record<string, unknown>;response:{[k:string]:unknown;};};
 const makeUsersPostRequest=(args:ExtractArgs<UsersPostModel>)=>({endpoint:"/users",method:"POST",body:args.body,search:args.search})
-interface UsersGetModel{search:{limit:unknown;page:unknown;role?:("admin"|"editor"|"viewer");status?:("active"|"banned"|"inactive");};response:unknown;};
+interface UsersGetModel{search:{[k:string]:unknown;};response:unknown;};
 const makeUsersGetRequest=(args:ExtractArgs<UsersGetModel>)=>({endpoint:"/users",method:"GET",search:args.search})
-interface UsersIdGetModel{search?:Record<string, unknown>;params:{id:string;};response:{age:number;createdAt:string;id:string;name:string;role:("admin"|"editor"|"viewer");status:("active"|"banned"|"inactive");tags:string[];updatedAt:string;};};
+interface UsersIdGetModel{search?:Record<string, unknown>;params:{[k:string]:unknown;};response:{[k:string]:unknown;};};
 const makeUsersIdGetRequest=(args:ExtractArgs<UsersIdGetModel>)=>({endpoint:`/users/${String(args.params.id)}`,method:"GET",search:args.search})
-interface UsersIdPutModel{body:{address:{city:string;country:string;zip?:string;};age:number;name:string;role:("admin"|"editor"|"viewer");tags:string[];};search?:Record<string, unknown>;params:{id:string;};response:{age:number;createdAt:string;id:string;name:string;role:("admin"|"editor"|"viewer");status:("active"|"banned"|"inactive");tags:string[];updatedAt:string;};};
+interface UsersIdPutModel{body:{[k:string]:unknown;};search?:Record<string, unknown>;params:{[k:string]:unknown;};response:{[k:string]:unknown;};};
 const makeUsersIdPutRequest=(args:ExtractArgs<UsersIdPutModel>)=>({endpoint:`/users/${String(args.params.id)}`,method:"PUT",body:args.body,search:args.search})
-interface UsersIdDeleteModel{search?:Record<string, unknown>;params:{id:string;};response:unknown;};
+interface UsersIdDeleteModel{search?:Record<string, unknown>;params:{[k:string]:unknown;};response:unknown;};
 const makeUsersIdDeleteRequest=(args:ExtractArgs<UsersIdDeleteModel>)=>({endpoint:`/users/${String(args.params.id)}`,method:"DELETE",search:args.search})
-interface UsersIdPostsPostModel{body:{content:string;metadata:{category:("life"|"other"|"tech");likes:number;views:number;};published:boolean;title:string;};search?:Record<string, unknown>;params:{id:string;};response:{authorId:string;content:string;createdAt:string;id:string;metadata:{category:("life"|"other"|"tech");likes:number;views:number;};published:boolean;title:string;updatedAt:string;};};
+interface UsersIdPostsPostModel{body:{[k:string]:unknown;};search?:Record<string, unknown>;params:{[k:string]:unknown;};response:{[k:string]:unknown;};};
 const makeUsersIdPostsPostRequest=(args:ExtractArgs<UsersIdPostsPostModel>)=>({endpoint:`/users/${String(args.params.id)}/posts`,method:"POST",body:args.body,search:args.search})
-interface OrgsPostModel{body:{name:string;owner:{role:("admin"|"editor"|"viewer");userId:string;};plan:("enterprise"|"free"|"pro");seats:number;};search?:Record<string, unknown>;response:unknown;};
+interface OrgsPostModel{body:{[k:string]:unknown;};search?:Record<string, unknown>;response:unknown;};
 const makeOrgsPostRequest=(args:ExtractArgs<OrgsPostModel>)=>({endpoint:"/orgs",method:"POST",body:args.body,search:args.search})
-interface OrgsOrgIdMembersGetModel{search:{limit:unknown;page:unknown;};params:{orgId:string;};response:unknown;};
+interface OrgsOrgIdMembersGetModel{search:{[k:string]:unknown;};params:{[k:string]:unknown;};response:unknown;};
 const makeOrgsOrgIdMembersGetRequest=(args:ExtractArgs<OrgsOrgIdMembersGetModel>)=>({endpoint:`/orgs/${String(args.params.orgId)}/members`,method:"GET",search:args.search})
-interface OrgsOrgIdMembersMemberIdPutModel{body:{role:("admin"|"editor"|"viewer");status:("active"|"banned"|"inactive");};search?:Record<string, unknown>;params:{memberId:string;orgId:string;};response:unknown;};
+interface OrgsOrgIdMembersMemberIdPutModel{body:{[k:string]:unknown;};search?:Record<string, unknown>;params:{[k:string]:unknown;};response:unknown;};
 const makeOrgsOrgIdMembersMemberIdPutRequest=(args:ExtractArgs<OrgsOrgIdMembersMemberIdPutModel>)=>({endpoint:`/orgs/${String(args.params.orgId)}/members/${String(args.params.memberId)}`,method:"PUT",body:args.body,search:args.search})
-interface OrgsOrgIdMembersMemberIdDeleteModel{search?:Record<string, unknown>;params:{memberId:string;orgId:string;};response:unknown;};
+interface OrgsOrgIdMembersMemberIdDeleteModel{search?:Record<string, unknown>;params:{[k:string]:unknown;};response:unknown;};
 const makeOrgsOrgIdMembersMemberIdDeleteRequest=(args:ExtractArgs<OrgsOrgIdMembersMemberIdDeleteModel>)=>({endpoint:`/orgs/${String(args.params.orgId)}/members/${String(args.params.memberId)}`,method:"DELETE",search:args.search})
 
 interface RequestDescriptor {endpoint: string;method: string;body?: unknown;search?: Record<string, unknown>;}

@@ -2,7 +2,8 @@ import type { GeneratorConfig } from "./GeneratorConfig";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "path";
 import { compile } from "json-schema-to-typescript";
-import type { Schema } from "./Schema";
+import type { Schema } from "../utils/Schema";
+import { toJsonSchema } from "@standard-community/standard-json";
 
 type DocEntry = { id: string; endpoint: string; method: string; model?: any };
 type MapEntry = {
@@ -21,14 +22,11 @@ const defaultGeneratorConfig = {
 	// drops any unsupported constraint and keeps the rest of the schema intact,
 	// which is the least-surprising behaviour for codegen purposes.
 	jsonSchemaOptions: {
-		target: "draft-07",
-		libraryOptions: {
-			fallback: (ctx: any) => ctx.base,
-		},
+		fallback: (ctx: any) => ctx.base,
 	},
 } satisfies Required<GeneratorConfig>;
 
-export class Generator {
+export class ApiClientGenerator {
 	constructor(
 		private readonly docs: Record<string, DocEntry>,
 		private readonly cliOverrides: GeneratorConfig,
@@ -204,7 +202,7 @@ export class Generator {
 	private async buildSchemaType(schema: Schema): Promise<string> {
 		try {
 			let schemaType = await compile(
-				schema["~standard"].jsonSchema.output(this.config.jsonSchemaOptions),
+				toJsonSchema(schema, this.config.jsonSchemaOptions),
 				"DoesnTMatterWillBeDeleted",
 				{
 					bannerComment: "",
