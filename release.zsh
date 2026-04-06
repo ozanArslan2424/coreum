@@ -70,21 +70,39 @@ pause "Step 5 complete. Ready to run tests?"
 # 6. Test all packages
 echo -e "${GREEN}Step 6: Running pnpm -r test:all...${RESET}"
 pnpm -r --reporter=append-only test:all
-pause "Step 6 complete. Ready to create a changeset?"
+pause "Step 6 complete. Ready to commit and push?"
 
-# 7. Changeset (interactive — waits for CLI to finish naturally)
-echo -e "${GREEN}Step 7: Running pnpm run changeset...${RESET}"
+# 7. Git commit and push
+echo -e "${GREEN}Step 7: Git commit and push...${RESET}"
+echo -n "  Commit message: "
+read -r COMMIT_MSG
+if [[ -z "$COMMIT_MSG" ]]; then
+  echo -e "${RED}Commit message cannot be empty. Aborting.${RESET}"
+  exit 1
+fi
+git add .
+git commit -m "$COMMIT_MSG"
+git push
+pause "Step 7 complete. Ready to create a changeset?"
+
+# 8. Changeset (interactive — waits for CLI to finish naturally)
+echo -e "${GREEN}Step 8: Running pnpm run changeset...${RESET}"
 pnpm run changeset
-pause "Step 7 complete. Ready to version packages?"
+pause "Step 8 complete. Ready to version packages?"
 
-# 8. Version
-echo -e "${GREEN}Step 8: Running pnpm run version...${RESET}"
+# 9. Version
+echo -e "${GREEN}Step 9: Running pnpm run version...${RESET}"
 pnpm run version
-pause "Step 8 complete. Ready to publish?"
+pause "Step 9 complete. Ready to publish?"
 
-# 9. Release
-echo -e "${GREEN}Step 9: Running pnpm run release...${RESET}"
+# 10. Release
+echo -e "${GREEN}Step 10: Running pnpm run release...${RESET}"
 pnpm run release
+
+# Cleanup backup
+echo ""
+echo -e "${GREEN}Cleaning up backup directory $BACKUP_DIR...${RESET}"
+rm -rf "$BACKUP_DIR"
 
 echo ""
 echo -e "${GREEN}=== Release complete! ===${RESET}"
