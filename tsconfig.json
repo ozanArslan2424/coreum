@@ -1,7 +1,12 @@
 {
 	"compilerOptions": {
-		"lib": ["ESNext", "DOM"],
-		"types": ["bun"],
+		"lib": [
+			"ESNext",
+			"DOM"
+		],
+		"types": [
+			"bun"
+		],
 		"target": "ESNext",
 		"module": "Preserve",
 		"moduleDetection": "force",
@@ -20,10 +25,10 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false,
-		"esModuleInterop": true,
-		"paths": {
-			"@/*": ["./src/*"]
-		}
+		"esModuleInterop": true
 	},
-	"exclude": ["dist", "node_modules"]
+	"exclude": [
+		"dist",
+		"node_modules"
+	]
 }

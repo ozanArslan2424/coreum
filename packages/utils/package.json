@@ -1,0 +1,49 @@
+{
+	"name": "corpus-utils",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "tsdown"
+	},
+	"exports": {
+		"./arrIncludes": "./dist/arrIncludes.mjs",
+		"./assert": "./dist/assert.mjs",
+		"./boolToString": "./dist/boolToString.mjs",
+		"./Branded": "./dist/Branded.mjs",
+		"./compile": "./dist/compile.mjs",
+		"./ConstructorOf": "./dist/ConstructorOf.mjs",
+		"./Func": "./dist/Func.mjs",
+		"./internalLog": "./dist/internalLog.mjs",
+		"./internFunc": "./dist/internFunc.mjs",
+		"./isNil": "./dist/isNil.mjs",
+		"./isObjectWith": "./dist/isObjectWith.mjs",
+		"./isPlainObject": "./dist/isPlainObject.mjs",
+		"./isPrimitive": "./dist/isPrimitive.mjs",
+		"./isSomeArray": "./dist/isSomeArray.mjs",
+		"./joinPathSegments": "./dist/joinPathSegments.mjs",
+		"./MaybePromise": "./dist/MaybePromise.mjs",
+		"./objAppendEntry": "./dist/objAppendEntry.mjs",
+		"./objGetKeys": "./dist/objGetKeys.mjs",
+		"./OrNumber": "./dist/OrNumber.mjs",
+		"./OrString": "./dist/OrString.mjs",
+		"./perform": "./dist/perform.mjs",
+		"./Prettify": "./dist/Prettify.mjs",
+		"./Store": "./dist/Store.mjs",
+		"./strAfterMark": "./dist/strAfterMark.mjs",
+		"./strBeforeMark": "./dist/strBeforeMark.mjs",
+		"./strCapitalize": "./dist/strCapitalize.mjs",
+		"./strIsDefined": "./dist/strIsDefined.mjs",
+		"./strRemoveWhitespace": "./dist/strRemoveWhitespace.mjs",
+		"./strSplit": "./dist/strSplit.mjs",
+		"./TestHelper": "./dist/TestHelper.mjs",
+		"./UnknownObject": "./dist/UnknownObject.mjs",
+		"./ValueOf": "./dist/ValueOf.mjs",
+		"./package.json": "./package.json"
+	},
+	"devDependencies": {
+		"@types/bun": "^1.3.11",
+		"tsdown": "^0.21.7",
+		"typescript": "^6.0.2"
+	}
+}

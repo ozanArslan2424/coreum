@@ -1,0 +1,54 @@
+{
+	"name": "@ozanarslan/corpus-callosum",
+	"version": "0.0.12",
+	"description": "CLI for @ozanarslan/corpus",
+	"license": "MIT",
+	"author": "Ozan Arslan <ozanarslanwork@gmail.com>",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ozanArslan2424/corpus.git",
+		"directory": "packages/corpus-callosum"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"bin": {
+		"corpus": "dist/index.mjs"
+	},
+	"files": [
+		"dist",
+		"LICENSE.txt"
+	],
+	"exports": {
+		".": "./dist/index.mjs",
+		"./Generator": "./dist/Generator.mjs",
+		"./GeneratorConfig": "./dist/GeneratorConfig.mjs",
+		"./getVariables": "./dist/getVariables.mjs",
+		"./hoistFunctionBody": "./dist/hoistFunctionBody.mjs",
+		"./logFatal": "./dist/logFatal.mjs",
+		"./replaceListenCall": "./dist/replaceListenCall.mjs",
+		"./runGenerator": "./dist/runGenerator.mjs",
+		"./Schema": "./dist/Schema.mjs",
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"build": "tsdown",
+		"test:cli": "bun run build && bun run ./dist/index.mjs -s -m ./test/other/startServer.ts -o ./test/other/generated.ts && bun run ./test/other/integration.ts",
+		"test:all": "bun test && bun test:cli",
+		"tests": "bun test"
+	},
+	"dependencies": {
+		"typescript": "^6.0.2",
+		"json-schema-to-typescript": "^15.0.4",
+		"@standard-community/standard-json": "^0.3.5",
+		"@standard-schema/spec": "^1.1.0"
+	},
+	"devDependencies": {
+		"corpus-utils": "workspace:*",
+		"@ozanarslan/corpus": "workspace:*",
+		"@types/bun": "^1.3.11",
+		"tsdown": "^0.21.7",
+		"arktype": "^2.2.0"
+	}
+}
