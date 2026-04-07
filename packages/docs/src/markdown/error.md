@@ -47,7 +47,7 @@ new C.Route("/validate", (c) => {
 });
 ```
 
-### Converting to response
+### Using the response getter
 
 ```ts
 new C.Route("/handle", async (c) => {
@@ -56,7 +56,7 @@ new C.Route("/handle", async (c) => {
 	} catch (err) {
 		if (err instanceof C.Error) {
 			// this is already done in the Server.handleError
-			return err.toResponse();
+			return err.response;
 		}
 		throw err;
 	}
@@ -112,7 +112,7 @@ HTTP status code for this error. Use `C.Status` enum for standard codes.
 
 `unknown`
 
-Additional data to include in the response. If a `CResponse` is passed, it will be modified with the status code and returned as-is from `toResponse()`.
+Additional data to include in the response. If a `CResponse` is passed, it will be modified with the status code and returned as-is in the `res` getter.
 
 </section>
 
@@ -120,21 +120,20 @@ Additional data to include in the response. If a `CResponse` is passed, it will 
 
 <section>
 
-| Property | Type      | Description                          |
-| -------- | --------- | ------------------------------------ |
-| message  | `string`  | Error message (inherited from Error) |
-| status   | `Status`  | HTTP status code                     |
-| data     | `unknown` | Optional additional payload          |
+| Property | Type        | Description                                |
+| -------- | ----------- | ------------------------------------------ |
+| message  | `string`    | Error message (inherited from Error)       |
+| status   | `Status`    | HTTP status code                           |
+| data     | `unknown`   | Optional additional payload                |
+| res      | `CResponse` | Getter to transform to CRequest, see below |
 
 </section>
 
-## Methods
-
 <section>
 
-### toResponse
+### response
 
-`toResponse(): CResponse`
+`get res(): CResponse`
 
 Converts the error to a `CResponse`:
 
@@ -143,19 +142,22 @@ Converts the error to a `CResponse`:
 
 ```ts
 // With plain data
-new C.Error("Not found", C.Status.NOT_FOUND).toResponse();
+const err = new C.Error("Not found", C.Status.NOT_FOUND);
+return err.res;
 // → CResponse with body { error: true, message: "Not found" }
 
 // With CResponse data
-new C.Error(
+const err = new C.Error(
 	"Failed",
 	C.Status.BAD_REQUEST,
 	new C.Response("custom"),
-).toResponse();
-// → The passed CResponse with status 400
+);
+return err.res; // → The passed CResponse with status 400
 ```
 
 </section>
+
+## Methods
 
 <section>
 

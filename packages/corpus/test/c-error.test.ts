@@ -39,17 +39,17 @@ describe("C.Error", () => {
 		expect(err.isStatusOf(500)).toBe(false);
 	});
 
-	// ─── toResponse() ───────────────────────────────────────────────
+	// ─── res ───────────────────────────────────────────────
 
 	it("TO RESPONSE - RETURNS CORRECT STATUS", () => {
 		const err = new TC.Error("bad request", 400);
-		const res = err.toResponse();
+		const res = err.res;
 		expect(res.status).toBe(400);
 	});
 
 	it("TO RESPONSE - WITHOUT DATA USES ERROR TRUE", async () => {
 		const err = new TC.Error("bad request", 400);
-		const res = err.toResponse();
+		const res = err.res;
 		const data = await TC.Parser.parseBody<{ error: boolean; message: string }>(
 			res,
 		);
@@ -59,7 +59,7 @@ describe("C.Error", () => {
 
 	it("TO RESPONSE - WITH DATA USES ERROR DATA", async () => {
 		const err = new TC.Error("invalid", 422, { field: "email" });
-		const res = err.toResponse();
+		const res = err.res;
 		const data = await TC.Parser.parseBody<{ error: unknown; message: string }>(
 			res,
 		);

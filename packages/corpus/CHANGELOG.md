@@ -1,5 +1,11 @@
 # @ozanarslan/corpus
 
+## 0.3.7
+
+### Patch Changes
+
+- Controller interface altered to remove constructor args.
+
 ## 0.3.6
 
 ### Patch Changes

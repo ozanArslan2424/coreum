@@ -171,7 +171,7 @@ This example uses the popular "redis" package: `bun add redis`
 
 ```ts
 import type { createClient } from "redis";
-import type { X } from "@/index";
+import type { X } from "@ozanarslan/corpus";
 
 export class RateLimiterRedisStore implements X.RateLimitStoreInterface {
 	constructor(

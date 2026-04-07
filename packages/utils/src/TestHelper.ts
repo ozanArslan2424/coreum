@@ -1,22 +1,24 @@
 import { log as alwaysLog, type Log } from "./internalLog";
 
 export class TestHelper {
-	constructor(private readonly log: Log) {}
+	constructor(silent: boolean) {
+		this.log = silent ? alwaysLog.noop : alwaysLog;
+	}
+
+	public readonly log: Log;
 
 	passed = 0;
 	failed = 0;
 	failures: string[] = [];
 
 	logResults(title: string) {
-		alwaysLog.bold(title);
-
 		if (this.failed > 0) {
 			alwaysLog.success(`${this.passed} passed`);
 			alwaysLog.error(`${this.failed} failed`);
 			alwaysLog.bold("Failures:");
 			for (const f of this.failures) alwaysLog.step(f);
 		} else {
-			alwaysLog.success(`All ${this.passed} assertions passed 🔥`);
+			alwaysLog.success(`All ${this.passed} assertions passed 🔥 (${title})`);
 		}
 	}
 

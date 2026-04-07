@@ -139,7 +139,7 @@ export abstract class ServerAbstract implements ServerInterface {
 	}
 	defaultErrorHandler: ErrorHandler = (err) => {
 		if (err instanceof CError) {
-			return err.toResponse();
+			return err.res;
 		}
 
 		return new CResponse(

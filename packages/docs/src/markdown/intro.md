@@ -34,8 +34,10 @@ new C.Route("/health", () => "ok");
 // Or in a Controller with prefix
 export class ItemController extends C.Controller {
 	constructor(private itemService: ItemService) {
-		super({ prefix: "/item" });
+		super();
 	}
+
+	prefix = "/item";
 
 	create = this.route(
 		{ method: "POST", path: "/create" },

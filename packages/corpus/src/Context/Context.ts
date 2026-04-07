@@ -35,15 +35,15 @@ export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
 		this.res = res ?? new CResponse<R>();
 	}
 
-	req: CRequest;
+	readonly req: CRequest;
 	url: URL;
 	headers: CHeaders;
 	cookies: Cookies;
 	body: B = {} as B;
 	search: S = {} as S;
 	params: P = {} as P;
-	res: CResponse<R>;
 	data: ContextDataInterface = {};
+	res: CResponse<R>;
 
 	static async appendParsedData<
 		B = unknown,

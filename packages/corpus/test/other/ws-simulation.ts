@@ -1,4 +1,3 @@
-import { log as _log } from "corpus-utils/internalLog";
 import { createTestWebSocketRoute } from "../utils/createTestWebSocketRoute";
 import { TestHelper } from "corpus-utils/TestHelper";
 import { TC } from "../_modules";
@@ -6,31 +5,30 @@ import { TC } from "../_modules";
 const PORT = 9876;
 const BASE_URL = `ws://localhost:${PORT}`;
 const SILENT = process.argv[2] === "-s";
-const log = SILENT ? _log.noop : _log;
-const T = new TestHelper(log);
+const T = new TestHelper(SILENT);
 const server = new TC.Server();
 
 async function run(withAbstract: boolean) {
-	log.info("Setting up WebSocket route...");
-	createTestWebSocketRoute(log, withAbstract);
+	T.log.info("Setting up WebSocket route...");
+	createTestWebSocketRoute(T.log, withAbstract);
 
 	const WS_URL = `${BASE_URL}/ws`;
-	log.info(`WebSocket URL: ${WS_URL}`);
+	T.log.info(`WebSocket URL: ${WS_URL}`);
 
 	// ── helpers ──────────────────────────────────────────────────────────────────
 
 	async function send(ws: WebSocket, payload: object) {
 		await new Promise((resolve) => setTimeout(resolve, 10));
 		const message = T.stringify(payload);
-		log.debug(`Sending message: ${message}`);
+		T.log.debug(`Sending message: ${message}`);
 		ws.send(message);
 	}
 
 	function close(ws: WebSocket): Promise<void> {
-		log.debug(`Closing WebSocket connection...`);
+		T.log.debug(`Closing WebSocket connection...`);
 		return new Promise((resolve) => {
 			ws.onclose = () => {
-				log.success(`WebSocket closed successfully`);
+				T.log.success(`WebSocket closed successfully`);
 				resolve();
 			};
 			ws.close();
@@ -40,7 +38,7 @@ async function run(withAbstract: boolean) {
 	function makeClient(
 		label: string,
 	): Promise<{ ws: WebSocket; next: () => Promise<any> }> {
-		log.info(`Creating client: ${label}`);
+		T.log.info(`Creating client: ${label}`);
 		return new Promise((resolve, reject) => {
 			const ws = new WebSocket(WS_URL);
 			const queue: object[] = [];
@@ -48,7 +46,7 @@ async function run(withAbstract: boolean) {
 
 			ws.onmessage = (e) => {
 				const msg = JSON.parse(e.data as string);
-				log.info(`[${label}] << Received:`, msg);
+				T.log.info(`[${label}] << Received:`, msg);
 				const waiter = waiters.shift();
 				if (waiter) waiter(msg);
 				else queue.push(msg);
@@ -60,11 +58,11 @@ async function run(withAbstract: boolean) {
 			};
 
 			ws.onopen = () => {
-				log.success(`[${label}] Connected to WebSocket server`);
+				T.log.success(`[${label}] Connected to WebSocket server`);
 				resolve({ ws, next });
 			};
 			ws.onerror = (error) => {
-				log.error(`[${label}] Connection error:`, error);
+				T.log.error(`[${label}] Connection error:`, error);
 				reject(new Error(`[${label}] connection error`));
 			};
 		});
@@ -74,21 +72,21 @@ async function run(withAbstract: boolean) {
 
 	async function runTests() {
 		// Three clients
-		log.info("Creating three test clients...");
+		T.log.info("Creating three test clients...");
 		const { ws: alice, next: aliceNext } = await makeClient("alice");
 		const { ws: bob, next: bobNext } = await makeClient("bob");
 		const { ws: carol, next: carolNext } = await makeClient("carol");
-		log.success("All three clients connected");
+		T.log.success("All three clients connected");
 
 		// Consume the "connected" greeting from each
-		log.info("Consuming connected greetings...");
+		T.log.info("Consuming connected greetings...");
 		const aliceGreeting = await aliceNext();
 		const bobGreeting = await bobNext();
 		const carolGreeting = await carolNext();
 
-		log.debug("[alice] greeting:", aliceGreeting);
-		log.debug("[bob]   greeting:", bobGreeting);
-		log.debug("[carol] greeting:", carolGreeting);
+		T.log.debug("[alice] greeting:", aliceGreeting);
+		T.log.debug("[bob]   greeting:", bobGreeting);
+		T.log.debug("[carol] greeting:", carolGreeting);
 
 		T.expect("alice greeting event", aliceGreeting).toHaveProperty(
 			"event",
@@ -102,19 +100,19 @@ async function run(withAbstract: boolean) {
 			"event",
 			"connected",
 		);
-		log.success("All clients received connected greetings");
+		T.log.success("All clients received connected greetings");
 
 		// ── ping / pong ───────────────────────────────────────────────────────────
-		log.info("Testing ping/pong...");
+		T.log.info("Testing ping/pong...");
 		await send(alice, { event: "ping", data: { ts: Date.now() } });
 		const pong = await aliceNext();
-		log.info("[alice] pong received:", pong);
+		T.log.info("[alice] pong received:", pong);
 		T.expect("pong event", pong).toHaveProperty("event", "pong");
 		T.expect("pong has data", pong).toHaveProperty("data");
-		log.success("Ping/pong successful");
+		T.log.success("Ping/pong successful");
 
 		// ── subscribe alice + bob to "news", carol to "sports" ───────────────────
-		log.info("Testing subscriptions...");
+		T.log.info("Testing subscriptions...");
 		await send(alice, { event: "subscribe", topic: "news" });
 		await send(bob, { event: "subscribe", topic: "news" });
 		await send(carol, { event: "subscribe", topic: "sports" });
@@ -123,9 +121,9 @@ async function run(withAbstract: boolean) {
 		const bobSub = await bobNext();
 		const carolSub = await carolNext();
 
-		log.info("[alice] subscribed:", aliceSub);
-		log.info("[bob]   subscribed:", bobSub);
-		log.info("[carol] subscribed:", carolSub);
+		T.log.info("[alice] subscribed:", aliceSub);
+		T.log.info("[bob]   subscribed:", bobSub);
+		T.log.info("[carol] subscribed:", carolSub);
 
 		T.expect("alice sub event", aliceSub).toHaveProperty("event", "subscribed");
 		T.expect("alice sub topic", aliceSub).toHaveProperty("topic", "news");
@@ -133,13 +131,13 @@ async function run(withAbstract: boolean) {
 		T.expect("bob sub topic", bobSub).toHaveProperty("topic", "news");
 		T.expect("carol sub event", carolSub).toHaveProperty("event", "subscribed");
 		T.expect("carol sub topic", carolSub).toHaveProperty("topic", "sports");
-		log.success("Initial subscriptions successful");
+		T.log.success("Initial subscriptions successful");
 
 		// ── carol also subscribes to "news" ───────────────────────────────────────
-		log.info("Carol subscribing to news...");
+		T.log.info("Carol subscribing to news...");
 		await send(carol, { event: "subscribe", topic: "news" });
 		const carolSubNews = await carolNext();
-		log.info("[carol] subscribed to news:", carolSubNews);
+		T.log.info("[carol] subscribed to news:", carolSubNews);
 		T.expect("carol sub news event", carolSubNews).toHaveProperty(
 			"event",
 			"subscribed",
@@ -148,23 +146,23 @@ async function run(withAbstract: boolean) {
 			"topic",
 			"news",
 		);
-		log.success("Carol subscribed to news");
+		T.log.success("Carol subscribed to news");
 
 		// ── query subscriptions ───────────────────────────────────────────────────
-		log.info("Querying Carol's subscriptions...");
+		T.log.info("Querying Carol's subscriptions...");
 		await send(carol, { event: "subscriptions" });
 		const carolSubs = (await carolNext()) as any;
-		log.info("[carol] active subscriptions:", carolSubs);
+		T.log.info("[carol] active subscriptions:", carolSubs);
 		T.expect("carol subs event", carolSubs).toHaveProperty(
 			"event",
 			"subscriptions",
 		);
 		T.expect("carol subs data", carolSubs.data).toEqual(["sports", "news"]);
 		T.expect("carol subs length", carolSubs.data?.length).toBe(2);
-		log.success("Subscription query successful");
+		T.log.success("Subscription query successful");
 
 		// ── alice publishes to "news" (bob + carol receive, alice gets ack) ───────
-		log.info("Testing publish to news topic...");
+		T.log.info("Testing publish to news topic...");
 		const bobReceives = bobNext();
 		const carolReceives = carolNext();
 
@@ -178,9 +176,9 @@ async function run(withAbstract: boolean) {
 		const bobNews = (await bobReceives) as any;
 		const carolNews = (await carolReceives) as any;
 
-		log.info("[alice] publish ack:", aliceAck);
-		log.info("[bob]   received news:", bobNews);
-		log.info("[carol] received news:", carolNews);
+		T.log.info("[alice] publish ack:", aliceAck);
+		T.log.info("[bob]   received news:", bobNews);
+		T.log.info("[carol] received news:", carolNews);
 
 		T.expect("alice ack event", aliceAck).toHaveProperty("event", "published");
 		T.expect("alice ack topic", aliceAck).toHaveProperty("topic", "news");
@@ -193,17 +191,17 @@ async function run(withAbstract: boolean) {
 		T.expect("carol news headline", carolNews.data?.headline).toBe(
 			"corpus ships",
 		);
-		log.success("Both Bob and Carol received the news message");
+		T.log.success("Both Bob and Carol received the news message");
 
 		// ── carol publishes to "sports" (only carol is subscribed, she doesn't receive her own) ─
-		log.info("Testing publish to sports topic...");
+		T.log.info("Testing publish to sports topic...");
 		await send(carol, {
 			event: "publish",
 			topic: "sports",
 			data: { score: "2-1" },
 		});
 		const carolSportsAck = (await carolNext()) as any;
-		log.info("[carol] sports publish ack:", carolSportsAck);
+		T.log.info("[carol] sports publish ack:", carolSportsAck);
 		T.expect("carol sports ack event", carolSportsAck).toHaveProperty(
 			"event",
 			"published",
@@ -213,22 +211,22 @@ async function run(withAbstract: boolean) {
 			"sports",
 		);
 		T.expect("carol sports ack bytes", carolSportsAck.bytes).toBe(0);
-		log.success("Sports publish successful");
+		T.log.success("Sports publish successful");
 
 		// ── bob unsubscribes from "news" ──────────────────────────────────────────
-		log.info("Bob unsubscribing from news...");
+		T.log.info("Bob unsubscribing from news...");
 		await send(bob, { event: "unsubscribe", topic: "news" });
 		const bobUnsub = await bobNext();
-		log.info("[bob]   unsubscribed:", bobUnsub);
+		T.log.info("[bob]   unsubscribed:", bobUnsub);
 		T.expect("bob unsub event", bobUnsub).toHaveProperty(
 			"event",
 			"unsubscribed",
 		);
 		T.expect("bob unsub topic", bobUnsub).toHaveProperty("topic", "news");
-		log.success("Bob unsubscribed successfully");
+		T.log.success("Bob unsubscribed successfully");
 
 		// ── alice publishes to "news" again — only carol should receive ───────────
-		log.info(
+		T.log.info(
 			"Testing publish after unsubscribe (only Carol should receive)...",
 		);
 		const carolReceives2 = carolNext();
@@ -241,8 +239,8 @@ async function run(withAbstract: boolean) {
 		const aliceAck2 = (await aliceNext()) as any;
 		const carolNews2 = (await carolReceives2) as any;
 
-		log.info("[alice] publish ack 2:", aliceAck2);
-		log.info("[carol] received news after bob left:", carolNews2);
+		T.log.info("[alice] publish ack 2:", aliceAck2);
+		T.log.info("[carol] received news after bob left:", carolNews2);
 
 		T.expect("alice ack2 event", aliceAck2).toHaveProperty(
 			"event",
@@ -257,29 +255,29 @@ async function run(withAbstract: boolean) {
 			"bob missed this",
 		);
 
-		log.info(
+		T.log.info(
 			"Only Carol received the second message (Bob correctly unsubscribed)",
 		);
 
 		// ── unknown event ─────────────────────────────────────────────────────────
-		log.info("Testing unknown event handling...");
+		T.log.info("Testing unknown event handling...");
 		await send(bob, { event: "explode" });
 		const err = (await bobNext()) as any;
-		log.info("[bob]   error response:", err);
+		T.log.info("[bob]   error response:", err);
 		T.expect("unknown event error", err).toHaveProperty("event", "error");
 		T.expect("unknown event message", err.data).toContain("unknown event");
-		log.success("Unknown event handled correctly");
+		T.log.success("Unknown event handled correctly");
 
 		// ── clean up ──────────────────────────────────────────────────────────────
-		log.info("Cleaning up connections...");
+		T.log.info("Cleaning up connections...");
 		await Promise.all([close(alice), close(bob), close(carol)]);
-		log.success("All clients closed successfully");
+		T.log.success("All clients closed successfully");
 	}
 
 	try {
 		await runTests();
 	} catch (err) {
-		_log.error("WebSocket Test suite failed:", err);
+		T.log.error("WebSocket Test suite failed:", err);
 		T.failures.push(`WebSocket run threw: ${T.stringify(err)}`);
 		T.failed++;
 	}

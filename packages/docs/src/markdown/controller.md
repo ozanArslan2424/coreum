@@ -7,9 +7,8 @@ The `Controller` class provides a base for grouping related routes under a share
 ##### Contents
 
 1. [Usage](#usage)
-2. [Constructor Parameters](#constructor-parameters)
-3. [Properties](#properties)
-4. [Methods](#methods)
+2. [Properties](#properties)
+3. [Methods](#methods)
 
 </section>
 
@@ -25,9 +24,13 @@ Controllers are created by extending the `Controller` class and instantiating th
 import { C } from "@ozanarslan/corpus";
 
 class UserController extends C.Controller {
-	constructor() {
-		super({ prefix: "/users" });
-	}
+	// prefix is abstract, you don't need to add override,
+	// typescript lsp's usually add it automatically though.
+	override prefix?: string | undefined = "/users";
+	// OR
+	// prefix: string = "/users";
+	// OR
+	// prefix = "/users";
 
 	getAll = this.route("/", () => getAllUsers());
 
@@ -48,16 +51,14 @@ new UserController();
 import { C } from "@ozanarslan/corpus";
 
 class ProtectedController extends C.Controller {
-	constructor() {
-		super({
-			prefix: "/admin",
-			beforeEach: async (c) => {
-				if (!c.headers.has("authorization")) {
-					throw new C.Error("Unauthorized", 401);
-				}
-			},
-		});
-	}
+	prefix = "/admin";
+
+	// This is undefined by default so you need to override it.
+	override beforeEach?: C.MiddlewareHandler | undefined = async (c) => {
+		if (!c.headers.has("authorization")) {
+			throw new C.Error("Unauthorized", 401);
+		}
+	};
 
 	dashboard = this.route("/", () => "Admin panel");
 	stats = this.route("/stats", () => getStats());
@@ -73,9 +74,7 @@ new ProtectedController();
 import { C } from "@ozanarslan/corpus";
 
 class AssetController extends C.Controller {
-	constructor() {
-		super({ prefix: "/assets" });
-	}
+	prefix = "/assets";
 
 	logo = this.staticRoute("/logo", "assets/logo.png");
 
@@ -91,30 +90,15 @@ new AssetController();
 
 </section>
 
-## Constructor Parameters
-
-<section>
-
-### opts (optional)
-
-`{ prefix?: string; beforeEach?: (context: Context) => MaybePromise<void> }`
-
-| Option       | Type     | Description                                                  |
-| ------------ | -------- | ------------------------------------------------------------ |
-| `prefix`     | `string` | URL prefix prepended to all routes in this controller        |
-| `beforeEach` | `Func`   | Middleware run before every route handler in this controller |
-
-</section>
-
 ## Properties
 
 <section>
 
-| Property     | Type                  | Description                                     |
-| ------------ | --------------------- | ----------------------------------------------- |
-| `prefix`     | `string \| undefined` | The controller's URL prefix                     |
-| `beforeEach` | `Func \| undefined`   | Optional middleware run before each handler     |
-| `routeIds`   | `Set<string>`         | Set of registered route IDs for this controller |
+| Property          | Type                  | Description                                     |
+| ----------------- | --------------------- | ----------------------------------------------- |
+| `abstract prefix` | `string \| undefined` | The controller's URL prefix                     |
+| `beforeEach`      | `Func \| undefined`   | Optional middleware run before each handler     |
+| `routeIds`        | `Set<string>`         | Set of registered route IDs for this controller |
 
 </section>
 

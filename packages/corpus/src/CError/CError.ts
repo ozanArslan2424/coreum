@@ -10,7 +10,7 @@ export class CError extends Error {
 		super(message);
 	}
 
-	toResponse(): CResponse {
+	get res(): CResponse {
 		if (this.data instanceof CResponse) {
 			this.data.status = this.status;
 			return this.data;

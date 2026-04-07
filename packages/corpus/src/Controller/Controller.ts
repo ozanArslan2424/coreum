@@ -1,11 +1,8 @@
 import { DynamicRoute } from "@/Route/DynamicRoute";
 import { StaticRoute } from "@/Route/StaticRoute";
-import type { ControllerOptions } from "@/Controller/ControllerOptions";
-import type { Context } from "@/Context/Context";
 import { Method } from "@/CRequest/Method";
-import type { MaybePromise } from "corpus-utils/MaybePromise";
 import { joinPathSegments } from "corpus-utils/joinPathSegments";
-import type { Func } from "corpus-utils/Func";
+import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
 
 /**
  * Base class for grouping related routes under a shared prefix and optional middleware.
@@ -31,14 +28,10 @@ import type { Func } from "corpus-utils/Func";
  */
 
 export abstract class Controller {
-	constructor(opts?: ControllerOptions) {
-		this.prefix = opts?.prefix;
-		this.beforeEach = opts?.beforeEach;
-	}
+	readonly routeIds: Set<string> = new Set<string>();
 
-	routeIds: Set<string> = new Set<string>();
-	protected prefix?: string;
-	protected beforeEach?: Func<[context: Context], MaybePromise<void>>;
+	abstract prefix?: string;
+	beforeEach?: MiddlewareHandler;
 
 	/**
 	 * Registers a dynamic route under this controller. Behaves identically to {@link DynamicRoute}

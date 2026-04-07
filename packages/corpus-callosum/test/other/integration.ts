@@ -1,5 +1,4 @@
 import { CorpusApi } from "./generated";
-import { log as _log } from "corpus-utils/internalLog";
 import { TestHelper } from "corpus-utils/TestHelper";
 import { startServer } from "./startServer";
 import { C } from "@ozanarslan/corpus";
@@ -7,12 +6,11 @@ import { C } from "@ozanarslan/corpus";
 const PORT = 9876;
 const BASE_URL = `http://localhost:${PORT}`;
 const SILENT = process.argv[2] === "-s";
-const log = SILENT ? _log.noop : _log;
-const T = new TestHelper(log);
+const T = new TestHelper(SILENT);
 
 await startServer(PORT);
 
-_log.info(`Server up on ${BASE_URL}\n`);
+T.log.info(`Server up on ${BASE_URL}\n`);
 
 const api = new CorpusApi(async (args) => {
 	const url = new URL(`${BASE_URL}${args.endpoint}`);

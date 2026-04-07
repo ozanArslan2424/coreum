@@ -81,9 +81,9 @@ class Model {
 }
 
 class Controller extends TC.Controller {
-	constructor() {
-		super({ prefix: "/controller" });
-	}
+	prefix = "/controller";
+
+	override beforeEach?: TC.MiddlewareHandler | undefined;
 
 	arkRoute = this.route(
 		{ method: "POST", path: "/arkRoute/:hello" },

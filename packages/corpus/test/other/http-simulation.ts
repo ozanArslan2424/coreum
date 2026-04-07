@@ -1,15 +1,13 @@
 import { type } from "arktype";
 import { TC } from "../_modules";
 import { TestHelper } from "corpus-utils/TestHelper";
-import { log as _log } from "corpus-utils/internalLog";
 
 // ── config ────────────────────────────────────────────────────────────────────
 
 const PORT = 9876;
 const BASE_URL = `http://localhost:${PORT}`;
 const SILENT = process.argv[2] === "-s";
-const log = SILENT ? _log.noop : _log;
-const T = new TestHelper(log);
+const T = new TestHelper(SILENT);
 const server = new TC.Server();
 
 // ── http client ───────────────────────────────────────────────────────────────
@@ -35,8 +33,8 @@ async function req(
 	opts: ReqOptions = {},
 ): Promise<Res> {
 	const url = `${BASE_URL}${path}`;
-	log.step(`${method} ${url}`);
-	if (opts.body) log.debug("↑", T.stringify(opts.body));
+	T.log.step(`${method} ${url}`);
+	if (opts.body) T.log.debug("↑", T.stringify(opts.body));
 
 	const start = performance.now();
 	const res = await fetch(url, {
@@ -51,8 +49,8 @@ async function req(
 		body = JSON.parse(raw);
 	} catch {}
 
-	log.info(`req took ${elapsed.toFixed(1)}ms`);
-	log.debug(`↓ ${res.status}`, body);
+	T.log.info(`req took ${elapsed.toFixed(1)}ms`);
+	T.log.debug(`↓ ${res.status}`, body);
 	return {
 		status: res.status,
 		headers: res.headers,
@@ -71,12 +69,12 @@ const DELETE = (path: string, opts?: ReqOptions) => req("DELETE", path, opts);
 // ── suite runner ──────────────────────────────────────────────────────────────
 
 async function suite(name: string, fn: () => Promise<void>) {
-	log.section(name);
+	T.log.section(name);
 	try {
 		await fn();
 	} catch (err) {
 		const msg = `Suite "${name}" threw unT.expectedly: ${T.stringify(err)}`;
-		log.error(msg);
+		T.log.error(msg);
 		T.failures.push(msg);
 		T.failed++;
 	}
@@ -268,7 +266,7 @@ new TC.Route(
 // ─────────────────────────────────────────────────────────────────────────────
 
 await server.listen(PORT);
-log.info(`Server up on ${BASE_URL}\n`);
+T.log.info(`Server up on ${BASE_URL}\n`);
 
 // ── HEALTH ────────────────────────────────────────────────────────────────────
 
@@ -282,7 +280,7 @@ await suite("HEALTH CHECK", async () => {
 // ── CRUD ──────────────────────────────────────────────────────────────────────
 
 await suite("CRUD - USERS", async () => {
-	log.info("Creating alice...");
+	T.log.info("Creating alice...");
 	const create = await POST("/users", {
 		body: { name: "Alice", email: "alice@example.com" },
 	});
@@ -292,7 +290,7 @@ await suite("CRUD - USERS", async () => {
 	T.expect("create has id", create.body).toHaveProperty("id");
 	const aliceId = create.body.id;
 
-	log.info("Creating bob...");
+	T.log.info("Creating bob...");
 	const bob = await POST("/users", {
 		body: { name: "Bob", email: "bob@example.com", role: "mod" },
 	});
@@ -300,18 +298,18 @@ await suite("CRUD - USERS", async () => {
 	T.expect("bob.role", bob.body?.role).toBe("mod");
 	const bobId = bob.body.id;
 
-	log.info("Listing all users...");
+	T.log.info("Listing all users...");
 	const list = await GET("/users");
 	T.expect("list status", list.status).toMatchStatus(200);
 	T.expect("list is array", Array.isArray(list.body)).toBe(true);
 	T.expect("list has 2 users", list.body?.length).toBe(2);
 
-	log.info("Fetching alice by id...");
+	T.log.info("Fetching alice by id...");
 	const read = await GET(`/users/${aliceId}`);
 	T.expect("read status", read.status).toMatchStatus(200);
 	T.expect("read.name", read.body?.name).toBe("Alice");
 
-	log.info("Full update alice...");
+	T.log.info("Full update alice...");
 	const put = await PUT(`/users/${aliceId}`, {
 		body: { name: "Alice Smith", email: "alice-smith@example.com" },
 	});
@@ -319,22 +317,22 @@ await suite("CRUD - USERS", async () => {
 	T.expect("put.name", put.body?.name).toBe("Alice Smith");
 	T.expect("put.id unchanged", put.body?.id).toBe(aliceId);
 
-	log.info("Partial update bob...");
+	T.log.info("Partial update bob...");
 	const patch = await PATCH(`/users/${bobId}`, { body: { role: "admin" } });
 	T.expect("patch status", patch.status).toMatchStatus(200);
 	T.expect("patch.role", patch.body?.role).toBe("admin");
 	T.expect("patch.name unchanged", patch.body?.name).toBe("Bob");
 
-	log.info("Deleting bob...");
+	T.log.info("Deleting bob...");
 	const del = await DELETE(`/users/${bobId}`);
 	T.expect("delete status", del.status).toMatchStatus(200);
 	T.expect("delete.deleted", del.body?.deleted).toBe(bobId);
 
-	log.info("Confirming bob is gone...");
+	T.log.info("Confirming bob is gone...");
 	const gone = await GET(`/users/${bobId}`);
 	T.expect("gone status", gone.status).toMatchStatus(404);
 
-	log.info("Confirming only alice remains...");
+	T.log.info("Confirming only alice remains...");
 	const remaining = await GET("/users");
 	T.expect("remaining count", remaining.body?.length).toBe(1);
 });
@@ -342,24 +340,24 @@ await suite("CRUD - USERS", async () => {
 // ── VALIDATION ────────────────────────────────────────────────────────────────
 
 await suite("VALIDATION - BAD INPUT", async () => {
-	log.info("POST /users with empty body...");
+	T.log.info("POST /users with empty body...");
 	const empty = await POST("/users", { body: {} });
 	T.expect("empty body status", empty.status).toMatchStatus(422);
 	T.expect("empty body has error field", empty.body).toHaveProperty("error");
 
-	log.info("POST /users missing email...");
+	T.log.info("POST /users missing email...");
 	const noEmail = await POST("/users", { body: { name: "Ghost" } });
 	T.expect("no email status", noEmail.status).toMatchStatus(422);
 
-	log.info("GET non-existent user...");
+	T.log.info("GET non-existent user...");
 	const noUser = await GET("/users/99999");
 	T.expect("no user status", noUser.status).toMatchStatus(404);
 
-	log.info("PUT non-existent user...");
+	T.log.info("PUT non-existent user...");
 	const noPut = await PUT("/users/99999", { body: { name: "Nobody" } });
 	T.expect("no put status", noPut.status).toMatchStatus(404);
 
-	log.info("DELETE non-existent user...");
+	T.log.info("DELETE non-existent user...");
 	const noDel = await DELETE("/users/99999");
 	T.expect("no del status", noDel.status).toMatchStatus(404);
 });
@@ -367,15 +365,15 @@ await suite("VALIDATION - BAD INPUT", async () => {
 // ── AUTH MIDDLEWARE ───────────────────────────────────────────────────────────
 
 await suite("AUTH - MIDDLEWARE PROTECTED ROUTES", async () => {
-	log.info("GET /me without token...");
+	T.log.info("GET /me without token...");
 	const noToken = await GET("/me");
 	T.expect("no token status", noToken.status).toMatchStatus(401);
 
-	log.info("GET /admin/dashboard without token...");
+	T.log.info("GET /admin/dashboard without token...");
 	const noAdmin = await GET("/admin/dashboard");
 	T.expect("no admin status", noAdmin.status).toMatchStatus(401);
 
-	log.info("GET /me with valid token...");
+	T.log.info("GET /me with valid token...");
 	const withToken = await GET("/me", {
 		headers: { Authorization: "Bearer secret-token" },
 	});
@@ -383,14 +381,14 @@ await suite("AUTH - MIDDLEWARE PROTECTED ROUTES", async () => {
 	T.expect("with token.name", withToken.body?.name).toBe("Admin");
 	T.expect("with token.role", withToken.body?.role).toBe("admin");
 
-	log.info("GET /admin/dashboard with valid token...");
+	T.log.info("GET /admin/dashboard with valid token...");
 	const admin = await GET("/admin/dashboard", {
 		headers: { Authorization: "Bearer secret-token" },
 	});
 	T.expect("admin status", admin.status).toMatchStatus(200);
 	T.expect("admin.secret", admin.body?.secret).toBe("admin area");
 
-	log.info("GET /me with wrong token...");
+	T.log.info("GET /me with wrong token...");
 	const wrong = await GET("/me", {
 		headers: { Authorization: "Bearer wrong-token" },
 	});
@@ -400,12 +398,12 @@ await suite("AUTH - MIDDLEWARE PROTECTED ROUTES", async () => {
 // ── WILDCARD ──────────────────────────────────────────────────────────────────
 
 await suite("WILDCARD ROUTES", async () => {
-	log.info("GET /files/images/photo.png...");
+	T.log.info("GET /files/images/photo.png...");
 	const r1 = await GET("/files/images/photo.png");
 	T.expect("wildcard status", r1.status).toMatchStatus(200);
 	T.expect("wildcard served", r1.body?.served).toBe(true);
 
-	log.info("GET /files/docs/report/2024/q4.pdf (deep)...");
+	T.log.info("GET /files/docs/report/2024/q4.pdf (deep)...");
 	const r2 = await GET("/files/docs/report/2024/q4.pdf");
 	T.expect("deep wildcard status", r2.status).toMatchStatus(200);
 	T.expect("deep wildcard served", r2.body?.served).toBe(true);
@@ -414,7 +412,7 @@ await suite("WILDCARD ROUTES", async () => {
 // ── ECHO ──────────────────────────────────────────────────────────────────────
 
 await suite("ECHO - HEADERS & BODY PASSTHROUGH", async () => {
-	log.info("POST /echo with nested body and custom header...");
+	T.log.info("POST /echo with nested body and custom header...");
 	const res = await POST("/echo", {
 		body: { hello: "corpus", nested: { works: true } },
 		headers: { "X-Custom-Header": "blazing-fast" },
@@ -433,7 +431,7 @@ await suite("ECHO - HEADERS & BODY PASSTHROUGH", async () => {
 // ── SEARCH ────────────────────────────────────────────────────────────────────
 
 await suite("SEARCH - QUERY PARAMS", async () => {
-	log.info("GET /search?q=alice...");
+	T.log.info("GET /search?q=alice...");
 	const res = await GET("/search?q=alice");
 	T.expect("search status", res.status).toMatchStatus(200);
 	T.expect("search q", res.body?.q).toBe("alice");
@@ -442,11 +440,11 @@ await suite("SEARCH - QUERY PARAMS", async () => {
 		"Alice Smith",
 	);
 
-	log.info("GET /search?q=nobody...");
+	T.log.info("GET /search?q=nobody...");
 	const none = await GET("/search?q=nobody");
 	T.expect("no results total", none.body?.total).toBe(0);
 
-	log.info("GET /search (no q, returns all)...");
+	T.log.info("GET /search (no q, returns all)...");
 	const all = await GET("/search");
 	T.expect("no query total", all.body?.total).toBeGreaterThan(0);
 });
@@ -454,17 +452,17 @@ await suite("SEARCH - QUERY PARAMS", async () => {
 // ── CONCURRENT LOAD ───────────────────────────────────────────────────────────
 
 await suite("PERFORMANCE - CONCURRENT REQUESTS", async () => {
-	log.info("Firing 20 concurrent GETs at /health...");
+	T.log.info("Firing 20 concurrent GETs at /health...");
 	const results = await Promise.all(
 		Array.from({ length: 20 }, () => GET("/health")),
 	);
 	const allOk = results.every((r) => r.status === 200);
 	T.expect("all 20 returned 200", allOk).toBe(true);
 	const avg = results.reduce((s, r) => s + r.elapsed, 0) / results.length;
-	log.info(`Average response time: ${avg.toFixed(2)}ms`);
+	T.log.info(`Average response time: ${avg.toFixed(2)}ms`);
 	T.expect("avg < 100ms", avg).toBeLessThan(100);
 
-	log.info("Firing 10 sequential POSTs to /users...");
+	T.log.info("Firing 10 sequential POSTs to /users...");
 	for (let i = 0; i < 10; i++) {
 		const r = await POST("/users", {
 			body: { name: `Bulk${i}`, email: `bulk${i}@test.com` },
@@ -472,7 +470,7 @@ await suite("PERFORMANCE - CONCURRENT REQUESTS", async () => {
 		T.expect(`bulk POST ${i}`, r.status).toMatchStatus(201);
 	}
 
-	log.info("Confirming all 10 + alice are in DB...");
+	T.log.info("Confirming all 10 + alice are in DB...");
 	const all = await GET("/users");
 	T.expect("total users in db", all.body?.length).toBe(11); // alice + 10 bulk
 });
@@ -481,7 +479,7 @@ await suite("PERFORMANCE - CONCURRENT REQUESTS", async () => {
 
 await suite("UNKNOWN ROUTES - 404s", async () => {
 	for (const path of ["/nope", "/not/real", "/deeply/nested/unknown"]) {
-		log.info(`GET ${path}...`);
+		T.log.info(`GET ${path}...`);
 		const res = await GET(path);
 		T.expect(`${path} → 404`, res.status).toMatchStatus(404);
 	}

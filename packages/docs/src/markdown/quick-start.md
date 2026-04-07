@@ -84,8 +84,10 @@ import { C } from "@ozanarslan/corpus";
 
 export class ItemController extends C.Controller {
 	constructor() {
-		super({ prefix: "/items" });
+		super();
 	}
+
+	prefix = "/items";
 
 	list = this.route({ method: "GET", path: "/" }, (c) => {
 		return { items: [] };

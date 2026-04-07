@@ -28,7 +28,7 @@
 	},
 	"scripts": {
 		"build": "tsdown",
-		"test:cli": "bun run build && bun run ./dist/index.mjs gen -s -m ./test/other/startServer.ts -o ./test/other/generated.ts && bun run ./test/other/integration.ts",
+		"test:cli": "bun run build && bun run ./dist/index.mjs gen -s -m ./test/other/startServer.ts -o ./test/other/generated.ts && bun run ./test/other/integration.ts -s",
 		"test:all": "bun test && bun test:cli",
 		"tests": "bun test"
 	},
