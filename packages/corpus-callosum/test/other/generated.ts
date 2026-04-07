@@ -1,8 +1,19 @@
+import { C } from "@ozanarslan/corpus";
 type Primitive = string | number | boolean;
-type ExtractArgs<T> =
-	Omit<T, "response"> extends infer U
-		? { [K in keyof U as U[K] extends undefined ? never : K]: U[K] }
-		: never;
+type ExtractArgs<T> = (Omit<T, "response"> extends infer U
+	? { [K in keyof U as U[K] extends undefined ? never : K]: U[K] }
+	: never) & {
+	headers?: HeadersInit;
+	init?: RequestInit;
+};
+interface RequestDescriptor {
+	endpoint: string;
+	method: string;
+	body?: unknown;
+	search?: Record<string, unknown>;
+	headers?: HeadersInit;
+	init?: RequestInit;
+}
 interface Param1Param2GetModel {
 	search?: Record<string, unknown>;
 	params: { param1: Primitive; param2: Primitive };
@@ -268,18 +279,33 @@ const makeOrgsOrgIdMembersMemberIdDeleteRequest = (
 	search: args.search,
 });
 
-interface RequestDescriptor {
-	endpoint: string;
-	method: string;
-	body?: unknown;
-	search?: Record<string, unknown>;
-}
 class CorpusApi {
-	constructor(
-		private readonly fetchFn: <R = unknown>(
-			descriptor: RequestDescriptor,
-		) => Promise<R>,
-	) {}
+	constructor(public readonly baseUrl: string) {}
+	public fetchFn: <R = unknown>(descriptor: RequestDescriptor) => Promise<R> =
+		async (args) => {
+			const url = new URL(args.endpoint, this.baseUrl);
+			const headers = new Headers(args.headers);
+			const method: RequestInit["method"] = args.method;
+			let body: RequestInit["body"];
+			if (args.search) {
+				for (const [key, val] of Object.entries(args.search)) {
+					if (val != null) url.searchParams.append(key, String(val));
+				}
+			}
+			if (args.body) {
+				if (!headers.has("Content-Type") || !headers.has("content-type")) {
+					headers.set("Content-Type", "application/json");
+				}
+				body = JSON.stringify(args.body);
+			}
+			const res = await fetch(url, { method, headers, body, ...args.init });
+			return C.Parser.parseBody(res);
+		};
+	public setFetchFn(
+		cb: <R = unknown>(descriptor: RequestDescriptor) => Promise<R>,
+	) {
+		this.fetchFn = cb;
+	}
 	param1Param2Get = (args: ExtractArgs<Param1Param2GetModel>) =>
 		this.fetchFn<Param1Param2GetModel["response"]>(
 			makeParam1Param2GetRequest(args),

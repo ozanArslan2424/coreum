@@ -1,5 +1,11 @@
 # @ozanarslan/corpus-callosum
 
+## 0.3.7
+
+### Patch Changes
+
+- CLI Changes
+
 ## 0.3.6
 
 ### Patch Changes

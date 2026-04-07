@@ -1,8 +1,7 @@
-import { describe, expect, it, beforeAll } from "bun:test";
-import { ApiClientGenerator } from "../src/generate/ApiClientGenerator";
+import { describe, expect, it } from "bun:test";
+import { ApiClientGenerator } from "../src/generateApiClient/ApiClientGenerator";
 
 const generator = new ApiClientGenerator({}, {});
-beforeAll(() => generator.readConfig());
 
 describe("toCamelCaseKey", () => {
 	const key = (path: string, method: string) =>

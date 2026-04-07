@@ -1,20 +1,15 @@
-import { registerSilentConsole } from "../utils/registerSilentConsole";
 import { writeFileSync } from "fs";
 import { resolve } from "path";
 import { getCasingConverter } from "../utils/getCasingConverter";
 import { getFilesToGenerate } from "./getFilesToGenerate";
 import { PackageManager } from "./PackageManager";
 import { ImportsManager } from "./ImportsManager";
-import { getInitializeConfig } from "./getInitializeConfig";
+import type { Config } from "../Config";
 
 const exampleModuleName = "Example";
 const fallbackDirName = "corpus";
 
-export async function initialize() {
-	const config = getInitializeConfig();
-
-	if (config.silent) registerSilentConsole();
-
+export async function initialize(config: Config) {
 	const cwd = resolve(process.cwd());
 	const convertCase = getCasingConverter(config.casing);
 	const pm = new PackageManager(config.packageManager);

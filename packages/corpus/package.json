@@ -1,6 +1,6 @@
 {
 	"name": "@ozanarslan/corpus",
-	"version": "0.3.7",
+	"version": "0.3.8",
 	"description": "Small Typescript backend framework with only core utilities",
 	"keywords": [
 		"backend framework",
@@ -44,7 +44,7 @@
 		"test:ws": "bun run test/other/ws-simulation.ts",
 		"test:benchmark": "bun run test/other/benchmark.ts",
 		"test:all": "bun run build && bun test --only-failures && bun test:http -s && bun test:ws -s && bun test:benchmark",
-		"tests": "bun test"
+		"tests": "bun test --only-failures"
 	},
 	"devDependencies": {
 		"@standard-schema/spec": "^1.1.0",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { hoistFunctionBody } from "../src/generate/hoistFunctionBody";
+import { hoistFunctionBody } from "../src/generateApiClient/hoistFunctionBody";
 
 describe("hoistFunctionBody", () => {
 	it("returns source unchanged if no function contains listen", () => {

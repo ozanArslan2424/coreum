@@ -1,5 +1,4 @@
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
-import { registerSilentConsole } from "../utils/registerSilentConsole";
 import { spawnSync } from "child_process";
 import { logFatal } from "corpus-utils/internalLog";
 import { dirname, join, resolve } from "path";
@@ -9,70 +8,23 @@ import {
 	API_GENERATOR_CLASS_NAME,
 } from "../utils/DIST_API_GENERATOR_FILE";
 import { hoistFunctionBody } from "./hoistFunctionBody";
-import { parseArgs } from "util";
-import { defaultApiClientGeneratorConfig } from "./defaultApiClientGeneratorConfig";
+import type { Config } from "../Config";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export async function generate() {
-	const { values } = parseArgs({
-		args: process.argv.slice(3),
-		options: {
-			main: {
-				type: "string",
-				short: "m",
-				default: defaultApiClientGeneratorConfig.main,
-			},
-			package: {
-				type: "string",
-				short: "p",
-				default: defaultApiClientGeneratorConfig.packageName,
-			},
-			output: {
-				type: "string",
-				short: "o",
-				default: defaultApiClientGeneratorConfig.output,
-			},
-			exportRoutesAs: {
-				type: "string",
-				default: defaultApiClientGeneratorConfig.exportRoutesAs,
-			},
-			exportClientAs: {
-				type: "string",
-				default: defaultApiClientGeneratorConfig.exportClientAs,
-			},
-			generateClient: {
-				type: "boolean",
-				default: defaultApiClientGeneratorConfig.generateClient,
-			},
-			silent: {
-				type: "boolean",
-				short: "s",
-				default: defaultApiClientGeneratorConfig.silent,
-			},
-		},
-	});
-
-	const mainPath = resolve(values.main);
-	const packagePath = values.package;
+export async function generateApiClient(config: Config) {
+	const mainPath = resolve(config.main);
 
 	const cliOverrides = Object.fromEntries(
-		Object.entries({
-			output: values.output,
-			exportRoutesAs: values.exportRoutesAs,
-			exportClientAs: values.exportClientAs,
-			generateClient: values.generateClient,
-		}).filter(([, v]) => v !== undefined),
+		Object.entries(config.apiClientGenerator).filter(
+			([, v]) => v !== undefined,
+		),
 	);
 
 	const tempPath = mainPath.replace(/\.ts$/, ".gen.ts");
 
-	if (values.silent) {
-		registerSilentConsole();
-	}
-
 	try {
-		const lines: string[] = [`import { $registry } from "${packagePath}";`];
+		const lines: string[] = [`import { $registry } from "${config.pkgPath}";`];
 		const generatorPath = join(__dirname, DIST_API_GENERATOR_FILE);
 		lines.push(
 			`import { ${API_GENERATOR_CLASS_NAME} } from "${generatorPath}";`,
@@ -91,7 +43,6 @@ export async function generate() {
 
 		const replacement = [
 			`const generator = new ${API_GENERATOR_CLASS_NAME}($registry.docs, ${JSON.stringify(cliOverrides)});`,
-			`generator.readConfig();`,
 			`await generator.generate();`,
 		].join("\n");
 

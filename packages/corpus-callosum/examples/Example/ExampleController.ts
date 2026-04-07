@@ -4,8 +4,10 @@ import type { ExampleService } from "./ExampleService";
 
 export class ExampleController extends C.Controller {
 	constructor(private readonly service: ExampleService) {
-		super({ prefix: "/example" });
+		super();
 	}
+
+	prefix = "/example";
 
 	get = this.route("/:id", (c) => this.service.get(c.params), ExampleModel.get);
 
