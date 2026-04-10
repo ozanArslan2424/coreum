@@ -1,5 +1,19 @@
 import { C } from "@ozanarslan/corpus";
-import { type } from "arktype";
+import { getSchemas } from "./getSchemas";
+
+const {
+	Pagination,
+	UserParams,
+	UserBody,
+	UserSearch,
+	UserResponse,
+	PostBody,
+	PostResponse,
+	OrgParams,
+	OrgBody,
+	OrgMemberParams,
+	OrgMemberBody,
+} = getSchemas("arktype");
 
 export async function startServer(PORT: number) {
 	const server = new C.Server();
@@ -21,90 +35,6 @@ export async function startServer(PORT: number) {
 	new C.Route("/verywild/*", () => "ok");
 	new C.Route("/craaaazy/*", () => "ok");
 
-	// ── Shared primitives ─────────────────────────────────────────────────────────
-
-	const Role = type("'admin' | 'editor' | 'viewer'");
-	const Status = type("'active' | 'inactive' | 'banned'");
-	const Pagination = type({
-		page: type("string").pipe(Number),
-		limit: type("string").pipe(Number),
-	});
-	const Timestamp = type({ createdAt: "string", updatedAt: "string" });
-
-	// ── User schemas ──────────────────────────────────────────────────────────────
-
-	const UserParams = type({ id: "string" });
-
-	const UserBody = type({
-		name: "string",
-		age: "number",
-		role: Role,
-		tags: "string[]",
-		address: type({
-			city: "string",
-			country: "string",
-			"zip?": "string",
-		}),
-	});
-
-	const UserSearch = Pagination.and(type({ "role?": Role, "status?": Status }));
-
-	const UserResponse = type({
-		id: "string",
-		name: "string",
-		age: "number",
-		role: Role,
-		status: Status,
-		tags: "string[]",
-	}).and(Timestamp);
-
-	// ── Post schemas ──────────────────────────────────────────────────────────────
-
-	const PostBody = type({
-		title: "string",
-		content: "string",
-		published: "boolean",
-		metadata: type({
-			views: "number",
-			likes: "number",
-			category: "'tech' | 'life' | 'other'",
-		}),
-	});
-
-	const PostResponse = type({
-		id: "string",
-		title: "string",
-		content: "string",
-		published: "boolean",
-		authorId: "string",
-		metadata: type({
-			views: "number",
-			likes: "number",
-			category: "'tech' | 'life' | 'other'",
-		}),
-	}).and(Timestamp);
-
-	// ── Org schemas ───────────────────────────────────────────────────────────────
-
-	const OrgParams = type({ orgId: "string" });
-
-	const OrgBody = type({
-		name: "string",
-		plan: "'free' | 'pro' | 'enterprise'",
-		seats: "number",
-		owner: type({
-			userId: "string",
-			role: Role,
-		}),
-	});
-
-	const OrgMemberParams = type({ orgId: "string", memberId: "string" });
-
-	const OrgMemberBody = type({
-		role: Role,
-		status: Status,
-	});
-
 	// ── Routes with models ────────────────────────────────────────────────────────
 
 	// POST /users — create user
@@ -121,7 +51,7 @@ export async function startServer(PORT: number) {
 	);
 
 	// GET /users — list users with filters
-	new C.Route("/users", () => [], { search: UserSearch });
+	new C.Route("/users", (c) => [c.search.page], { search: UserSearch });
 
 	// GET /users/:id
 	new C.Route(

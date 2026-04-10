@@ -65,12 +65,18 @@ importers:
 
   packages/corpus-callosum:
     dependencies:
+      "@sodaru/yup-to-json-schema":
+        specifier: ^2.0.1
+        version: 2.0.1
       "@standard-community/standard-json":
         specifier: ^0.3.5
-        version: 0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(arktype@2.2.0)(quansync@1.0.0)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
+        version: 0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(@valibot/to-json-schema@1.6.0(valibot@1.3.1(typescript@6.0.2)))(arktype@2.2.0)(quansync@1.0.0)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
       "@standard-schema/spec":
         specifier: ^1.1.0
         version: 1.1.0
+      "@valibot/to-json-schema":
+        specifier: ^1.6.0
+        version: 1.6.0(valibot@1.3.1(typescript@6.0.2))
       json-schema-to-typescript:
         specifier: ^15.0.4
         version: 15.0.4
@@ -743,6 +749,12 @@ packages:
         integrity: sha512-HHMwmarRKvoFsJorqYlFeFRzXZqCt2ETQlEDOb9aqssrnVBB1/+xgTGtuTrIk5vzLNX1MjMtTf7W9z3tsSbrxw==,
       }
 
+  "@sodaru/yup-to-json-schema@2.0.1":
+    resolution:
+      {
+        integrity: sha512-lWb0Wiz8KZ9ip/dY1eUqt7fhTPmL24p6Hmv5Fd9pzlzAdw/YNcWZr+tiCT4oZ4Zyxzi9+1X4zv82o7jYvcFxYA==,
+      }
+
   "@standard-community/standard-json@0.3.5":
     resolution:
       {
@@ -831,6 +843,14 @@ packages:
       {
         integrity: sha512-tO4ZIRKNC+MDWV4qKVZe3Ql/woTnmHDr5JD8UI5hn2pwBrHEwOEMZK7WlNb5RKB6EoJ02gwmQS9OrjuFnZYdpg==,
       }
+
+  "@valibot/to-json-schema@1.6.0":
+    resolution:
+      {
+        integrity: sha512-d6rYyK5KVa2XdqamWgZ4/Nr+cXhxjy7lmpe6Iajw15J/jmU+gyxl2IEd1Otg1d7Rl3gOQL5reulnSypzBtYy1A==,
+      }
+    peerDependencies:
+      valibot: ^1.3.0
 
   ansi-colors@4.1.3:
     resolution:
@@ -2191,12 +2211,15 @@ snapshots:
 
   "@rolldown/pluginutils@1.0.0-rc.12": {}
 
-  "@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(arktype@2.2.0)(quansync@1.0.0)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)":
+  "@sodaru/yup-to-json-schema@2.0.1": {}
+
+  "@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(@valibot/to-json-schema@1.6.0(valibot@1.3.1(typescript@6.0.2)))(arktype@2.2.0)(quansync@1.0.0)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)":
     dependencies:
       "@standard-schema/spec": 1.1.0
       "@types/json-schema": 7.0.15
       quansync: 1.0.0
     optionalDependencies:
+      "@valibot/to-json-schema": 1.6.0(valibot@1.3.1(typescript@6.0.2))
       arktype: 2.2.0
       valibot: 1.3.1(typescript@6.0.2)
       zod: 4.3.6
@@ -2225,6 +2248,10 @@ snapshots:
   "@types/node@25.5.2":
     dependencies:
       undici-types: 7.18.2
+
+  "@valibot/to-json-schema@1.6.0(valibot@1.3.1(typescript@6.0.2))":
+    dependencies:
+      valibot: 1.3.1(typescript@6.0.2)
 
   ansi-colors@4.1.3: {}
 

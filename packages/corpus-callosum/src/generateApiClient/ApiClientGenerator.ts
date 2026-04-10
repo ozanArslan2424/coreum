@@ -1,33 +1,35 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "path";
-import { compile } from "json-schema-to-typescript";
 import type { Schema } from "../utils/Schema";
-import { toJsonSchema } from "@standard-community/standard-json";
-import type { Config, PartialConfig } from "../Config";
-import { getFileConfig } from "../getFileConfig";
-import { getDefaultConfig } from "../getDefaultConfig";
+import type { Config, PartialConfig } from "../Config/Config";
+import { Writer } from "../Writer/Writer";
+import { SchemaManager } from "../SchemaManager/SchemaManager";
+import { ConfigManager } from "../ConfigManager/ConfigManager";
 
 type DocEntry = { id: string; endpoint: string; method: string; model?: any };
 type MapEntry = {
-	model: string | null;
+	key: string;
 	modelKey: string;
-	func: string;
 	funcKey: string;
+	params: string[];
+	model?: any;
+	method: string;
+	endpoint: string;
 };
 
 export class ApiClientGenerator {
 	constructor(
+		private readonly pkgPath: string,
 		private readonly docs: Record<string, DocEntry>,
-		private readonly cliOverrides: Omit<
-			PartialConfig["apiClientGenerator"],
-			"jsonSchemaOptions"
-		>,
+		private readonly cliOverrides: Omit<PartialConfig, "jsonSchemaOptions">,
 	) {}
 
-	get config(): Config["apiClientGenerator"] {
+	private readonly schemaManager = new SchemaManager(this.config);
+
+	get config(): Config {
 		return {
-			...getFileConfig().apiClientGenerator,
-			...getDefaultConfig().apiClientGenerator,
+			...ConfigManager.getFileConfig(),
+			...ConfigManager.getDefaultConfig(),
 			...this.cliOverrides,
 		};
 	}
@@ -45,32 +47,209 @@ export class ApiClientGenerator {
 		);
 	}
 
-	private async generateFileContent(routes: DocEntry[]) {
+	private getRouteMap(routes: DocEntry[]) {
 		const map = new Map<string, MapEntry>();
-		const lines: string[] = [];
 
-		for (const route of routes) {
-			const key = this.toCamelCaseKey(route.endpoint, route.method);
-			const params = this.extractParams(route.endpoint);
-			const modelKey = `${this.capitalize(key)}Model`;
-			const model = await this.buildModel(modelKey, route, params);
-			if (model) lines.push(model);
-			const funcKey = `make${this.capitalize(key)}Request`;
-			const func = this.buildFunc(route, params, funcKey, model, modelKey);
-			lines.push(func);
-			map.set(key, { model, modelKey, func, funcKey });
+		for (const r of routes) {
+			const key = this.toCamelCaseKey(r.endpoint, r.method);
+			map.set(r.id, {
+				key,
+				params: this.extractParams(r.endpoint),
+				modelKey: `${this.capitalize(key)}Model`,
+				funcKey: `make${this.capitalize(key)}Request`,
+				model: r.model,
+				method: r.method,
+				endpoint: r.endpoint,
+			});
+		}
+
+		return map;
+	}
+
+	private async generateFileContent(routes: DocEntry[]) {
+		const map = this.getRouteMap(routes);
+
+		const w = new Writer();
+
+		if (this.config.exportClientAs !== false) {
+			w.$import({
+				keys: ["C"],
+				from: this.pkgPath,
+			});
+		}
+
+		w.append(`type _Prim = string | number | boolean;`);
+
+		w.append(
+			`type ExtractArgs<T> = (Omit<T, "response"> extends infer U ? { [K in keyof U as U[K] extends undefined ? never : K]: U[K] } : never) & { headers?: HeadersInit; init?: RequestInit };`,
+		);
+
+		w.$interface({
+			variant: "interface",
+			name: "ReqArgs",
+			body: (w) => {
+				w.pair("endpoint", "string");
+				w.pair("method", "string");
+				w.pair("body?", "unknown");
+				w.pair("search?", "Record<string, unknown>");
+				w.pair("headers?", "HeadersInit");
+				w.pair("init?", "RequestInit");
+			},
+		});
+
+		for (const r of map.values()) {
+			await this.writeModel(w, r.modelKey, r.params, r.model);
+
+			w.$function({
+				variant: "const",
+				name: r.funcKey,
+				args: [`args: ExtractArgs<${r.modelKey}>`],
+				body: (w) =>
+					w.$return({
+						variant: "object",
+						body: (w) => {
+							if (r.params.length === 0) {
+								w.pair("endpoint", `"${r.endpoint}"`);
+							} else {
+								w.pair(
+									"endpoint",
+									`\`${r.endpoint
+										.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
+										.map((part, i) => {
+											if (i % 2 === 1) return `\${String(args.params.${part})}`;
+											return part.replace("*", `\${String(args.params["*"])}`);
+										})
+										.join("")}\``,
+								);
+							}
+
+							w.pair("method", `"${r.method}"`);
+							w.pair("search", `args.search`);
+							if (r.model?.body) {
+								w.pair("body", `args.body`);
+							}
+						},
+					}),
+			});
 		}
 
 		if (this.config.exportClientAs !== false) {
-			lines.push("");
-			lines.push(await this.buildClientClass(map));
+			w.$class({
+				name: this.config.exportClientAs,
+				constr: {
+					args: [
+						{ keyword: "public readonly", key: "baseUrl", type: "string" },
+					],
+				},
+				body: (w) => {
+					w.$function({
+						variant: "constMethod",
+						keyword: "public",
+						isAsync: true,
+						name: "fetchFn",
+						type: "<R = unknown>(args: ReqArgs) => Promise<R>",
+						args: ["args"],
+						body: (w) => {
+							w.append(`const url = new URL(args.endpoint, this.baseUrl);`);
+							w.append(`const headers = new Headers(args.headers);`);
+							w.append(`const method: RequestInit["method"] = args.method;`);
+							w.append(`let body: RequestInit["body"];`);
+
+							w.$if(`args.search`).then((w) => {
+								w.$for(
+									[`const`, `[key, val]`, `of`, `Object.entries(args.search)`],
+									(w) => {
+										w.$if(`val == null`).then((w) => w.append(`continue;`));
+										w.append(`url.searchParams.append(key, String(val));`);
+									},
+								);
+							});
+
+							w.$if(`args.body`).then((w) => {
+								w.$if(
+									`!headers.has("Content-Type")`,
+									`||`,
+									`!headers.has("content-type")`,
+								).then((w) => {
+									w.append(`headers.set("Content-Type", "application/json");`);
+								});
+								w.append(`body = JSON.stringify(args.body);`);
+							});
+
+							w.append(
+								`const res = await fetch(url, { method, headers, body, ...args.init });`,
+							);
+							w.append(`return await C.Parser.parseBody(res);`);
+						},
+					});
+
+					w.$function({
+						variant: "method",
+						keyword: "public",
+						isAsync: false,
+						name: "setFetchFn",
+						args: ["cb: <R = unknown>(args: ReqArgs) => Promise<R>"],
+						body: (w) =>
+							w.$return({ variant: "value", value: `this.fetchFn = cb;` }),
+					});
+
+					w.$object({
+						variant: "classMember",
+						keyword: "public readonly",
+						name: "endpoints",
+						body: (w) => {
+							for (const r of map.values()) {
+								w.pair(
+									r.key,
+									r.params.length === 0
+										? `"${r.endpoint}"`
+										: `(p: ExtractArgs<${r.modelKey}>["params"]) => \`${r.endpoint
+												.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
+												.map((part, i) => {
+													if (i % 2 === 1) return `\${String(p.${part})}`;
+													return part.replace("*", `\${String(p["*"])}`);
+												})
+												.join("")}\``,
+								);
+							}
+						},
+					});
+
+					for (const r of map.values()) {
+						w.$function({
+							variant: "constMethod",
+							name: r.key,
+							args: [`args: ExtractArgs<${r.modelKey}>`],
+							body: (w) =>
+								w.$return({
+									variant: "value",
+									value: `this.fetchFn<${r.modelKey}["response"]>(${r.funcKey}(args))`,
+								}),
+							keyword: "public",
+						});
+					}
+				},
+			});
 		}
 
-		lines.push(this.buildExports(map));
+		const consts = Array.from(w.variables);
+		const types = Array.from(w.interfaces);
 
-		const body = lines.join("\n");
-		const header = this.buildInitialContent(body);
-		return [header, body].join("\n");
+		w.$export({ variant: "type", keys: types });
+
+		if (this.config.exportRoutesAs === "individual") {
+			w.$export({ variant: "obj", keys: consts });
+		} else if (this.config.exportRoutesAs === "default") {
+			w.$export({ variant: "default", keys: consts });
+		} else {
+			w.$export({
+				variant: "named",
+				name: this.config.exportRoutesAs,
+				keys: consts,
+			});
+		}
+
+		return w.read();
 	}
 
 	private extractParams(path: string): string[] {
@@ -109,208 +288,76 @@ export class ApiClientGenerator {
 		);
 	}
 
-	private buildFunc(
-		route: DocEntry,
-		params: string[],
-		functionKey: string,
-		model: string | null,
+	// TODO: just write
+	private async writeModel(
+		w: Writer,
 		modelKey: string,
-	) {
-		const lines: string[] = [];
-		lines.push(
-			`const ${functionKey}=(${model ? `args:ExtractArgs<${modelKey}>` : ""})=>({`,
-			`endpoint:${this.buildEndpoint(route, params)}`,
-			`,`,
-			`method:${this.buildMethod(route)}`,
-			...(route.model?.body ? [`,`, `body:args.body`] : []),
-			`,`,
-			`search:args.search`,
-			`})`,
-		);
-		return lines.join("").trim();
-	}
-
-	private buildMethod(route: DocEntry) {
-		return `"${route.method}"`;
-	}
-
-	private buildEndpoint(route: DocEntry, params: string[]) {
-		if (params.length === 0) {
-			return `"${route.endpoint}"`;
-		} else {
-			return `\`${route.endpoint
-				.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
-				.map((part, i) => {
-					if (i % 2 === 1) return `\${String(args.params.${part})}`;
-					return part.replace("*", `\${String(args.params["*"])}`);
-				})
-				.join("")}\``;
-		}
-	}
-
-	private async buildModel(
-		modelKey: string,
-		route: DocEntry,
 		params: string[],
+		routeModel: any,
 	) {
-		const lines: string[] = [];
-		lines.push(`interface ${modelKey}{`);
+		const model: Record<
+			"body" | "search" | "params" | "response",
+			{ opt: boolean; type: string }
+		> = {
+			body: { opt: false, type: `` },
+			search: { opt: true, type: `Record<string, unknown>` },
+			params: { opt: false, type: `` },
+			response: { opt: false, type: `unknown` },
+		};
 
-		if (route.model?.body) {
-			lines.push(`body:${await this.buildSchemaType(route.model.body)}`);
+		if (routeModel?.body) {
+			model.body = {
+				opt: false,
+				type: await this.buildSchemaType(routeModel.body),
+			};
 		}
 
-		if (route.model?.search) {
-			lines.push(`search:${await this.buildSchemaType(route.model.search)}`);
-		} else {
-			lines.push(`search?:Record<string, unknown>;`);
+		if (routeModel?.search) {
+			model.search = {
+				opt: false,
+				type: await this.buildSchemaType(routeModel.search),
+			};
 		}
 
-		if (route.model?.params) {
-			lines.push(`params:${await this.buildSchemaType(route.model.params)}`);
+		if (routeModel?.params) {
+			model.params = {
+				opt: false,
+				type: await this.buildSchemaType(routeModel.params),
+			};
 		} else if (params.length > 0) {
-			lines.push(
-				`params:{${params
-					.map((p) => `${p === "*" ? '"*"' : p}:Primitive`)
-					.join(";")}};`,
-			);
+			model.params = {
+				opt: false,
+				type: `{ ${params.map((p) => `${p === "*" ? '"*"' : p}: _Prim`).join(";")}}`,
+			};
 		}
 
-		if (route.model?.response) {
-			lines.push(
-				`response:${await this.buildSchemaType(route.model.response)}`,
-			);
-		} else {
-			lines.push(`response:unknown;`);
+		if (routeModel?.response) {
+			model.response = {
+				opt: false,
+				type: await this.buildSchemaType(routeModel.response),
+			};
 		}
 
-		lines.push(`};`);
-
-		return lines.length > 2 ? lines.join("").trim() : null;
+		w.$interface({
+			variant: "interface",
+			name: modelKey,
+			body: (w) => {
+				for (const [key, val] of Object.entries(model)) {
+					if (val.type === "") continue;
+					w.pair(`${val.opt ? `${key}?` : key}`, `${val.type}`);
+				}
+			},
+		});
 	}
 
 	private async buildSchemaType(schema: Schema): Promise<string> {
 		try {
-			let schemaType = await compile(
-				toJsonSchema(schema, this.config.jsonSchemaOptions),
-				"DoesnTMatterWillBeDeleted",
-				{
-					bannerComment: "",
-					format: false,
-					ignoreMinAndMaxItems: true,
-					additionalProperties: false,
-				},
+			return await this.schemaManager.toInterface(
+				this.schemaManager.toJsonSchema(schema, this.config.validationLibrary),
 			);
-			schemaType = schemaType
-				.replace("export interface DoesnTMatterWillBeDeleted", "")
-				.replace("export type DoesnTMatterWillBeDeleted =", "")
-				.replace(/([^{])\n/g, "$1;") // newline → semicolon only when not preceded by {
-				.replace(/;+/g, ";") // collapse consecutive semicolons
-				.replace(/\s+/g, "") // collapse whitespace
-				.replace(/; }/g, "}") // clean "; }" → " }"
-				.trim();
-			return schemaType;
 		} catch (err) {
 			console.log(JSON.stringify(schema));
-			console.log(err);
-			process.exit(1);
+			throw err;
 		}
-	}
-
-	private readonly defaultFetchFnBody = [
-		`const url = new URL(args.endpoint, this.baseUrl);`,
-		`const headers = new Headers(args.headers);`,
-		`const method: RequestInit["method"] = args.method;`,
-		`let body: RequestInit["body"];`,
-		`if (args.search) {`,
-		`for (const [key, val] of Object.entries(args.search)) {`,
-		`if (val != null) url.searchParams.append(key, String(val));`,
-		`}`,
-		`}`,
-		`if (args.body) {`,
-		`if (!headers.has("Content-Type") || !headers.has("content-type")) {`,
-		`headers.set("Content-Type", "application/json");`,
-		`}`,
-		`body = JSON.stringify(args.body);`,
-		`}`,
-		`const res = await fetch(url, { method, headers, body, ...args.init });`,
-		`return C.Parser.parseBody(res);`,
-	];
-
-	private async buildClientClass(map: Map<string, MapEntry>) {
-		const lines: string[] = [];
-		lines.push(
-			`class ${this.config.exportClientAs} {`,
-			`constructor(public readonly baseUrl: string) {}`,
-			`public fetchFn: <R = unknown>(descriptor: RequestDescriptor) => Promise<R> =`,
-			`async (args) => {`,
-			...this.defaultFetchFnBody,
-			`};`,
-			`public setFetchFn(cb: <R = unknown>(descriptor: RequestDescriptor) => Promise<R>) {`,
-			`this.fetchFn = cb;`,
-			`};`,
-		);
-
-		for (const [key, entry] of map.entries()) {
-			lines.push(
-				`${key}=(${entry.model ? `args: ExtractArgs<${entry.modelKey}>` : ``}) => this.fetchFn<${entry.modelKey}["response"]>(${entry.funcKey}(${entry.model ? `args` : ``}));`,
-			);
-		}
-
-		lines.push(`}`);
-		return lines.join("\n");
-	}
-
-	private buildExports(map: Map<string, MapEntry>) {
-		const lines: string[] = [];
-		const consts = Array.from(map.values().map((v) => v.funcKey));
-		const types = Array.from(map.values().map((v) => v.modelKey));
-
-		if (this.config.exportClientAs !== false) {
-			types.push("RequestDescriptor");
-			lines.push(`export {${this.config.exportClientAs}};`);
-		}
-
-		lines.push("export type {", types.join(", "), "};");
-
-		if (this.config.exportRoutesAs === "individual") {
-			lines.push(`export {${consts.join(",")}};`);
-		} else if (this.config.exportRoutesAs === "default") {
-			lines.push(`export default {${consts.join(",")}};`);
-		} else {
-			lines.push(
-				`export const ${this.config.exportRoutesAs}={${consts.join(",")}};`,
-			);
-		}
-		return lines.join("");
-	}
-
-	private buildInitialContent(body: string) {
-		const lines: string[] = [];
-		if (this.config.exportClientAs !== false) {
-			lines.push(`import { C } from "@ozanarslan/corpus";`);
-		}
-
-		if (body.includes("Primitive")) {
-			lines.push("type Primitive = string | number | boolean;");
-		}
-		lines.push(
-			`type ExtractArgs<T> = `,
-			`(Omit<T, "response"> extends infer U ? { [K in keyof U as U[K] extends undefined ? never : K]: U[K] } : never)`,
-			` & {`,
-			`headers?: HeadersInit;`,
-			`init?: RequestInit`,
-			`};`,
-
-			`interface RequestDescriptor {`,
-			`endpoint: string;`,
-			`method: string;`,
-			`body?: unknown;`,
-			`search?: Record<string, unknown>;`,
-			`headers?: HeadersInit;`,
-			`init?: RequestInit`,
-			`}`,
-		);
-		return lines.join("\n");
 	}
 }

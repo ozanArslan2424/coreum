@@ -173,4 +173,4 @@ Very much inspired from the core ideas behind [Elysia](https://github.com/elysia
 - [x] Support additional response body types (ArrayBuffer, Blob, FormData, etc.) in the custom Response object.
 - [x] Support WebSocket
 - [x] [Documentation](https://corpus-production.up.railway.app/)
-- [ ] Compress static files in StaticRoute for caching and stuff maybe?
+- [ ] Better static routing.

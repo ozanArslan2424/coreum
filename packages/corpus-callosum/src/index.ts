@@ -1,8 +1,9 @@
+import { ConfigManager } from "./ConfigManager/ConfigManager";
 import { generateApiClient } from "./generateApiClient";
 import { initialize } from "./initialize";
-import { getResolvedConfig } from "./getResolvedConfig";
 
-const { action, config } = getResolvedConfig();
+const action = ConfigManager.getAction();
+const config = ConfigManager.getResolvedConfig();
 
 if (action === "api") {
 	await generateApiClient(config);

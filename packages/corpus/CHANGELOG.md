@@ -1,5 +1,11 @@
 # @ozanarslan/corpus
 
+## 0.3.9
+
+### Patch Changes
+
+- cli fixed
+
 ## 0.3.8
 
 ### Patch Changes

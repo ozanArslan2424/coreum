@@ -37,6 +37,7 @@
 		"./strRemoveWhitespace": "./dist/strRemoveWhitespace.mjs",
 		"./strSplit": "./dist/strSplit.mjs",
 		"./TestHelper": "./dist/TestHelper.mjs",
+		"./tuple": "./dist/tuple.mjs",
 		"./UnknownObject": "./dist/UnknownObject.mjs",
 		"./ValueOf": "./dist/ValueOf.mjs",
 		"./package.json": "./package.json"

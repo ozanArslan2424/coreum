@@ -156,3 +156,9 @@ export type InitializeConfig = Partial<{
 	packageManager: "bun" | "pnpm" | "npm" | null;
 }>;
 ```
+
+# Roadmap
+
+- [] Valibot support.
+- [] Module generation.
+- [] More commands.

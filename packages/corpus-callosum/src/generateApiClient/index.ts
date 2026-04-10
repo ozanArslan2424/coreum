@@ -8,7 +8,7 @@ import {
 	API_GENERATOR_CLASS_NAME,
 } from "../utils/DIST_API_GENERATOR_FILE";
 import { hoistFunctionBody } from "./hoistFunctionBody";
-import type { Config } from "../Config";
+import type { Config } from "../Config/Config";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -16,8 +16,8 @@ export async function generateApiClient(config: Config) {
 	const mainPath = resolve(config.main);
 
 	const cliOverrides = Object.fromEntries(
-		Object.entries(config.apiClientGenerator).filter(
-			([, v]) => v !== undefined,
+		Object.entries(config).filter(
+			([k, v]) => v !== undefined && k !== "jsonSchemaOptions",
 		),
 	);
 
@@ -42,7 +42,7 @@ export async function generateApiClient(config: Config) {
 		}
 
 		const replacement = [
-			`const generator = new ${API_GENERATOR_CLASS_NAME}($registry.docs, ${JSON.stringify(cliOverrides)});`,
+			`const generator = new ${API_GENERATOR_CLASS_NAME}("${config.pkgPath}", $registry.docs, ${JSON.stringify(cliOverrides)});`,
 			`await generator.generate();`,
 		].join("\n");
 
