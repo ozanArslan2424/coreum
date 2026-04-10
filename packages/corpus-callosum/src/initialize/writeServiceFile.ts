@@ -24,8 +24,7 @@ export function writeServiceFile(c: Config, m: ModuleInterface) {
 			],
 		},
 		body: (w) => {
-			w.$function({
-				variant: "method",
+			w.$method({
 				isAsync: true,
 				name: "get",
 				args: [`params: ${m.modelTypeName}["get"]["params"]`],
@@ -42,8 +41,7 @@ export function writeServiceFile(c: Config, m: ModuleInterface) {
 				},
 			});
 
-			w.$function({
-				variant: "method",
+			w.$method({
 				isAsync: true,
 				name: "list",
 				args: [`search: ${m.modelTypeName}["list"]["search"]`],
@@ -55,8 +53,7 @@ export function writeServiceFile(c: Config, m: ModuleInterface) {
 				},
 			});
 
-			w.$function({
-				variant: "method",
+			w.$method({
 				isAsync: true,
 				name: "create",
 				args: [`body: ${m.modelTypeName}["create"]["body"]`],
@@ -66,8 +63,7 @@ export function writeServiceFile(c: Config, m: ModuleInterface) {
 				},
 			});
 
-			w.$function({
-				variant: "method",
+			w.$method({
 				isAsync: true,
 				name: "update",
 				args: [
@@ -90,8 +86,7 @@ export function writeServiceFile(c: Config, m: ModuleInterface) {
 				},
 			});
 
-			w.$function({
-				variant: "method",
+			w.$method({
 				isAsync: true,
 				name: "delete",
 				args: [`params: ${m.modelTypeName}["delete"]["params"]`],

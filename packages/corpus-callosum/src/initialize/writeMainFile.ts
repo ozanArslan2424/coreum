@@ -31,7 +31,7 @@ export function writeMainFile(
 
 	w.$const({ name: "server", value: "new C.Server()" });
 	w.$const({ name: database.camelName, value: `new ${database.name}()` });
-	w.append(`new C.Route("/health", () => "ok");`);
+	w.line(`new C.Route("/health", () => "ok");`);
 
 	for (const m of modules) {
 		w.$const({
@@ -42,10 +42,10 @@ export function writeMainFile(
 			name: m.service.camelName,
 			value: `new ${m.service.name}(${m.repository.camelName})`,
 		});
-		w.append(`new ${m.controller.name}(${m.service.camelName})`);
+		w.line(`new ${m.controller.name}(${m.service.camelName})`);
 	}
 
-	w.append(
+	w.line(
 		`new X.RateLimiter();`,
 		`new X.Cors({`,
 		`	allowedOrigins: [X.Config.get("CLIENT_URL")],`,

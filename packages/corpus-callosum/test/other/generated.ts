@@ -1,8 +1,11 @@
 import { C } from "@ozanarslan/corpus";
+
 type _Prim = string | number | boolean;
+
 type ExtractArgs<T> = (Omit<T, "response"> extends infer U
 	? { [K in keyof U as U[K] extends undefined ? never : K]: U[K] }
 	: never) & { headers?: HeadersInit; init?: RequestInit };
+
 interface ReqArgs {
 	endpoint: string;
 	method: string;
@@ -11,11 +14,13 @@ interface ReqArgs {
 	headers?: HeadersInit;
 	init?: RequestInit;
 }
+
 interface Param1Param2GetModel {
 	search?: Record<string, unknown>;
 	params: { param1: _Prim; param2: _Prim };
 	response: unknown;
 }
+
 const makeParam1Param2GetRequest = (
 	args: ExtractArgs<Param1Param2GetModel>,
 ) => {
@@ -25,11 +30,13 @@ const makeParam1Param2GetRequest = (
 		search: args.search,
 	};
 };
+
 interface HelloParam1Param2GetModel {
 	search?: Record<string, unknown>;
 	params: { param1: _Prim; param2: _Prim };
 	response: unknown;
 }
+
 const makeHelloParam1Param2GetRequest = (
 	args: ExtractArgs<HelloParam1Param2GetModel>,
 ) => {
@@ -39,11 +46,13 @@ const makeHelloParam1Param2GetRequest = (
 		search: args.search,
 	};
 };
+
 interface WorldParam1Param2GetModel {
 	search?: Record<string, unknown>;
 	params: { param1: _Prim; param2: _Prim };
 	response: unknown;
 }
+
 const makeWorldParam1Param2GetRequest = (
 	args: ExtractArgs<WorldParam1Param2GetModel>,
 ) => {
@@ -53,11 +62,13 @@ const makeWorldParam1Param2GetRequest = (
 		search: args.search,
 	};
 };
+
 interface LalalaParam1Param2GetModel {
 	search?: Record<string, unknown>;
 	params: { param1: _Prim; param2: _Prim };
 	response: unknown;
 }
+
 const makeLalalaParam1Param2GetRequest = (
 	args: ExtractArgs<LalalaParam1Param2GetModel>,
 ) => {
@@ -67,11 +78,13 @@ const makeLalalaParam1Param2GetRequest = (
 		search: args.search,
 	};
 };
+
 interface YesyesParam2GetModel {
 	search?: Record<string, unknown>;
 	params: { param2: _Prim };
 	response: unknown;
 }
+
 const makeYesyesParam2GetRequest = (
 	args: ExtractArgs<YesyesParam2GetModel>,
 ) => {
@@ -81,11 +94,13 @@ const makeYesyesParam2GetRequest = (
 		search: args.search,
 	};
 };
+
 interface OkayParam1LetsgoGetModel {
 	search?: Record<string, unknown>;
 	params: { param1: _Prim };
 	response: unknown;
 }
+
 const makeOkayParam1LetsgoGetRequest = (
 	args: ExtractArgs<OkayParam1LetsgoGetModel>,
 ) => {
@@ -95,11 +110,13 @@ const makeOkayParam1LetsgoGetRequest = (
 		search: args.search,
 	};
 };
+
 interface DenemeParam1Param2GetModel {
 	search?: Record<string, unknown>;
 	params: { param1: _Prim; param2: _Prim };
 	response: unknown;
 }
+
 const makeDenemeParam1Param2GetRequest = (
 	args: ExtractArgs<DenemeParam1Param2GetModel>,
 ) => {
@@ -109,10 +126,12 @@ const makeDenemeParam1Param2GetRequest = (
 		search: args.search,
 	};
 };
+
 interface WeGotThisGetModel {
 	search?: Record<string, unknown>;
 	response: unknown;
 }
+
 const makeWeGotThisGetRequest = (args: ExtractArgs<WeGotThisGetModel>) => {
 	return {
 		endpoint: "/we/got/this",
@@ -120,10 +139,12 @@ const makeWeGotThisGetRequest = (args: ExtractArgs<WeGotThisGetModel>) => {
 		search: args.search,
 	};
 };
+
 interface OhmyohmyGetModel {
 	search?: Record<string, unknown>;
 	response: unknown;
 }
+
 const makeOhmyohmyGetRequest = (args: ExtractArgs<OhmyohmyGetModel>) => {
 	return {
 		endpoint: "/ohmyohmy",
@@ -131,10 +152,12 @@ const makeOhmyohmyGetRequest = (args: ExtractArgs<OhmyohmyGetModel>) => {
 		search: args.search,
 	};
 };
+
 interface _2brosGetModel {
 	search?: Record<string, unknown>;
 	response: unknown;
 }
+
 const make_2brosGetRequest = (args: ExtractArgs<_2brosGetModel>) => {
 	return {
 		endpoint: "/2bros",
@@ -142,10 +165,12 @@ const make_2brosGetRequest = (args: ExtractArgs<_2brosGetModel>) => {
 		search: args.search,
 	};
 };
+
 interface ChillinInAHottubGetModel {
 	search?: Record<string, unknown>;
 	response: unknown;
 }
+
 const makeChillinInAHottubGetRequest = (
 	args: ExtractArgs<ChillinInAHottubGetModel>,
 ) => {
@@ -155,10 +180,12 @@ const makeChillinInAHottubGetRequest = (
 		search: args.search,
 	};
 };
+
 interface _5FeetApartCuzTheyreNotGayGetModel {
 	search?: Record<string, unknown>;
 	response: unknown;
 }
+
 const make_5FeetApartCuzTheyreNotGayGetRequest = (
 	args: ExtractArgs<_5FeetApartCuzTheyreNotGayGetModel>,
 ) => {
@@ -168,11 +195,13 @@ const make_5FeetApartCuzTheyreNotGayGetRequest = (
 		search: args.search,
 	};
 };
+
 interface Verywild_GetModel {
 	search?: Record<string, unknown>;
 	params: { "*": _Prim };
 	response: unknown;
 }
+
 const makeVerywild_GetRequest = (args: ExtractArgs<Verywild_GetModel>) => {
 	return {
 		endpoint: `/verywild/${String(args.params["*"])}`,
@@ -180,11 +209,13 @@ const makeVerywild_GetRequest = (args: ExtractArgs<Verywild_GetModel>) => {
 		search: args.search,
 	};
 };
+
 interface Craaaazy_GetModel {
 	search?: Record<string, unknown>;
 	params: { "*": _Prim };
 	response: unknown;
 }
+
 const makeCraaaazy_GetRequest = (args: ExtractArgs<Craaaazy_GetModel>) => {
 	return {
 		endpoint: `/craaaazy/${String(args.params["*"])}`,
@@ -192,6 +223,7 @@ const makeCraaaazy_GetRequest = (args: ExtractArgs<Craaaazy_GetModel>) => {
 		search: args.search,
 	};
 };
+
 interface UsersPostModel {
 	body: {
 		address: { city: string; country: string; zip?: string };
@@ -212,6 +244,7 @@ interface UsersPostModel {
 		updatedAt: string;
 	};
 }
+
 const makeUsersPostRequest = (args: ExtractArgs<UsersPostModel>) => {
 	return {
 		endpoint: "/users",
@@ -220,6 +253,7 @@ const makeUsersPostRequest = (args: ExtractArgs<UsersPostModel>) => {
 		body: args.body,
 	};
 };
+
 interface UsersGetModel {
 	search: {
 		limit: unknown;
@@ -229,6 +263,7 @@ interface UsersGetModel {
 	};
 	response: unknown;
 }
+
 const makeUsersGetRequest = (args: ExtractArgs<UsersGetModel>) => {
 	return {
 		endpoint: "/users",
@@ -236,6 +271,7 @@ const makeUsersGetRequest = (args: ExtractArgs<UsersGetModel>) => {
 		search: args.search,
 	};
 };
+
 interface UsersIdGetModel {
 	search?: Record<string, unknown>;
 	params: { id: string };
@@ -250,6 +286,7 @@ interface UsersIdGetModel {
 		updatedAt: string;
 	};
 }
+
 const makeUsersIdGetRequest = (args: ExtractArgs<UsersIdGetModel>) => {
 	return {
 		endpoint: `/users/${String(args.params.id)}`,
@@ -257,6 +294,7 @@ const makeUsersIdGetRequest = (args: ExtractArgs<UsersIdGetModel>) => {
 		search: args.search,
 	};
 };
+
 interface UsersIdPutModel {
 	body: {
 		address: { city: string; country: string; zip?: string };
@@ -278,6 +316,7 @@ interface UsersIdPutModel {
 		updatedAt: string;
 	};
 }
+
 const makeUsersIdPutRequest = (args: ExtractArgs<UsersIdPutModel>) => {
 	return {
 		endpoint: `/users/${String(args.params.id)}`,
@@ -286,11 +325,13 @@ const makeUsersIdPutRequest = (args: ExtractArgs<UsersIdPutModel>) => {
 		body: args.body,
 	};
 };
+
 interface UsersIdDeleteModel {
 	search?: Record<string, unknown>;
 	params: { id: string };
 	response: unknown;
 }
+
 const makeUsersIdDeleteRequest = (args: ExtractArgs<UsersIdDeleteModel>) => {
 	return {
 		endpoint: `/users/${String(args.params.id)}`,
@@ -298,6 +339,7 @@ const makeUsersIdDeleteRequest = (args: ExtractArgs<UsersIdDeleteModel>) => {
 		search: args.search,
 	};
 };
+
 interface UsersIdPostsPostModel {
 	body: {
 		content: string;
@@ -326,6 +368,7 @@ interface UsersIdPostsPostModel {
 		updatedAt: string;
 	};
 }
+
 const makeUsersIdPostsPostRequest = (
 	args: ExtractArgs<UsersIdPostsPostModel>,
 ) => {
@@ -336,6 +379,7 @@ const makeUsersIdPostsPostRequest = (
 		body: args.body,
 	};
 };
+
 interface OrgsPostModel {
 	body: {
 		name: string;
@@ -346,6 +390,7 @@ interface OrgsPostModel {
 	search?: Record<string, unknown>;
 	response: unknown;
 }
+
 const makeOrgsPostRequest = (args: ExtractArgs<OrgsPostModel>) => {
 	return {
 		endpoint: "/orgs",
@@ -354,11 +399,13 @@ const makeOrgsPostRequest = (args: ExtractArgs<OrgsPostModel>) => {
 		body: args.body,
 	};
 };
+
 interface OrgsOrgIdMembersGetModel {
 	search: { limit: unknown; page: unknown };
 	params: { orgId: string };
 	response: unknown;
 }
+
 const makeOrgsOrgIdMembersGetRequest = (
 	args: ExtractArgs<OrgsOrgIdMembersGetModel>,
 ) => {
@@ -368,6 +415,7 @@ const makeOrgsOrgIdMembersGetRequest = (
 		search: args.search,
 	};
 };
+
 interface OrgsOrgIdMembersMemberIdPutModel {
 	body: {
 		role: "admin" | "editor" | "viewer";
@@ -377,6 +425,7 @@ interface OrgsOrgIdMembersMemberIdPutModel {
 	params: { memberId: string; orgId: string };
 	response: unknown;
 }
+
 const makeOrgsOrgIdMembersMemberIdPutRequest = (
 	args: ExtractArgs<OrgsOrgIdMembersMemberIdPutModel>,
 ) => {
@@ -387,11 +436,13 @@ const makeOrgsOrgIdMembersMemberIdPutRequest = (
 		body: args.body,
 	};
 };
+
 interface OrgsOrgIdMembersMemberIdDeleteModel {
 	search?: Record<string, unknown>;
 	params: { memberId: string; orgId: string };
 	response: unknown;
 }
+
 const makeOrgsOrgIdMembersMemberIdDeleteRequest = (
 	args: ExtractArgs<OrgsOrgIdMembersMemberIdDeleteModel>,
 ) => {
@@ -401,8 +452,10 @@ const makeOrgsOrgIdMembersMemberIdDeleteRequest = (
 		search: args.search,
 	};
 };
+
 class CorpusApi {
 	constructor(public readonly baseUrl: string) {}
+
 	public fetchFn: <R = unknown>(args: ReqArgs) => Promise<R> = async (args) => {
 		const url = new URL(args.endpoint, this.baseUrl);
 		const headers = new Headers(args.headers);
@@ -427,9 +480,11 @@ class CorpusApi {
 		const res = await fetch(url, { method, headers, body, ...args.init });
 		return await C.Parser.parseBody(res);
 	};
+
 	public setFetchFn(cb: <R = unknown>(args: ReqArgs) => Promise<R>) {
 		return (this.fetchFn = cb);
 	}
+
 	public readonly endpoints = {
 		param1Param2Get: (p: ExtractArgs<Param1Param2GetModel>["params"]) =>
 			`/${String(p.param1)}/${String(p.param2)}`,
@@ -483,6 +538,7 @@ class CorpusApi {
 			makeParam1Param2GetRequest(args),
 		);
 	};
+
 	public helloParam1Param2Get = (
 		args: ExtractArgs<HelloParam1Param2GetModel>,
 	) => {
@@ -490,6 +546,7 @@ class CorpusApi {
 			makeHelloParam1Param2GetRequest(args),
 		);
 	};
+
 	public worldParam1Param2Get = (
 		args: ExtractArgs<WorldParam1Param2GetModel>,
 	) => {
@@ -497,6 +554,7 @@ class CorpusApi {
 			makeWorldParam1Param2GetRequest(args),
 		);
 	};
+
 	public lalalaParam1Param2Get = (
 		args: ExtractArgs<LalalaParam1Param2GetModel>,
 	) => {
@@ -504,11 +562,13 @@ class CorpusApi {
 			makeLalalaParam1Param2GetRequest(args),
 		);
 	};
+
 	public yesyesParam2Get = (args: ExtractArgs<YesyesParam2GetModel>) => {
 		return this.fetchFn<YesyesParam2GetModel["response"]>(
 			makeYesyesParam2GetRequest(args),
 		);
 	};
+
 	public okayParam1LetsgoGet = (
 		args: ExtractArgs<OkayParam1LetsgoGetModel>,
 	) => {
@@ -516,6 +576,7 @@ class CorpusApi {
 			makeOkayParam1LetsgoGetRequest(args),
 		);
 	};
+
 	public denemeParam1Param2Get = (
 		args: ExtractArgs<DenemeParam1Param2GetModel>,
 	) => {
@@ -523,19 +584,23 @@ class CorpusApi {
 			makeDenemeParam1Param2GetRequest(args),
 		);
 	};
+
 	public weGotThisGet = (args: ExtractArgs<WeGotThisGetModel>) => {
 		return this.fetchFn<WeGotThisGetModel["response"]>(
 			makeWeGotThisGetRequest(args),
 		);
 	};
+
 	public ohmyohmyGet = (args: ExtractArgs<OhmyohmyGetModel>) => {
 		return this.fetchFn<OhmyohmyGetModel["response"]>(
 			makeOhmyohmyGetRequest(args),
 		);
 	};
+
 	public _2brosGet = (args: ExtractArgs<_2brosGetModel>) => {
 		return this.fetchFn<_2brosGetModel["response"]>(make_2brosGetRequest(args));
 	};
+
 	public chillinInAHottubGet = (
 		args: ExtractArgs<ChillinInAHottubGetModel>,
 	) => {
@@ -543,6 +608,7 @@ class CorpusApi {
 			makeChillinInAHottubGetRequest(args),
 		);
 	};
+
 	public _5FeetApartCuzTheyreNotGayGet = (
 		args: ExtractArgs<_5FeetApartCuzTheyreNotGayGetModel>,
 	) => {
@@ -550,45 +616,55 @@ class CorpusApi {
 			make_5FeetApartCuzTheyreNotGayGetRequest(args),
 		);
 	};
+
 	public verywild_Get = (args: ExtractArgs<Verywild_GetModel>) => {
 		return this.fetchFn<Verywild_GetModel["response"]>(
 			makeVerywild_GetRequest(args),
 		);
 	};
+
 	public craaaazy_Get = (args: ExtractArgs<Craaaazy_GetModel>) => {
 		return this.fetchFn<Craaaazy_GetModel["response"]>(
 			makeCraaaazy_GetRequest(args),
 		);
 	};
+
 	public usersPost = (args: ExtractArgs<UsersPostModel>) => {
 		return this.fetchFn<UsersPostModel["response"]>(makeUsersPostRequest(args));
 	};
+
 	public usersGet = (args: ExtractArgs<UsersGetModel>) => {
 		return this.fetchFn<UsersGetModel["response"]>(makeUsersGetRequest(args));
 	};
+
 	public usersIdGet = (args: ExtractArgs<UsersIdGetModel>) => {
 		return this.fetchFn<UsersIdGetModel["response"]>(
 			makeUsersIdGetRequest(args),
 		);
 	};
+
 	public usersIdPut = (args: ExtractArgs<UsersIdPutModel>) => {
 		return this.fetchFn<UsersIdPutModel["response"]>(
 			makeUsersIdPutRequest(args),
 		);
 	};
+
 	public usersIdDelete = (args: ExtractArgs<UsersIdDeleteModel>) => {
 		return this.fetchFn<UsersIdDeleteModel["response"]>(
 			makeUsersIdDeleteRequest(args),
 		);
 	};
+
 	public usersIdPostsPost = (args: ExtractArgs<UsersIdPostsPostModel>) => {
 		return this.fetchFn<UsersIdPostsPostModel["response"]>(
 			makeUsersIdPostsPostRequest(args),
 		);
 	};
+
 	public orgsPost = (args: ExtractArgs<OrgsPostModel>) => {
 		return this.fetchFn<OrgsPostModel["response"]>(makeOrgsPostRequest(args));
 	};
+
 	public orgsOrgIdMembersGet = (
 		args: ExtractArgs<OrgsOrgIdMembersGetModel>,
 	) => {
@@ -596,6 +672,7 @@ class CorpusApi {
 			makeOrgsOrgIdMembersGetRequest(args),
 		);
 	};
+
 	public orgsOrgIdMembersMemberIdPut = (
 		args: ExtractArgs<OrgsOrgIdMembersMemberIdPutModel>,
 	) => {
@@ -603,6 +680,7 @@ class CorpusApi {
 			makeOrgsOrgIdMembersMemberIdPutRequest(args),
 		);
 	};
+
 	public orgsOrgIdMembersMemberIdDelete = (
 		args: ExtractArgs<OrgsOrgIdMembersMemberIdDeleteModel>,
 	) => {
@@ -612,6 +690,8 @@ class CorpusApi {
 	};
 }
 export type {
+	_Prim,
+	ExtractArgs,
 	ReqArgs,
 	Param1Param2GetModel,
 	HelloParam1Param2GetModel,
@@ -638,6 +718,7 @@ export type {
 	OrgsOrgIdMembersMemberIdPutModel,
 	OrgsOrgIdMembersMemberIdDeleteModel,
 };
+
 export {
 	makeParam1Param2GetRequest,
 	makeHelloParam1Param2GetRequest,

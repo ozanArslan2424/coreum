@@ -5,31 +5,31 @@ import { unlinkSync, readFileSync, writeFileSync } from "node:fs";
 describe("Writer core", () => {
 	it("write joins with newline by default", () => {
 		const w = new Writer();
-		w.append("a", "b");
+		w.line("a", "b");
 		expect(w.read()).toBe("a\nb");
 	});
 
 	it("write joins with custom separator", () => {
 		const w = new Writer();
-		w.append("a", "b");
+		w.line("a", "b");
 		expect(w.read("")).toBe("ab");
 	});
 
 	it("append adds tabs based on indent level", () => {
 		const w = new Writer(2);
-		w.append("x");
+		w.line("x");
 		expect(w.read()).toBe("\t\tx");
 	});
 
 	it("appendRaw skips indentation", () => {
 		const w = new Writer(2);
-		w.appendRaw("raw");
+		w.raw("raw");
 		expect(w.read()).toBe("raw");
 	});
 
 	it("inline appends to last line", () => {
 		const w = new Writer();
-		w.append("hello");
+		w.line("hello");
 		w.inline(" world");
 		expect(w.read()).toBe("hello world");
 	});
@@ -72,15 +72,15 @@ describe("Writer core", () => {
 
 	it("interfaces set is populated by $interface", () => {
 		const w = new Writer();
-		w.$interface({ variant: "interface", name: "MyInterface", body: () => {} });
+		w.$interface({ name: "MyInterface", body: () => {} });
 		expect(w.interfaces.has("MyInterface")).toBe(true);
 	});
 
 	it("writeToFilePath writes incrementally", () => {
 		const path = "/tmp/writer-incremental-test.ts";
 		const w = new Writer(path);
-		w.append(`const x = 1;`);
-		w.append(`const y = 2;`);
+		w.line(`const x = 1;`);
+		w.line(`const y = 2;`);
 		expect(readFileSync(path, "utf-8")).toContain(`const x = 1;`);
 		expect(readFileSync(path, "utf-8")).toContain(`const y = 2;`);
 		unlinkSync(path);
@@ -89,7 +89,7 @@ describe("Writer core", () => {
 	it("writeToFilePath inline patches last line", () => {
 		const path = "/tmp/writer-inline-test.ts";
 		const w = new Writer(path);
-		w.append(`const x`);
+		w.line(`const x`);
 		w.inline(` = 1;`);
 		expect(readFileSync(path, "utf-8")).toContain(`const x = 1;`);
 		unlinkSync(path);
@@ -140,64 +140,24 @@ describe("$var", () => {
 	});
 });
 
-describe("$array", () => {
-	it("const array without type", () => {
-		const w = new Writer();
-		w.$array({ variant: "const", name: "arr", items: ["1", "2", "3"] });
-		expect(w.read()).toBe("const arr = [1, 2, 3];");
-	});
-
-	it("const array with type", () => {
-		const w = new Writer();
-		w.$array({
-			variant: "const",
-			name: "arr",
-			type: "number",
-			items: ["1", "2"],
-		});
-		expect(w.read()).toBe("const arr: number[] = [1, 2];");
-	});
-
-	it("let array", () => {
-		const w = new Writer();
-		w.$array({ variant: "let", name: "arr", items: ["'a'", "'b'"] });
-		expect(w.read()).toBe("let arr = ['a', 'b'];");
-	});
-
-	it("anon array", () => {
-		const w = new Writer();
-		w.$array({ variant: "anon", items: ["x", "y"] });
-		expect(w.read()).toBe("[x, y]");
-	});
-
-	it("adds to variables set", () => {
-		const w = new Writer();
-		w.$array({ variant: "const", name: "arr", items: [] });
-		expect(w.variables.has("arr")).toBe(true);
-	});
-});
-
 describe("$return", () => {
 	it("void return", () => {
 		const w = new Writer();
-		w.$return({ variant: "void" });
+		w.$return("");
 		expect(w.read()).toBe("return;");
 	});
 
 	it("value return", () => {
 		const w = new Writer();
-		w.$return({ variant: "value", value: "42" });
+		w.$return("42");
 		expect(w.read()).toBe("return 42;");
 	});
 
 	it("object return", () => {
 		const w = new Writer();
-		w.$return({
-			variant: "object",
-			body: (w) => {
-				w.pair("a", "1");
-				w.pair("b", "2");
-			},
+		w.$return((w) => {
+			w.pair("a", "1");
+			w.pair("b", "2");
 		});
 		const result = w.read();
 		expect(result).toContain("return {");
@@ -309,7 +269,7 @@ describe("$if", () => {
 	it("simple if", () => {
 		const w = new Writer();
 		w.$if("x > 0").then((w) => {
-			w.append("return x;");
+			w.line("return x;");
 		});
 		const result = w.read();
 		expect(result).toContain("if (x > 0) {");
@@ -320,7 +280,7 @@ describe("$if", () => {
 	it("if with multiple conditions", () => {
 		const w = new Writer();
 		w.$if("x > 0", "&&", "x < 10").then((w) => {
-			w.append("ok();");
+			w.line("ok();");
 		});
 		expect(w.read()).toContain("if (x > 0 && x < 10) {");
 	});
@@ -329,10 +289,10 @@ describe("$if", () => {
 		const w = new Writer();
 		w.$if("x")
 			.then((w) => {
-				w.append("a();");
+				w.line("a();");
 			})
 			.else((w) => {
-				w.append("b();");
+				w.line("b();");
 			});
 		const result = w.read();
 		expect(result).toContain("if (x) {");
@@ -345,14 +305,14 @@ describe("$if", () => {
 		const w = new Writer();
 		w.$if("x === 1")
 			.then((w) => {
-				w.append("one();");
+				w.line("one();");
 			})
 			.elseif("x === 2")
 			.then((w) => {
-				w.append("two();");
+				w.line("two();");
 			})
 			.else((w) => {
-				w.append("other();");
+				w.line("other();");
 			});
 		const result = w.read();
 		expect(result).toContain("if (x === 1) {");
@@ -365,7 +325,7 @@ describe("$for", () => {
 	it("for..of loop", () => {
 		const w = new Writer();
 		w.$for(["const", "item", "of", "items"], (w) => {
-			w.append("use(item);");
+			w.line("use(item);");
 		});
 		const result = w.read();
 		expect(result).toContain("for (const item of items) {");
@@ -376,7 +336,7 @@ describe("$for", () => {
 	it("for..in loop", () => {
 		const w = new Writer();
 		w.$for(["const", "key", "in", "obj"], (w) => {
-			w.append("log(key);");
+			w.line("log(key);");
 		});
 		expect(w.read()).toContain("for (const key in obj) {");
 	});
@@ -390,13 +350,13 @@ describe("$switch", () => {
 			{
 				condition: `"a"`,
 				body: (w) => {
-					w.append(`doA();`);
+					w.line(`doA();`);
 				},
 			},
 			{
 				condition: `"b"`,
 				body: (w) => {
-					w.append(`doB();`);
+					w.line(`doB();`);
 				},
 			},
 		);
@@ -413,7 +373,7 @@ describe("$switch", () => {
 		w.$switch("x", {
 			condition: `"a"`,
 			body: (w) => {
-				w.append(`fall();`);
+				w.line(`fall();`);
 			},
 			break: false,
 		});
@@ -424,7 +384,7 @@ describe("$switch", () => {
 		const w = new Writer();
 		w.$switch("x", {
 			condition: "default",
-			body: (w) => w.append("noop();"),
+			body: (w) => w.line("noop();"),
 		});
 		const result = w.read();
 		expect(result).toContain("default: {");
@@ -437,7 +397,7 @@ describe("$tryCatch", () => {
 		const w = new Writer();
 		w.$tryCatch({
 			try: (w) => {
-				w.append("risky();");
+				w.line("risky();");
 			},
 		});
 		const result = w.read();
@@ -451,11 +411,11 @@ describe("$tryCatch", () => {
 		const w = new Writer();
 		w.$tryCatch({
 			try: (w) => {
-				w.append("risky();");
+				w.line("risky();");
 			},
 			catch: {
 				body: (w) => {
-					w.append("handle(e);");
+					w.line("handle(e);");
 				},
 			},
 		});
@@ -468,12 +428,12 @@ describe("$tryCatch", () => {
 		const w = new Writer();
 		w.$tryCatch({
 			try: (w) => {
-				w.append("x();");
+				w.line("x();");
 			},
 			catch: {
 				arg: "err",
 				body: (w) => {
-					w.append("log(err);");
+					w.line("log(err);");
 				},
 			},
 		});
@@ -484,15 +444,15 @@ describe("$tryCatch", () => {
 		const w = new Writer();
 		w.$tryCatch({
 			try: (w) => {
-				w.append("x();");
+				w.line("x();");
 			},
 			catch: {
 				body: (w) => {
-					w.append("y();");
+					w.line("y();");
 				},
 			},
 			finally: (w) => {
-				w.append("cleanup();");
+				w.line("cleanup();");
 			},
 		});
 		const result = w.read();
@@ -505,10 +465,9 @@ describe("$function", () => {
 	it("function declaration", () => {
 		const w = new Writer();
 		w.$function({
-			variant: "function",
 			name: "greet",
 			body: (w) => {
-				w.append(`return "hi";`);
+				w.line(`return "hi";`);
 			},
 		});
 		const result = w.read();
@@ -521,7 +480,6 @@ describe("$function", () => {
 	it("async function declaration", () => {
 		const w = new Writer();
 		w.$function({
-			variant: "function",
 			name: "fetch",
 			isAsync: true,
 			body: () => {},
@@ -532,7 +490,6 @@ describe("$function", () => {
 	it("function with generics and return type", () => {
 		const w = new Writer();
 		w.$function({
-			variant: "function",
 			name: "id",
 			generics: ["T"],
 			type: "T",
@@ -547,13 +504,13 @@ describe("$function", () => {
 
 	it("const arrow function", () => {
 		const w = new Writer();
-		w.$function({
-			variant: "const",
+		w.$arrow({
+			keyword: "const",
 			name: "add",
 			args: ["a: number", "b: number"],
 			type: "number",
 			body: (w) => {
-				w.append("return a + b;");
+				w.line("return a + b;");
 			},
 		});
 		const result = w.read();
@@ -564,12 +521,11 @@ describe("$function", () => {
 
 	it("method", () => {
 		const w = new Writer();
-		w.$function({
-			variant: "method",
+		w.$method({
 			name: "run",
 			keyword: "public",
 			body: (w) => {
-				w.append("this.go();");
+				w.line("this.go();");
 			},
 		});
 		const result = w.read();
@@ -580,7 +536,7 @@ describe("$function", () => {
 
 	it("constMethod", () => {
 		const w = new Writer();
-		w.$function({ variant: "constMethod", name: "handler", body: () => {} });
+		w.$arrowMethod({ name: "handler", body: () => {} });
 		const result = w.read();
 		expect(result).toContain("handler");
 		expect(result).toContain("=>");
@@ -588,7 +544,7 @@ describe("$function", () => {
 
 	it("abstractMethod has no body", () => {
 		const w = new Writer();
-		w.$function({ variant: "abstractMethod", name: "run", keyword: "public" });
+		w.$abstractMethod({ name: "run", keyword: "public" });
 		const result = w.read();
 		expect(result).toContain("abstract");
 		expect(result).toContain("run");
@@ -596,50 +552,8 @@ describe("$function", () => {
 
 	it("adds to variables set", () => {
 		const w = new Writer();
-		w.$function({ variant: "const", name: "myFn", body: () => {} });
+		w.$arrow({ keyword: "const", name: "myFn", body: () => {} });
 		expect(w.variables.has("myFn")).toBe(true);
-	});
-});
-
-describe("$object", () => {
-	it("const object", () => {
-		const w = new Writer();
-		w.$object({
-			variant: "const",
-			name: "config",
-			body: (w) => {
-				w.pair("debug", "true");
-			},
-		});
-		const result = w.read();
-		expect(result).toContain("const config");
-		expect(result).toContain("debug: true,");
-		expect(result).toContain("};");
-	});
-
-	it("objectMember", () => {
-		const w = new Writer();
-		w.$object({ variant: "objectMember", name: "meta", body: () => {} });
-		expect(w.read()).toContain("meta: {");
-	});
-
-	it("classMember with keyword", () => {
-		const w = new Writer();
-		w.$object({
-			variant: "classMember",
-			name: "state",
-			keyword: "private readonly",
-			body: () => {},
-		});
-		expect(w.read()).toContain("private readonly state = {");
-	});
-
-	it("anon object no semicolon", () => {
-		const w = new Writer();
-		w.$object({ variant: "anon", body: () => {} });
-		const result = w.read();
-		expect(result).toContain("{");
-		expect(result).not.toContain("};");
 	});
 });
 
@@ -684,7 +598,7 @@ describe("$class", () => {
 			constr: {
 				args: [{ keyword: "private", key: "name", type: "string" }],
 				body: (w) => {
-					w.append("this.init();");
+					w.line("this.init();");
 				},
 			},
 			body: () => {},
@@ -699,7 +613,7 @@ describe("$class", () => {
 		w.$class({
 			name: "X",
 			body: (w) => {
-				w.$function({ variant: "method", name: "go", body: () => {} });
+				w.$method({ name: "go", body: () => {} });
 			},
 		});
 		expect(w.read()).toContain("go");
@@ -716,10 +630,9 @@ describe("$interface", () => {
 	it("interface declaration", () => {
 		const w = new Writer();
 		w.$interface({
-			variant: "interface",
 			name: "IFoo",
 			body: (w) => {
-				w.append("x: number;");
+				w.line("x: number;");
 			},
 		});
 		const result = w.read();
@@ -729,14 +642,13 @@ describe("$interface", () => {
 
 	it("type alias", () => {
 		const w = new Writer();
-		w.$interface({ variant: "type", name: "MyType", body: () => {} });
+		w.$interface({ keyword: "type", name: "MyType", body: () => {} });
 		expect(w.read()).toContain("type MyType =");
 	});
 
 	it("interface with generics", () => {
 		const w = new Writer();
 		w.$interface({
-			variant: "interface",
 			name: "Repo",
 			generics: ["T"],
 			body: () => {},
@@ -744,22 +656,9 @@ describe("$interface", () => {
 		expect(w.read()).toContain("Repo<T>");
 	});
 
-	it("anon interface", () => {
-		const w = new Writer();
-		w.$interface({
-			variant: "anon",
-			body: (w) => {
-				w.append("id: string;");
-			},
-		});
-		const result = w.read();
-		expect(result).toContain("{");
-		expect(result).toContain("id: string;");
-	});
-
 	it("adds to interfaces set", () => {
 		const w = new Writer();
-		w.$interface({ variant: "interface", name: "IBar", body: () => {} });
+		w.$interface({ keyword: "interface", name: "IBar", body: () => {} });
 		expect(w.interfaces.has("IBar")).toBe(true);
 	});
 });
@@ -768,14 +667,12 @@ describe("nested Writers", () => {
 	it("nested indent is correct", () => {
 		const w = new Writer(0);
 		w.$function({
-			variant: "function",
 			name: "outer",
 			body: (inner) => {
 				inner.$function({
-					variant: "function",
 					name: "inner",
 					body: (innermost) => {
-						innermost.append("return 1;");
+						innermost.line("return 1;");
 					},
 				});
 			},

@@ -38,7 +38,7 @@ export function writeControllerFile(c: Config, m: ModuleInterface) {
 					const mm = m.model.name;
 					const g = v ? "" : `<unknown, unknown, ${mt}["get"]["params"]>`;
 					const e = v ? `, ${mm}.get)` : ")";
-					w.append(
+					w.line(
 						`this.route${g}("/:id", (c) => this.service.get(c.params)${e}`,
 					);
 				},
@@ -51,9 +51,7 @@ export function writeControllerFile(c: Config, m: ModuleInterface) {
 					const mm = m.model.name;
 					const g = v ? "" : `<unknown, ${mt}["list"]["search"]>`;
 					const e = v ? `, ${mm}.list)` : ")";
-					w.append(
-						`this.route${g}("/", (c) => this.service.list(c.search)${e}`,
-					);
+					w.line(`this.route${g}("/", (c) => this.service.list(c.search)${e}`);
 				},
 			});
 			w.$member({
@@ -64,7 +62,7 @@ export function writeControllerFile(c: Config, m: ModuleInterface) {
 					const mm = m.model.name;
 					const g = v ? "" : `<${mt}["create"]["body"]>`;
 					const e = v ? `, ${mm}.create)` : ")";
-					w.append(
+					w.line(
 						`this.route${g}({ method: "POST", path: "/" }, (c) => this.service.create(c.body)${e}`,
 					);
 				},
@@ -79,7 +77,7 @@ export function writeControllerFile(c: Config, m: ModuleInterface) {
 						? ""
 						: `<${mt}["update"]["body"], unknown, ${mt}["update"]["params"]>`;
 					const e = v ? `, ${mm}.update)` : ")";
-					w.append(
+					w.line(
 						`this.route${g}({ method: "PUT", path: "/:id" }, (c) => this.service.update(c.params, c.body)${e}`,
 					);
 				},

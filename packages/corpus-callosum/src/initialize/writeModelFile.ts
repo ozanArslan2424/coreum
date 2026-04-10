@@ -10,9 +10,8 @@ export function writeModelFile(c: Config, m: ModuleInterface): string {
 		w.$interface({
 			isExported: true,
 			name: m.modelTypeName,
-			variant: "interface",
 			body: (w) => {
-				w.append(
+				w.line(
 					`entity: { id: string, name: string }`,
 					`get: { params: { id: string }, response: ${m.modelTypeName}["entity"] }`,
 					`list: { search: { page?: string, limit?: string }, response: [${m.modelTypeName}["entity"]] }`,
@@ -27,10 +26,6 @@ export function writeModelFile(c: Config, m: ModuleInterface): string {
 	}
 
 	w.$import({ keys: ["X"], from: c.pkgPath });
-
-	w.append(
-		`export type ${m.modelTypeName} = X.InferModel<typeof ${m.model.name}>`,
-	);
 
 	let schemas = {
 		entity: ``,
@@ -94,6 +89,11 @@ export function writeModelFile(c: Config, m: ModuleInterface): string {
 			break;
 	}
 
+	w.$type({
+		isExported: true,
+		name: m.modelTypeName,
+		value: `X.InferModel<typeof ${m.model.name}>`,
+	});
 	w.$class({
 		isExported: true,
 		name: m.model.name,

@@ -19,6 +19,7 @@ export function writeDatabaseFile(
 		name: database.name,
 		body: (w) => {
 			w.$member({
+				keyword: "public readonly",
 				name: "examples",
 				type: `Map<string, ${m.modelTypeName}["entity"]>`,
 				value: "new Map()",

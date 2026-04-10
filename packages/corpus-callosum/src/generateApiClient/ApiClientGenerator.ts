@@ -77,15 +77,18 @@ export class ApiClientGenerator {
 				from: this.pkgPath,
 			});
 		}
+		w.line("");
+		w.$type({ name: "_Prim", value: "string | number | boolean" });
 
-		w.append(`type _Prim = string | number | boolean;`);
+		w.line("");
+		w.$type({
+			name: "ExtractArgs",
+			generics: ["T"],
+			value: `(Omit<T, "response"> extends infer U ? { [K in keyof U as U[K] extends undefined ? never : K]: U[K] } : never) & { headers?: HeadersInit; init?: RequestInit }`,
+		});
 
-		w.append(
-			`type ExtractArgs<T> = (Omit<T, "response"> extends infer U ? { [K in keyof U as U[K] extends undefined ? never : K]: U[K] } : never) & { headers?: HeadersInit; init?: RequestInit };`,
-		);
-
+		w.line("");
 		w.$interface({
-			variant: "interface",
 			name: "ReqArgs",
 			body: (w) => {
 				w.pair("endpoint", "string");
@@ -100,35 +103,31 @@ export class ApiClientGenerator {
 		for (const r of map.values()) {
 			await this.writeModel(w, r.modelKey, r.params, r.model);
 
-			w.$function({
-				variant: "const",
+			w.$arrow({
 				name: r.funcKey,
 				args: [`args: ExtractArgs<${r.modelKey}>`],
 				body: (w) =>
-					w.$return({
-						variant: "object",
-						body: (w) => {
-							if (r.params.length === 0) {
-								w.pair("endpoint", `"${r.endpoint}"`);
-							} else {
-								w.pair(
-									"endpoint",
-									`\`${r.endpoint
-										.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
-										.map((part, i) => {
-											if (i % 2 === 1) return `\${String(args.params.${part})}`;
-											return part.replace("*", `\${String(args.params["*"])}`);
-										})
-										.join("")}\``,
-								);
-							}
+					w.$return((w) => {
+						if (r.params.length === 0) {
+							w.pair("endpoint", `"${r.endpoint}"`);
+						} else {
+							w.pair(
+								"endpoint",
+								`\`${r.endpoint
+									.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
+									.map((part, i) => {
+										if (i % 2 === 1) return `\${String(args.params.${part})}`;
+										return part.replace("*", `\${String(args.params["*"])}`);
+									})
+									.join("")}\``,
+							);
+						}
 
-							w.pair("method", `"${r.method}"`);
-							w.pair("search", `args.search`);
-							if (r.model?.body) {
-								w.pair("body", `args.body`);
-							}
-						},
+						w.pair("method", `"${r.method}"`);
+						w.pair("search", `args.search`);
+						if (r.model?.body) {
+							w.pair("body", `args.body`);
+						}
 					}),
 			});
 		}
@@ -142,25 +141,24 @@ export class ApiClientGenerator {
 					],
 				},
 				body: (w) => {
-					w.$function({
-						variant: "constMethod",
+					w.$arrowMethod({
 						keyword: "public",
 						isAsync: true,
 						name: "fetchFn",
 						type: "<R = unknown>(args: ReqArgs) => Promise<R>",
 						args: ["args"],
 						body: (w) => {
-							w.append(`const url = new URL(args.endpoint, this.baseUrl);`);
-							w.append(`const headers = new Headers(args.headers);`);
-							w.append(`const method: RequestInit["method"] = args.method;`);
-							w.append(`let body: RequestInit["body"];`);
+							w.line(`const url = new URL(args.endpoint, this.baseUrl);`);
+							w.line(`const headers = new Headers(args.headers);`);
+							w.line(`const method: RequestInit["method"] = args.method;`);
+							w.line(`let body: RequestInit["body"];`);
 
 							w.$if(`args.search`).then((w) => {
 								w.$for(
 									[`const`, `[key, val]`, `of`, `Object.entries(args.search)`],
 									(w) => {
-										w.$if(`val == null`).then((w) => w.append(`continue;`));
-										w.append(`url.searchParams.append(key, String(val));`);
+										w.$if(`val == null`).then((w) => w.line(`continue;`));
+										w.line(`url.searchParams.append(key, String(val));`);
 									},
 								);
 							});
@@ -171,33 +169,31 @@ export class ApiClientGenerator {
 									`||`,
 									`!headers.has("content-type")`,
 								).then((w) => {
-									w.append(`headers.set("Content-Type", "application/json");`);
+									w.line(`headers.set("Content-Type", "application/json");`);
 								});
-								w.append(`body = JSON.stringify(args.body);`);
+								w.line(`body = JSON.stringify(args.body);`);
 							});
 
-							w.append(
+							w.line(
 								`const res = await fetch(url, { method, headers, body, ...args.init });`,
 							);
-							w.append(`return await C.Parser.parseBody(res);`);
+							w.line(`return await C.Parser.parseBody(res);`);
 						},
 					});
 
-					w.$function({
-						variant: "method",
+					w.$method({
 						keyword: "public",
 						isAsync: false,
 						name: "setFetchFn",
 						args: ["cb: <R = unknown>(args: ReqArgs) => Promise<R>"],
-						body: (w) =>
-							w.$return({ variant: "value", value: `this.fetchFn = cb;` }),
+						body: (w) => w.$return("this.fetchFn = cb"),
 					});
 
-					w.$object({
-						variant: "classMember",
+					w.$member({
 						keyword: "public readonly",
 						name: "endpoints",
-						body: (w) => {
+						value: (w) => {
+							w.line("{");
 							for (const r of map.values()) {
 								w.pair(
 									r.key,
@@ -212,20 +208,19 @@ export class ApiClientGenerator {
 												.join("")}\``,
 								);
 							}
+							w.line("};");
 						},
 					});
 
 					for (const r of map.values()) {
-						w.$function({
-							variant: "constMethod",
+						w.$arrowMethod({
+							keyword: "public",
 							name: r.key,
 							args: [`args: ExtractArgs<${r.modelKey}>`],
 							body: (w) =>
-								w.$return({
-									variant: "value",
-									value: `this.fetchFn<${r.modelKey}["response"]>(${r.funcKey}(args))`,
-								}),
-							keyword: "public",
+								w.$return(
+									`this.fetchFn<${r.modelKey}["response"]>(${r.funcKey}(args))`,
+								),
 						});
 					}
 				},
@@ -236,6 +231,7 @@ export class ApiClientGenerator {
 		const types = Array.from(w.interfaces);
 
 		w.$export({ variant: "type", keys: types });
+		w.line("");
 
 		if (this.config.exportRoutesAs === "individual") {
 			w.$export({ variant: "obj", keys: consts });
@@ -339,7 +335,6 @@ export class ApiClientGenerator {
 		}
 
 		w.$interface({
-			variant: "interface",
 			name: modelKey,
 			body: (w) => {
 				for (const [key, val] of Object.entries(model)) {

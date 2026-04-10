@@ -1,5 +1,11 @@
 # @ozanarslan/corpus
 
+## 0.4.0
+
+### Minor Changes
+
+- go public
+
 ## 0.3.9
 
 ### Patch Changes

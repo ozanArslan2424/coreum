@@ -9,7 +9,7 @@ export function writesTypesFile(
 ) {
 	const w = new Writer(typesFilePath);
 
-	w.append(
+	w.line(
 		`import "${config.pkgPath}";`,
 		`import type { ${database.name} } from "${database.import(typesFilePath)}";`,
 		``,

@@ -16,21 +16,16 @@ export function writeRepositoryFile(c: Config, m: ModuleInterface) {
 		name: m.repository.name,
 		extends: "X.Repository",
 		body: (w) => {
-			w.$function({
-				variant: "method",
+			w.$method({
 				name: "findById",
 				args: [`id: ${m.modelTypeName}["entity"]["id"]`],
 				type: `${m.modelTypeName}["entity"] | null`,
 				body: (w) => {
-					w.$return({
-						variant: "value",
-						value: `this.db.examples.get(id) ?? null`,
-					});
+					w.$return(`this.db.examples.get(id) ?? null`);
 				},
 			});
 
-			w.$function({
-				variant: "method",
+			w.$method({
 				name: "findMany",
 				args: [`filters: { page?: number; limit?: number; }`],
 				type: `Array<${m.modelTypeName}["entity"]>`,
@@ -46,20 +41,18 @@ export function writeRepositoryFile(c: Config, m: ModuleInterface) {
 				},
 			});
 
-			w.$function({
-				variant: "method",
+			w.$method({
 				name: "create",
 				args: [`data: Omit<${m.modelTypeName}["entity"], "id">`],
 				type: `${m.modelTypeName}["entity"]`,
 				body: (w) => {
 					w.$const({ name: "id", value: "this.db.examples.size.toString()" });
-					w.append("this.db.examples.set(id, { id, name: data.name })");
+					w.line("this.db.examples.set(id, { id, name: data.name })");
 					w.$return("{ id, name: data.name }");
 				},
 			});
 
-			w.$function({
-				variant: "method",
+			w.$method({
 				name: "update",
 				args: [
 					`id: ${m.modelTypeName}["entity"]["id"]`,
@@ -70,13 +63,12 @@ export function writeRepositoryFile(c: Config, m: ModuleInterface) {
 					w.$const({ name: "exists", value: "this.db.examples.get(id)" });
 					w.$if("!exists").then((w) => w.$return("null"));
 					w.$const({ name: "newEntity", value: "{ ...exists, ...data }" });
-					w.append("this.db.examples.set(id, newEntity)");
+					w.line("this.db.examples.set(id, newEntity)");
 					w.$return("newEntity");
 				},
 			});
 
-			w.$function({
-				variant: "method",
+			w.$method({
 				name: "delete",
 				args: [`id: ${m.modelTypeName}["entity"]["id"]`],
 				type: `boolean`,
