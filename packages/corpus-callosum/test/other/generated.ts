@@ -453,31 +453,34 @@ const makeOrgsOrgIdMembersMemberIdDeleteRequest = (
 	};
 };
 
-interface Args {
-	param1Param2Get: ExtractArgs<Param1Param2GetModel>;
-	helloParam1Param2Get: ExtractArgs<HelloParam1Param2GetModel>;
-	worldParam1Param2Get: ExtractArgs<WorldParam1Param2GetModel>;
-	lalalaParam1Param2Get: ExtractArgs<LalalaParam1Param2GetModel>;
-	yesyesParam2Get: ExtractArgs<YesyesParam2GetModel>;
-	okayParam1LetsgoGet: ExtractArgs<OkayParam1LetsgoGetModel>;
-	denemeParam1Param2Get: ExtractArgs<DenemeParam1Param2GetModel>;
-	weGotThisGet: ExtractArgs<WeGotThisGetModel>;
-	ohmyohmyGet: ExtractArgs<OhmyohmyGetModel>;
-	_2brosGet: ExtractArgs<_2brosGetModel>;
-	chillinInAHottubGet: ExtractArgs<ChillinInAHottubGetModel>;
-	_5FeetApartCuzTheyreNotGayGet: ExtractArgs<_5FeetApartCuzTheyreNotGayGetModel>;
-	verywild_Get: ExtractArgs<Verywild_GetModel>;
-	craaaazy_Get: ExtractArgs<Craaaazy_GetModel>;
-	usersPost: ExtractArgs<UsersPostModel>;
-	usersGet: ExtractArgs<UsersGetModel>;
-	usersIdGet: ExtractArgs<UsersIdGetModel>;
-	usersIdPut: ExtractArgs<UsersIdPutModel>;
-	usersIdDelete: ExtractArgs<UsersIdDeleteModel>;
-	usersIdPostsPost: ExtractArgs<UsersIdPostsPostModel>;
-	orgsPost: ExtractArgs<OrgsPostModel>;
-	orgsOrgIdMembersGet: ExtractArgs<OrgsOrgIdMembersGetModel>;
-	orgsOrgIdMembersMemberIdPut: ExtractArgs<OrgsOrgIdMembersMemberIdPutModel>;
-	orgsOrgIdMembersMemberIdDelete: ExtractArgs<OrgsOrgIdMembersMemberIdDeleteModel>;
+namespace Args {
+	export type Param1Param2Get = ExtractArgs<Param1Param2GetModel>;
+	export type HelloParam1Param2Get = ExtractArgs<HelloParam1Param2GetModel>;
+	export type WorldParam1Param2Get = ExtractArgs<WorldParam1Param2GetModel>;
+	export type LalalaParam1Param2Get = ExtractArgs<LalalaParam1Param2GetModel>;
+	export type YesyesParam2Get = ExtractArgs<YesyesParam2GetModel>;
+	export type OkayParam1LetsgoGet = ExtractArgs<OkayParam1LetsgoGetModel>;
+	export type DenemeParam1Param2Get = ExtractArgs<DenemeParam1Param2GetModel>;
+	export type WeGotThisGet = ExtractArgs<WeGotThisGetModel>;
+	export type OhmyohmyGet = ExtractArgs<OhmyohmyGetModel>;
+	export type _2brosGet = ExtractArgs<_2brosGetModel>;
+	export type ChillinInAHottubGet = ExtractArgs<ChillinInAHottubGetModel>;
+	export type _5FeetApartCuzTheyreNotGayGet =
+		ExtractArgs<_5FeetApartCuzTheyreNotGayGetModel>;
+	export type Verywild_Get = ExtractArgs<Verywild_GetModel>;
+	export type Craaaazy_Get = ExtractArgs<Craaaazy_GetModel>;
+	export type UsersPost = ExtractArgs<UsersPostModel>;
+	export type UsersGet = ExtractArgs<UsersGetModel>;
+	export type UsersIdGet = ExtractArgs<UsersIdGetModel>;
+	export type UsersIdPut = ExtractArgs<UsersIdPutModel>;
+	export type UsersIdDelete = ExtractArgs<UsersIdDeleteModel>;
+	export type UsersIdPostsPost = ExtractArgs<UsersIdPostsPostModel>;
+	export type OrgsPost = ExtractArgs<OrgsPostModel>;
+	export type OrgsOrgIdMembersGet = ExtractArgs<OrgsOrgIdMembersGetModel>;
+	export type OrgsOrgIdMembersMemberIdPut =
+		ExtractArgs<OrgsOrgIdMembersMemberIdPutModel>;
+	export type OrgsOrgIdMembersMemberIdDelete =
+		ExtractArgs<OrgsOrgIdMembersMemberIdDeleteModel>;
 }
 
 class CorpusApi {

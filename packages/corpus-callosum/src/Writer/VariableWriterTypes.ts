@@ -12,4 +12,10 @@ export namespace VariableWriterTypes {
 	export type Let = Base;
 	export type Var = Base;
 	export type Type = Omit<Base, "type"> & { generics?: string[] };
+
+	export type Namespace = {
+		isExported?: boolean;
+		name: string;
+		body: B.BodyWriter;
+	};
 }

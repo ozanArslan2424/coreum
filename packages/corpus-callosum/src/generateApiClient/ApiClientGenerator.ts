@@ -192,11 +192,15 @@ export class ApiClientGenerator {
 	}
 
 	private writeArgsInterface(w: Writer, map: Map<string, MapEntry>) {
-		w.$interface({
+		w.$namespace({
 			name: "Args",
 			body: (w) => {
 				for (const r of map.values()) {
-					w.pair(r.key, `ExtractArgs<${r.modelKey}>`);
+					w.$type({
+						name: r.modelKey.replace("Model", ""),
+						value: `ExtractArgs<${r.modelKey}>`,
+						isExported: true,
+					});
 				}
 			},
 		});

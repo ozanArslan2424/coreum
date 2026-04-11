@@ -228,6 +228,23 @@ export class Writer {
 		this.line("");
 	}
 
+	$namespace(o: VWT.Namespace) {
+		this.line(`${o.isExported ? "export " : ""}namespace ${o.name} {`);
+
+		const w = new Writer(this.indent + 1);
+		o.body(w);
+		this.raw(w.read());
+
+		this.line("}");
+		this.line("");
+		const onlyTypes = w.variables.size === 0;
+		if (onlyTypes) {
+			this.interfaces.add(o.name);
+		} else {
+			this.variables.add(o.name);
+		}
+	}
+
 	$if(...conditions: SWT.Condition[]): SWT.If {
 		const self = this;
 		self.line("");
