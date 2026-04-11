@@ -453,6 +453,33 @@ const makeOrgsOrgIdMembersMemberIdDeleteRequest = (
 	};
 };
 
+interface Args {
+	param1Param2Get: ExtractArgs<Param1Param2GetModel>;
+	helloParam1Param2Get: ExtractArgs<HelloParam1Param2GetModel>;
+	worldParam1Param2Get: ExtractArgs<WorldParam1Param2GetModel>;
+	lalalaParam1Param2Get: ExtractArgs<LalalaParam1Param2GetModel>;
+	yesyesParam2Get: ExtractArgs<YesyesParam2GetModel>;
+	okayParam1LetsgoGet: ExtractArgs<OkayParam1LetsgoGetModel>;
+	denemeParam1Param2Get: ExtractArgs<DenemeParam1Param2GetModel>;
+	weGotThisGet: ExtractArgs<WeGotThisGetModel>;
+	ohmyohmyGet: ExtractArgs<OhmyohmyGetModel>;
+	_2brosGet: ExtractArgs<_2brosGetModel>;
+	chillinInAHottubGet: ExtractArgs<ChillinInAHottubGetModel>;
+	_5FeetApartCuzTheyreNotGayGet: ExtractArgs<_5FeetApartCuzTheyreNotGayGetModel>;
+	verywild_Get: ExtractArgs<Verywild_GetModel>;
+	craaaazy_Get: ExtractArgs<Craaaazy_GetModel>;
+	usersPost: ExtractArgs<UsersPostModel>;
+	usersGet: ExtractArgs<UsersGetModel>;
+	usersIdGet: ExtractArgs<UsersIdGetModel>;
+	usersIdPut: ExtractArgs<UsersIdPutModel>;
+	usersIdDelete: ExtractArgs<UsersIdDeleteModel>;
+	usersIdPostsPost: ExtractArgs<UsersIdPostsPostModel>;
+	orgsPost: ExtractArgs<OrgsPostModel>;
+	orgsOrgIdMembersGet: ExtractArgs<OrgsOrgIdMembersGetModel>;
+	orgsOrgIdMembersMemberIdPut: ExtractArgs<OrgsOrgIdMembersMemberIdPutModel>;
+	orgsOrgIdMembersMemberIdDelete: ExtractArgs<OrgsOrgIdMembersMemberIdDeleteModel>;
+}
+
 class CorpusApi {
 	constructor(public readonly baseUrl: string) {}
 
@@ -533,6 +560,7 @@ class CorpusApi {
 			p: ExtractArgs<OrgsOrgIdMembersMemberIdDeleteModel>["params"],
 		) => `/orgs/${String(p.orgId)}/members/${String(p.memberId)}`,
 	};
+
 	public param1Param2Get = (args: ExtractArgs<Param1Param2GetModel>) => {
 		return this.fetchFn<Param1Param2GetModel["response"]>(
 			makeParam1Param2GetRequest(args),
@@ -690,9 +718,6 @@ class CorpusApi {
 	};
 }
 export type {
-	_Prim,
-	ExtractArgs,
-	ReqArgs,
 	Param1Param2GetModel,
 	HelloParam1Param2GetModel,
 	WorldParam1Param2GetModel,
@@ -717,6 +742,7 @@ export type {
 	OrgsOrgIdMembersGetModel,
 	OrgsOrgIdMembersMemberIdPutModel,
 	OrgsOrgIdMembersMemberIdDeleteModel,
+	Args,
 };
 
 export {

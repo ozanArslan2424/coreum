@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import path from "path";
 import type { Schema } from "../utils/Schema";
 import type { Config, PartialConfig } from "../Config/Config";
@@ -41,10 +41,19 @@ export class ApiClientGenerator {
 		const dir = path.resolve(process.cwd(), ...dirName);
 		const file = path.join(dir, fileName);
 		mkdirSync(dir, { recursive: true });
-		writeFileSync(
-			file,
-			await this.generateFileContent(Object.values(this.docs)),
-		);
+
+		const routes = Object.values(this.docs);
+		const w = new Writer(file);
+		const map = this.getRouteMap(routes);
+
+		this.writeInitialContent(w);
+		for (const r of map.values()) {
+			await this.writeModel(w, r);
+			this.writeRequestMaker(w, r);
+		}
+		this.writeArgsInterface(w, map);
+		this.writeApiClientClass(w, map);
+		this.writeExports(w);
 	}
 
 	private getRouteMap(routes: DocEntry[]) {
@@ -66,11 +75,7 @@ export class ApiClientGenerator {
 		return map;
 	}
 
-	private async generateFileContent(routes: DocEntry[]) {
-		const map = this.getRouteMap(routes);
-
-		const w = new Writer();
-
+	private writeInitialContent(w: Writer) {
 		if (this.config.exportClientAs !== false) {
 			w.$import({
 				keys: ["C"],
@@ -99,136 +104,205 @@ export class ApiClientGenerator {
 				w.pair("init?", "RequestInit");
 			},
 		});
+	}
 
-		for (const r of map.values()) {
-			await this.writeModel(w, r.modelKey, r.params, r.model);
+	private async writeModel(w: Writer, r: MapEntry) {
+		const model: Record<
+			"body" | "search" | "params" | "response",
+			{ opt: boolean; type: string }
+		> = {
+			body: { opt: false, type: `` },
+			search: { opt: true, type: `Record<string, unknown>` },
+			params: { opt: false, type: `` },
+			response: { opt: false, type: `unknown` },
+		};
 
-			w.$arrow({
-				name: r.funcKey,
-				args: [`args: ExtractArgs<${r.modelKey}>`],
-				body: (w) =>
-					w.$return((w) => {
-						if (r.params.length === 0) {
-							w.pair("endpoint", `"${r.endpoint}"`);
-						} else {
-							w.pair(
-								"endpoint",
-								`\`${r.endpoint
-									.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
-									.map((part, i) => {
-										if (i % 2 === 1) return `\${String(args.params.${part})}`;
-										return part.replace("*", `\${String(args.params["*"])}`);
-									})
-									.join("")}\``,
-							);
-						}
-
-						w.pair("method", `"${r.method}"`);
-						w.pair("search", `args.search`);
-						if (r.model?.body) {
-							w.pair("body", `args.body`);
-						}
-					}),
-			});
+		if (r.model?.body) {
+			model.body = {
+				opt: false,
+				type: await this.buildSchemaType(r.model.body),
+			};
 		}
 
-		if (this.config.exportClientAs !== false) {
-			w.$class({
-				name: this.config.exportClientAs,
-				constr: {
-					args: [
-						{ keyword: "public readonly", key: "baseUrl", type: "string" },
-					],
-				},
-				body: (w) => {
+		if (r.model?.search) {
+			model.search = {
+				opt: false,
+				type: await this.buildSchemaType(r.model.search),
+			};
+		}
+
+		if (r.model?.params) {
+			model.params = {
+				opt: false,
+				type: await this.buildSchemaType(r.model.params),
+			};
+		} else if (r.params.length > 0) {
+			model.params = {
+				opt: false,
+				type: `{ ${r.params.map((p) => `${p === "*" ? '"*"' : p}: _Prim`).join(";")}}`,
+			};
+		}
+
+		if (r.model?.response) {
+			model.response = {
+				opt: false,
+				type: await this.buildSchemaType(r.model.response),
+			};
+		}
+
+		w.$interface({
+			name: r.modelKey,
+			body: (w) => {
+				for (const [key, val] of Object.entries(model)) {
+					if (val.type === "") continue;
+					w.pair(`${val.opt ? `${key}?` : key}`, `${val.type}`);
+				}
+			},
+		});
+	}
+
+	private writeRequestMaker(w: Writer, r: MapEntry) {
+		w.$arrow({
+			name: r.funcKey,
+			args: [`args: ExtractArgs<${r.modelKey}>`],
+			body: (w) =>
+				w.$return((w) => {
+					if (r.params.length === 0) {
+						w.pair("endpoint", `"${r.endpoint}"`);
+					} else {
+						w.pair(
+							"endpoint",
+							`\`${r.endpoint
+								.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
+								.map((part, i) => {
+									if (i % 2 === 1) return `\${String(args.params.${part})}`;
+									return part.replace("*", `\${String(args.params["*"])}`);
+								})
+								.join("")}\``,
+						);
+					}
+
+					w.pair("method", `"${r.method}"`);
+					w.pair("search", `args.search`);
+					if (r.model?.body) {
+						w.pair("body", `args.body`);
+					}
+				}),
+		});
+	}
+
+	private writeArgsInterface(w: Writer, map: Map<string, MapEntry>) {
+		w.$interface({
+			name: "Args",
+			body: (w) => {
+				for (const r of map.values()) {
+					w.pair(r.key, `ExtractArgs<${r.modelKey}>`);
+				}
+			},
+		});
+	}
+
+	private writeApiClientClass(w: Writer, map: Map<string, MapEntry>) {
+		if (this.config.exportClientAs === false) return;
+
+		w.$class({
+			name: this.config.exportClientAs,
+			constr: {
+				args: [{ keyword: "public readonly", key: "baseUrl", type: "string" }],
+			},
+			body: (w) => {
+				w.$arrowMethod({
+					keyword: "public",
+					isAsync: true,
+					name: "fetchFn",
+					type: "<R = unknown>(args: ReqArgs) => Promise<R>",
+					args: ["args"],
+					body: (w) => {
+						w.line(`const url = new URL(args.endpoint, this.baseUrl);`);
+						w.line(`const headers = new Headers(args.headers);`);
+						w.line(`const method: RequestInit["method"] = args.method;`);
+						w.line(`let body: RequestInit["body"];`);
+
+						w.$if(`args.search`).then((w) => {
+							w.$for(
+								[`const`, `[key, val]`, `of`, `Object.entries(args.search)`],
+								(w) => {
+									w.$if(`val == null`).then((w) => w.line(`continue;`));
+									w.line(`url.searchParams.append(key, String(val));`);
+								},
+							);
+						});
+
+						w.$if(`args.body`).then((w) => {
+							w.$if(
+								`!headers.has("Content-Type")`,
+								`||`,
+								`!headers.has("content-type")`,
+							).then((w) => {
+								w.line(`headers.set("Content-Type", "application/json");`);
+							});
+							w.line(`body = JSON.stringify(args.body);`);
+						});
+
+						w.line(
+							`const res = await fetch(url, { method, headers, body, ...args.init });`,
+						);
+						w.line(`return await C.Parser.parseBody(res);`);
+					},
+				});
+
+				w.$method({
+					keyword: "public",
+					isAsync: false,
+					name: "setFetchFn",
+					args: ["cb: <R = unknown>(args: ReqArgs) => Promise<R>"],
+					body: (w) => w.$return("this.fetchFn = cb"),
+				});
+
+				w.$member({
+					keyword: "public readonly",
+					name: "endpoints",
+					value: (w) => {
+						w.inline("{");
+						for (const r of map.values()) {
+							w.pair(
+								r.key,
+								r.params.length === 0
+									? `"${r.endpoint}"`
+									: `(p: ExtractArgs<${r.modelKey}>["params"]) => \`${r.endpoint
+											.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
+											.map((part, i) => {
+												if (i % 2 === 1) return `\${String(p.${part})}`;
+												return part.replace("*", `\${String(p["*"])}`);
+											})
+											.join("")}\``,
+							);
+						}
+						w.untab("}");
+					},
+				});
+				w.line("");
+
+				for (const r of map.values()) {
 					w.$arrowMethod({
 						keyword: "public",
-						isAsync: true,
-						name: "fetchFn",
-						type: "<R = unknown>(args: ReqArgs) => Promise<R>",
-						args: ["args"],
-						body: (w) => {
-							w.line(`const url = new URL(args.endpoint, this.baseUrl);`);
-							w.line(`const headers = new Headers(args.headers);`);
-							w.line(`const method: RequestInit["method"] = args.method;`);
-							w.line(`let body: RequestInit["body"];`);
-
-							w.$if(`args.search`).then((w) => {
-								w.$for(
-									[`const`, `[key, val]`, `of`, `Object.entries(args.search)`],
-									(w) => {
-										w.$if(`val == null`).then((w) => w.line(`continue;`));
-										w.line(`url.searchParams.append(key, String(val));`);
-									},
-								);
-							});
-
-							w.$if(`args.body`).then((w) => {
-								w.$if(
-									`!headers.has("Content-Type")`,
-									`||`,
-									`!headers.has("content-type")`,
-								).then((w) => {
-									w.line(`headers.set("Content-Type", "application/json");`);
-								});
-								w.line(`body = JSON.stringify(args.body);`);
-							});
-
-							w.line(
-								`const res = await fetch(url, { method, headers, body, ...args.init });`,
-							);
-							w.line(`return await C.Parser.parseBody(res);`);
-						},
+						name: r.key,
+						args: [`args: ExtractArgs<${r.modelKey}>`],
+						body: (w) =>
+							w.$return(
+								`this.fetchFn<${r.modelKey}["response"]>(${r.funcKey}(args))`,
+							),
 					});
+				}
+			},
+		});
+	}
 
-					w.$method({
-						keyword: "public",
-						isAsync: false,
-						name: "setFetchFn",
-						args: ["cb: <R = unknown>(args: ReqArgs) => Promise<R>"],
-						body: (w) => w.$return("this.fetchFn = cb"),
-					});
-
-					w.$member({
-						keyword: "public readonly",
-						name: "endpoints",
-						value: (w) => {
-							w.line("{");
-							for (const r of map.values()) {
-								w.pair(
-									r.key,
-									r.params.length === 0
-										? `"${r.endpoint}"`
-										: `(p: ExtractArgs<${r.modelKey}>["params"]) => \`${r.endpoint
-												.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
-												.map((part, i) => {
-													if (i % 2 === 1) return `\${String(p.${part})}`;
-													return part.replace("*", `\${String(p["*"])}`);
-												})
-												.join("")}\``,
-								);
-							}
-							w.line("};");
-						},
-					});
-
-					for (const r of map.values()) {
-						w.$arrowMethod({
-							keyword: "public",
-							name: r.key,
-							args: [`args: ExtractArgs<${r.modelKey}>`],
-							body: (w) =>
-								w.$return(
-									`this.fetchFn<${r.modelKey}["response"]>(${r.funcKey}(args))`,
-								),
-						});
-					}
-				},
-			});
-		}
-
+	private writeExports(w: Writer) {
 		const consts = Array.from(w.variables);
-		const types = Array.from(w.interfaces);
+		const types = Array.from(w.interfaces).filter(
+			(t) => !["_Prim", "ExtractArgs", "ReqArgs"].includes(t),
+		);
 
 		w.$export({ variant: "type", keys: types });
 		w.line("");
@@ -244,8 +318,6 @@ export class ApiClientGenerator {
 				keys: consts,
 			});
 		}
-
-		return w.read();
 	}
 
 	private extractParams(path: string): string[] {
@@ -284,74 +356,17 @@ export class ApiClientGenerator {
 		);
 	}
 
-	// TODO: just write
-	private async writeModel(
-		w: Writer,
-		modelKey: string,
-		params: string[],
-		routeModel: any,
-	) {
-		const model: Record<
-			"body" | "search" | "params" | "response",
-			{ opt: boolean; type: string }
-		> = {
-			body: { opt: false, type: `` },
-			search: { opt: true, type: `Record<string, unknown>` },
-			params: { opt: false, type: `` },
-			response: { opt: false, type: `unknown` },
-		};
-
-		if (routeModel?.body) {
-			model.body = {
-				opt: false,
-				type: await this.buildSchemaType(routeModel.body),
-			};
-		}
-
-		if (routeModel?.search) {
-			model.search = {
-				opt: false,
-				type: await this.buildSchemaType(routeModel.search),
-			};
-		}
-
-		if (routeModel?.params) {
-			model.params = {
-				opt: false,
-				type: await this.buildSchemaType(routeModel.params),
-			};
-		} else if (params.length > 0) {
-			model.params = {
-				opt: false,
-				type: `{ ${params.map((p) => `${p === "*" ? '"*"' : p}: _Prim`).join(";")}}`,
-			};
-		}
-
-		if (routeModel?.response) {
-			model.response = {
-				opt: false,
-				type: await this.buildSchemaType(routeModel.response),
-			};
-		}
-
-		w.$interface({
-			name: modelKey,
-			body: (w) => {
-				for (const [key, val] of Object.entries(model)) {
-					if (val.type === "") continue;
-					w.pair(`${val.opt ? `${key}?` : key}`, `${val.type}`);
-				}
-			},
-		});
-	}
-
 	private async buildSchemaType(schema: Schema): Promise<string> {
 		try {
 			return await this.schemaManager.toInterface(
-				this.schemaManager.toJsonSchema(schema, this.config.validationLibrary),
+				this.schemaManager.toJsonSchema(schema),
 			);
 		} catch (err) {
-			console.log(JSON.stringify(schema));
+			console.error(
+				`[corpus] Failed to convert schema to TypeScript interface. ` +
+					`Check your config.jsonSchemaOptions in corpus.config.ts.\n` +
+					`Schema: ${JSON.stringify(schema, null, 2)}`,
+			);
 			throw err;
 		}
 	}

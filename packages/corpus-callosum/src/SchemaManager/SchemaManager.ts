@@ -1,11 +1,11 @@
 import type { Config } from "../Config/Config";
-import type { ValidationLib } from "../utils/ACCEPTED_VALIDATION_LIBS";
 import type { JsonSchema, Schema } from "../utils/Schema";
 import { compile } from "json-schema-to-typescript";
 
 import { convertSchema as yupToJsonSchema } from "@sodaru/yup-to-json-schema";
-// import { toJsonSchema as valibotToJsonSchema } from "@valibot/to-json-schema";
 import z from "zod";
+// TODO:
+// import { toJsonSchema as valibotToJsonSchema } from "@valibot/to-json-schema";
 
 export class SchemaManager {
 	constructor(private readonly config: Config) {}
@@ -14,16 +14,11 @@ export class SchemaManager {
 		return this.config.jsonSchemaOptions;
 	}
 
-	toJsonSchema(schema: Schema, lib: ValidationLib): Record<string, unknown> {
-		const usedLib = lib ?? schema["~standard"].vendor;
-		switch (usedLib) {
-			// TODO:
-			// case "valibot":
-			// 	return valibotToJsonSchema(schema as any, this.options) as Record<
-			// 		string,
-			// 		unknown
-			// 	>;
-
+	toJsonSchema(schema: Schema): Record<string, unknown> {
+		const confLib = this.config.validationLibrary;
+		const vendor = schema["~standard"].vendor;
+		const lib = confLib !== vendor ? vendor : (confLib ?? vendor);
+		switch (lib) {
 			case "yup":
 				return yupToJsonSchema(schema as any, this.options) as Record<
 					string,

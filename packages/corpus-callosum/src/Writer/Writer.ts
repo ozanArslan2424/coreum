@@ -51,10 +51,7 @@ export class Writer {
 		if (this.O.length === 0) this.O.push("");
 		this.O[this.O.length - 1] += strings.join("");
 		if (this.writeToFilePath) {
-			const content = fs.readFileSync(this.writeToFilePath, "utf-8");
-			const lines = content.split("\n");
-			lines[this.fileLineCount - 1] = this.O[this.O.length - 1]!;
-			fs.writeFileSync(this.writeToFilePath, lines.join("\n"));
+			fs.writeFileSync(this.writeToFilePath, this.O.join("\n") + "\n");
 		}
 	}
 
@@ -65,6 +62,17 @@ export class Writer {
 	tab(str: string, indent: number = 1) {
 		const tabs = new Array(this.indent + indent).fill(this.tabChar).join("");
 		this.line(`${tabs}${str}`);
+	}
+
+	untab(str: string, indent: number = 1) {
+		const tabs = new Array(Math.max(0, this.indent - indent))
+			.fill(this.tabChar)
+			.join("");
+		this.O.push(`${tabs}${str}`);
+		if (this.writeToFilePath) {
+			fs.appendFileSync(this.writeToFilePath, `${tabs}${str}\n`);
+			this.fileLineCount += 1;
+		}
 	}
 
 	writeBody(self: Writer, bodyWriter: B.BodyWriter, addIndent: number = 1) {
