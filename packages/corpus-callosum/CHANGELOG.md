@@ -1,5 +1,11 @@
 # @ozanarslan/corpus-callosum
 
+## 0.4.1
+
+### Patch Changes
+
+- exports
+
 ## 0.4.0
 
 ### Minor Changes

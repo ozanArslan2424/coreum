@@ -1,3 +1,6 @@
+export * from "./Config/Config";
+export * from "./Config/defineConfig";
+
 import { ConfigManager } from "./ConfigManager/ConfigManager";
 import { generateApiClient } from "./generateApiClient";
 import { initialize } from "./initialize";
