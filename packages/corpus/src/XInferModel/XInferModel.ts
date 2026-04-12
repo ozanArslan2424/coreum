@@ -1,4 +1,4 @@
-import type { InferSchema, Schema } from "corpus-utils/Schema";
+import type { InferSchemaOut, Schema } from "corpus-utils/Schema";
 import type { RouteConfig } from "@/Route/RouteConfig";
 import type { Prettify } from "corpus-utils/Prettify";
 
@@ -12,19 +12,19 @@ export type XInferModel<T extends Record<string, any>> = {
 	>
 		? Prettify<
 				(T[K]["body"] extends Schema
-					? { body: InferSchema<T[K]["body"]> }
+					? { body: InferSchemaOut<T[K]["body"]> }
 					: {}) &
 					(T[K]["search"] extends Schema
-						? { search: InferSchema<T[K]["search"]> }
+						? { search: InferSchemaOut<T[K]["search"]> }
 						: {}) &
 					(T[K]["params"] extends Schema
-						? { params: InferSchema<T[K]["params"]> }
+						? { params: InferSchemaOut<T[K]["params"]> }
 						: {}) &
 					(T[K]["response"] extends Schema
-						? { response: InferSchema<T[K]["response"]> }
+						? { response: InferSchemaOut<T[K]["response"]> }
 						: {})
 			>
 		: T[K] extends Schema
-			? InferSchema<T[K]>
+			? InferSchemaOut<T[K]>
 			: never;
 };
