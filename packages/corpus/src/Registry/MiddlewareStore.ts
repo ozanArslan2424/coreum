@@ -1,21 +1,25 @@
 import { Controller } from "@/Controller/Controller";
-import { DynamicRoute } from "@/DynamicRoute/DynamicRoute";
 import type { MiddlewareInterface } from "@/Middleware/MiddlwareInterface";
 import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
 import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
-import type { MiddlewareRegistryReturn } from "@/Registry/MiddlewareRegistryReturn";
+import type { MiddlewareStoreReturn } from "@/Registry/MiddlewareStoreReturn";
 import { compile } from "corpus-utils/compile";
+import { RouteAbstract } from "@/Route/RouteAbstract";
+import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
 
-export class MiddlewareRegistry {
-	private inboundMiddlewares = new Map<string, Array<MiddlewareHandler>>();
-	private outboundMiddlewares = new Map<string, Array<MiddlewareHandler>>();
+export class MiddlewareStore {
+	private inboundMap = new Map<string, Array<MiddlewareHandler>>();
+	private outboundMap = new Map<string, Array<MiddlewareHandler>>();
 
 	add(middleware: MiddlewareInterface): void {
-		const resolved = MiddlewareRegistry.resolveRouteIds(middleware);
+		const resolved = MiddlewareStore.resolveRouteIds(
+			middleware.useOn,
+			middleware.variant,
+		);
 		const map =
 			resolved.variant === MiddlewareVariant.inbound
-				? this.inboundMiddlewares
-				: this.outboundMiddlewares;
+				? this.inboundMap
+				: this.outboundMap;
 
 		if (resolved.isGlobal) {
 			const existing = map.get("*") ?? [];
@@ -29,10 +33,10 @@ export class MiddlewareRegistry {
 		}
 	}
 
-	find(routeId: string): MiddlewareRegistryReturn {
+	find(routeId: string): MiddlewareStoreReturn {
 		return {
-			inbound: compile(this.inboundMiddlewares.get(routeId) ?? []),
-			outbound: compile(this.outboundMiddlewares.get(routeId) ?? []),
+			inbound: compile(this.inboundMap.get(routeId) ?? []),
+			outbound: compile(this.outboundMap.get(routeId) ?? []),
 		};
 	}
 
@@ -40,23 +44,26 @@ export class MiddlewareRegistry {
 
 	/** Returns a discriminated union — isGlobal true means useOn was "*" */
 	static resolveRouteIds(
-		m: MiddlewareInterface,
+		useOn: MiddlewareUseOn,
+		variant: MiddlewareVariant,
 	):
 		| { isGlobal: true; variant: MiddlewareVariant }
 		| { isGlobal: false; routeIds: string[]; variant: MiddlewareVariant } {
-		if (m.useOn === "*") return { isGlobal: true, variant: m.variant };
+		if (useOn === "*") return { isGlobal: true, variant };
 
-		const targets = Array.isArray(m.useOn) ? m.useOn : [m.useOn];
+		const targets = Array.isArray(useOn) ? useOn : [useOn];
 		const routeIds: string[] = [];
 
 		for (const target of targets) {
-			if (target instanceof DynamicRoute) {
+			if (target instanceof RouteAbstract) {
 				routeIds.push(target.id);
 			} else if (target instanceof Controller) {
 				routeIds.push(...target.routeIds);
+			} else {
+				routeIds.push(target);
 			}
 		}
 
-		return { isGlobal: false, routeIds, variant: m.variant };
+		return { isGlobal: false, routeIds, variant };
 	}
 }

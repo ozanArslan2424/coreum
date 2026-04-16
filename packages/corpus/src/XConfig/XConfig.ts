@@ -47,6 +47,10 @@ export class XConfig {
 		return path.resolve(...paths);
 	}
 
+	static joinPath(...paths: string[]) {
+		return path.join(...paths);
+	}
+
 	static get<T = string>(
 		key: OrString<keyof Env>,
 		opts?: { parser?: Func<[raw: string], T>; fallback?: T },

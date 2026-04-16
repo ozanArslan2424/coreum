@@ -44,6 +44,9 @@ export { StaticRouteAbstract } from "./StaticRoute/StaticRouteAbstract";
 export type { StaticRouteDefinition } from "./StaticRoute/StaticRouteDefinition";
 export type { StaticRouteCallback } from "./StaticRoute/StaticRouteCallback";
 
+export { BundleRoute } from "./BundleRoute/BundleRoute";
+export { BundleRouteAbstract } from "./BundleRoute/BundleRouteAbstract";
+
 export { WebSocketRoute } from "./WebSocketRoute/WebSocketRoute";
 export { WebSocketRouteAbstract } from "./WebSocketRoute/WebSocketRouteAbstract";
 export type { WebSocketRouteDefinition } from "./WebSocketRoute/WebSocketRouteDefinition";
@@ -57,3 +60,7 @@ export * from "./Registry/BranchAdapter";
 export * from "./Registry/RouterAdapterInterface";
 export * from "./Registry/RouterReturn";
 export * from "./Registry/RouterData";
+
+export * from "./Entity/Entity";
+export * from "./Entity/EntityDefinition";
+export * from "./Entity/EntityJsonSchema";

@@ -12,8 +12,6 @@ export default defineConfig({
 	// which is the least-surprising behaviour for codegen purposes.
 	jsonSchemaOptions: {
 		target: "draft-07",
-		libraryOptions: {
-			fallback: (ctx: any) => ctx.base,
-		},
+		fallback: (ctx: any) => ctx.base,
 	},
 });

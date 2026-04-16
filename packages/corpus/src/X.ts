@@ -18,5 +18,3 @@ export * from "./XRateLimiter/RateLimitIdPrefix";
 export { XCacheMap as CacheMap } from "./XCacheMap/XCacheMap";
 
 export type { XInferModel as InferModel } from "./XInferModel/XInferModel";
-
-export { XEntity as Entity } from "./XEntity/XEntity";

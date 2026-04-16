@@ -24,6 +24,24 @@ export class Parser {
 		return result.value;
 	}
 
+	static parseSync<T = UnknownObject>(
+		data: unknown,
+		validate?: SchemaValidator<T>,
+	): T {
+		if (!validate) return data as T;
+		const result = validate(data);
+		if (result instanceof Promise) {
+			throw new Error(
+				"parseSync called with async validator — use a sync schema library",
+			);
+		}
+		if (result.issues !== undefined) {
+			const msg = this.issuesToErrorMessage(result.issues);
+			throw new CError(msg, Status.UNPROCESSABLE_ENTITY, data);
+		}
+		return result.value;
+	}
+
 	static issuesToErrorMessage(issues: ValidationIssues): string {
 		if (issues.length === 0) return "";
 

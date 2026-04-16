@@ -38,7 +38,7 @@ export class Router {
 			}
 		}
 		this.adapter.add(data);
-		$registry.appendDocs(route.id, {
+		$registry.docs.set(route.id, {
 			id: route.id,
 			endpoint: route.endpoint,
 			method: route.method,

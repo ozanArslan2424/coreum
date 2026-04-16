@@ -5,6 +5,8 @@ import type { Config, PartialConfig } from "../Config/Config";
 import { Writer } from "../Writer/Writer";
 import { SchemaManager } from "../SchemaManager/SchemaManager";
 import { ConfigManager } from "../ConfigManager/ConfigManager";
+import type { EntityDefinition } from "@ozanarslan/corpus";
+import { toPascalCase } from "../utils/toPascalCase";
 
 type DocEntry = { id: string; endpoint: string; method: string; model?: any };
 type MapEntry = {
@@ -25,9 +27,11 @@ export class ApiClientGenerator {
 		private readonly cliOverrides: Omit<PartialConfig, "jsonSchemaOptions">,
 	) {
 		this.docs = this.registry.docs;
+		this.entities = this.registry.entities.map;
 	}
 
-	private readonly docs: Record<string, DocEntry>;
+	private readonly docs: Map<string, DocEntry>;
+	private readonly entities: Map<string, EntityDefinition>;
 	private readonly schemaManager = new SchemaManager(this.config);
 
 	get config(): Config {
@@ -46,15 +50,17 @@ export class ApiClientGenerator {
 		const file = path.join(dir, fileName);
 		fs.mkdirSync(dir, { recursive: true });
 
-		const routes = Object.values(this.docs);
+		const routes = Array.from(this.docs.values());
 		const w = new Writer(file);
 		const map = this.getRouteMap(routes);
 
 		this.writeInitialContent(w);
+		await this.writeEntitiesNamespace(w, this.entities);
 		await this.writeModelsNamespace(w, map);
 		this.writeArgsNamespace(w, map);
 		this.writeApiClientClass(w, map);
 		this.writeExports(w);
+		w.format("typescript");
 	}
 
 	private getRouteMap(routes: DocEntry[]) {
@@ -113,6 +119,39 @@ export class ApiClientGenerator {
 				w.pair("search?", "Record<string, unknown>");
 				w.pair("headers?", "HeadersInit");
 				w.pair("init?", `Omit<RequestInit, "headers">`);
+			},
+		});
+	}
+
+	private async writeEntitiesNamespace(
+		w: Writer,
+		map: Map<string, EntityDefinition>,
+	) {
+		const types = new Map<string, string>();
+		for (const def of map.values()) {
+			if (def.jsonSchema) {
+				types.set(
+					def.name,
+					await this.buildJsonSchemaType(
+						def.jsonSchema as Record<string, unknown>,
+					),
+				);
+			} else {
+				types.set(def.name, await this.buildSchemaType(def.schema));
+			}
+		}
+
+		w.$namespace({
+			name: "Entities",
+			body: (w) => {
+				for (const [name, typedef] of types.entries()) {
+					const pascalKey = toPascalCase(name);
+					w.$type({
+						isExported: true,
+						name: pascalKey,
+						value: typedef,
+					});
+				}
 			},
 		});
 	}
@@ -185,16 +224,16 @@ export class ApiClientGenerator {
 
 							for (const [key, val] of Object.entries(model)) {
 								if (val.type === "" || key === "body") continue;
-								w.pair(`${val.opt ? `${key}?` : key}`, val.type);
+								w.line(`${val.opt ? `${key}?` : key}: ${val.type}`);
 							}
 
 							if (model.body.type !== "") {
 								w.untab("} & ({");
-								w.pair("body", model.body.type);
-								w.pair("formData?", "never");
+								w.line(`body: ${model.body.type}`);
+								w.line("formData?: never");
 								w.untab("} | {");
-								w.pair("body?", "never");
-								w.pair("formData", "FormData");
+								w.line("body?: never");
+								w.line("formData: FormData");
 								w.untab("})>");
 							} else {
 								w.untab("}>");
@@ -420,6 +459,21 @@ export class ApiClientGenerator {
 		);
 	}
 
+	private async buildJsonSchemaType(
+		json: Record<string, unknown>,
+	): Promise<string> {
+		try {
+			const inter = await this.schemaManager.toInterface(json);
+			return inter;
+		} catch (err) {
+			console.error(
+				`[corpus] Failed to convert json schema to TypeScript interface. ` +
+					`Check your definition.\n` +
+					`Schema: ${JSON.stringify(json, null, 2)}`,
+			);
+			throw err;
+		}
+	}
 	private async buildSchemaType(schema: Schema): Promise<string> {
 		try {
 			const json = this.schemaManager.toJsonSchema(schema);

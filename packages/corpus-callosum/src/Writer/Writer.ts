@@ -5,6 +5,7 @@ import type { FunctionWriterTypes as FWT } from "./FunctionWriterTypes";
 import type { InterfaceWriterTypes as IWT } from "./InterfaceWriterTypes";
 import type { StatementWriterTypes as SWT } from "./StatementWriterTypes";
 import type { VariableWriterTypes as VWT } from "./VariableWriterTypes";
+import prettier from "prettier";
 
 export class Writer {
 	constructor(indentOrFilePath?: number | string) {
@@ -20,13 +21,23 @@ export class Writer {
 	private readonly writeToFilePath?: string;
 
 	private fileLineCount = 0;
-	private readonly O: string[] = [];
+	private O: string[] = [];
 	variables: Set<string> = new Set();
 	interfaces: Set<string> = new Set();
 	tabChar = "\t";
 
 	read(join: string = "\n") {
 		return this.O.join(join);
+	}
+
+	async format(parser: string) {
+		const formatted = await prettier.format(this.read(), { parser });
+		this.O = [];
+		this.O.push(formatted);
+		if (this.writeToFilePath) {
+			fs.writeFileSync(this.writeToFilePath, formatted);
+		}
+		return formatted;
 	}
 
 	raw(...strings: string[]) {

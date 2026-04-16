@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
 
-export type MiddlewareRegistryReturn = {
+export type MiddlewareStoreReturn = {
 	inbound: MiddlewareHandler;
 	outbound: MiddlewareHandler;
 };

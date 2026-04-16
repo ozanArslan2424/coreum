@@ -1,9 +1,9 @@
 import type { Config } from "../Config/Config";
-import type { JsonSchema, Schema } from "../utils/Schema";
+import type { Schema } from "../utils/Schema";
 import { compile } from "json-schema-to-typescript";
-
 import { convertSchema as yupToJsonSchema } from "@sodaru/yup-to-json-schema";
 import z from "zod";
+import type { Type } from "arktype";
 // TODO:
 // import { toJsonSchema as valibotToJsonSchema } from "@valibot/to-json-schema";
 
@@ -34,12 +34,10 @@ export class SchemaManager {
 
 			case "arktype":
 			default:
-				return (schema as unknown as JsonSchema)["~standard"].jsonSchema.output(
-					{
-						target: "draft-07",
-						...this.options,
-					},
-				);
+				return (schema as Type).toJsonSchema({
+					target: "draft-07",
+					...this.options,
+				}) as Record<string, unknown>;
 		}
 	}
 
@@ -56,13 +54,25 @@ export class SchemaManager {
 		);
 
 		if (!name) {
-			const match = schemaType.match(/\{[\s\S]*\}/);
-			if (!match) return schemaType.trim();
-			return match[0]
-				.replace(/([^{])\n/g, "$1;")
-				.replace(/;+/g, ";")
-				.replace(/\s+/g, "")
-				.replace(/;}/g, "}");
+			// const clean = schemaType
+			// 	.replace("export ", "")
+			// 	.replace("type DoesnTMatterWillBeDeleted = ", "")
+			// 	.replace("interface DoesnTMatterWillBeDeleted", "")
+			// 	.trim();
+			//
+			// let bld = "";
+			// for (let line of clean.split("\n")) {
+			// 	if (!line.endsWith("{")) {
+			// 		line += ";";
+			// 	}
+			// 	bld += line;
+			// }
+			// return bld;
+			return schemaType
+				.replace("export ", "")
+				.replace("type DoesnTMatterWillBeDeleted = ", "")
+				.replace("interface DoesnTMatterWillBeDeleted", "")
+				.trim();
 		}
 
 		return schemaType;

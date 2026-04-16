@@ -1,4 +1,4 @@
-type JSONSchema = boolean | XEntityJsonSchema;
+type JSONSchema = boolean | EntityJsonSchema;
 
 type SimpleType =
 	| "array"
@@ -9,7 +9,7 @@ type SimpleType =
 	| "object"
 	| "string";
 
-export interface XEntityJsonSchema {
+export interface EntityJsonSchema {
 	$id?: string;
 	$schema?: string;
 	$ref?: string;

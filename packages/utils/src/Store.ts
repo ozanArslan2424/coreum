@@ -1,25 +1,17 @@
-import type { Func } from "./Func";
-
 export class Store<T> {
-	constructor(protected readonly init: T) {
+	constructor(protected init: T) {
 		this.value = init;
 	}
 
 	protected value: T;
 
 	set(value: T) {
-		this.make = () => value;
 		this.value = value;
+		this.init = value;
 	}
 
 	get(): T {
 		return this.value;
-	}
-
-	make: Func<[], T> = () => this.init;
-
-	remake(): void {
-		this.value = this.make();
 	}
 
 	reset(): void {

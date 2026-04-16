@@ -308,9 +308,7 @@ export class ConfigManager {
 		w.$comment("which is the least-surprising behaviour for codegen purposes.");
 		w.line("jsonSchemaOptions: {");
 		w.tab(`target: "draft-07",`);
-		w.tab("libraryOptions: {");
-		w.tab("fallback: (ctx: any) => ctx.base", 2);
-		w.tab("}");
+		w.tab("fallback: (ctx: any) => ctx.base,", 2);
 		w.line("}");
 		w.untab("})");
 		log.info(`Config written to corpus.config.ts`);
