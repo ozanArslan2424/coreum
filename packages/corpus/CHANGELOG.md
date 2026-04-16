@@ -1,5 +1,11 @@
 # @ozanarslan/corpus
 
+## 0.5.0
+
+### Minor Changes
+
+- entities and better static/bundle serving routes
+
 ## 0.4.0
 
 ### Minor Changes
