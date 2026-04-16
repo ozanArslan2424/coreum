@@ -1,8 +1,8 @@
 import { CResponse } from "@/CResponse/CResponse";
 import type { RouteModel } from "@/Route/RouteModel";
-import type { StaticRouteDefinition } from "@/StaticRoute/StaticRouteDefinition";
 import { StaticRouteAbstract } from "@/StaticRoute/StaticRouteAbstract";
 import type { StaticRouteCallback } from "@/StaticRoute/StaticRouteCallback";
+import type { StaticRouteDefinition } from "@/StaticRoute/StaticRouteDefinition";
 
 type R = CResponse | string;
 

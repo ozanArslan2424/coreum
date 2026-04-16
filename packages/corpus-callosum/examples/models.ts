@@ -1,5 +1,5 @@
-import { type } from "arktype";
 import type { X } from "@ozanarslan/corpus";
+import { type } from "arktype";
 
 export type ArkType = X.InferModel<typeof ArkModel>;
 

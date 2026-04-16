@@ -46,11 +46,7 @@ You can implement a custom router adapter by satisfying the `RouterAdapterInterf
 
 ```ts
 import { C } from "@ozanarslan/corpus";
-import type {
-	RouterAdapterInterface,
-	RouterReturn,
-	RouterData,
-} from "@ozanarslan/corpus";
+import type { RouterAdapterInterface, RouterReturn, RouterData } from "@ozanarslan/corpus";
 
 class MyAdapter implements RouterAdapterInterface {
 	add(data: RouterData): void {

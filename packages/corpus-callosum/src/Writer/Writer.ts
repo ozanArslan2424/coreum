@@ -1,11 +1,13 @@
 import fs from "node:fs";
-import type { ClassWriterTypes as CWT } from "./ClassWriterTypes";
+
+import prettier from "prettier";
+
 import type { BaseWriterTypes as B } from "./BaseWriterTypes";
+import type { ClassWriterTypes as CWT } from "./ClassWriterTypes";
 import type { FunctionWriterTypes as FWT } from "./FunctionWriterTypes";
 import type { InterfaceWriterTypes as IWT } from "./InterfaceWriterTypes";
 import type { StatementWriterTypes as SWT } from "./StatementWriterTypes";
 import type { VariableWriterTypes as VWT } from "./VariableWriterTypes";
-import prettier from "prettier";
 
 export class Writer {
 	constructor(indentOrFilePath?: number | string) {
@@ -76,9 +78,7 @@ export class Writer {
 	}
 
 	untab(str: string, indent: number = 1) {
-		const tabs = new Array(Math.max(0, this.indent - indent))
-			.fill(this.tabChar)
-			.join("");
+		const tabs = new Array(Math.max(0, this.indent - indent)).fill(this.tabChar).join("");
 		this.O.push(`${tabs}${str}`);
 		if (this.writeToFilePath) {
 			fs.appendFileSync(this.writeToFilePath, `${tabs}${str}\n`);
@@ -429,11 +429,7 @@ export class Writer {
 				this.line(`export const ${o.name} = { ${o.keys.join(", ")} };`);
 				break;
 			case "default":
-				this.line(
-					`export default ${
-						o.keys.length > 1 ? `{ ${o.keys.join(", ")} }` : o.keys
-					};`,
-				);
+				this.line(`export default ${o.keys.length > 1 ? `{ ${o.keys.join(", ")} }` : o.keys};`);
 				break;
 			case "reexport":
 				this.line(`export { ${o.keys.join(", ")} } from "${o.from}";`);

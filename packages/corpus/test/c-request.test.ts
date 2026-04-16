@@ -1,5 +1,6 @@
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC } from "./_modules";
 
 beforeEach(() => $registryTesting.reset());
 
@@ -42,28 +43,17 @@ describe("C.Request", () => {
 		expectEmpty(req);
 	});
 
-	it.each(Object.values(TC.Method))(
-		"METHOD %s - STRING URL INPUT",
-		(method) => {
-			expect(new TC.Request(urlString, { method }).method).toBe(method);
-		},
-	);
+	it.each(Object.values(TC.Method))("METHOD %s - STRING URL INPUT", (method) => {
+		expect(new TC.Request(urlString, { method }).method).toBe(method);
+	});
 
-	it.each(Object.values(TC.Method))(
-		"METHOD %s - URL OBJECT INPUT",
-		(method) => {
-			expect(new TC.Request(urlObject, { method }).method).toBe(method);
-		},
-	);
+	it.each(Object.values(TC.Method))("METHOD %s - URL OBJECT INPUT", (method) => {
+		expect(new TC.Request(urlObject, { method }).method).toBe(method);
+	});
 
-	it.each(Object.values(TC.Method))(
-		"METHOD %s - REQUEST OBJECT INPUT",
-		(method) => {
-			expect(new TC.Request(new Request(urlObject, { method })).method).toBe(
-				method,
-			);
-		},
-	);
+	it.each(Object.values(TC.Method))("METHOD %s - REQUEST OBJECT INPUT", (method) => {
+		expect(new TC.Request(new Request(urlObject, { method })).method).toBe(method);
+	});
 
 	it("METHODS - REQUEST OBJECT INPUT OVERRIDE", () => {
 		const values = Object.values(TC.Method);

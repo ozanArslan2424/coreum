@@ -2,9 +2,7 @@ export function joinPathSegments<E extends string>(
 	...segments: (string | undefined | number)[]
 ): E {
 	const joined = segments
-		.map((segment) =>
-			typeof segment === "number" ? segment.toString() : segment,
-		)
+		.map((segment) => (typeof segment === "number" ? segment.toString() : segment))
 		.filter(
 			(segment): segment is string =>
 				segment !== undefined && segment !== null && segment.trim() !== "",

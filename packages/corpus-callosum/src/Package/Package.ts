@@ -1,5 +1,5 @@
-import type { PackageInterface } from "./PackageInterface";
 import type { PackageManager } from "../PackageManager/PackageManager";
+import type { PackageInterface } from "./PackageInterface";
 
 export class Package implements PackageInterface {
 	constructor(
@@ -12,8 +12,7 @@ export class Package implements PackageInterface {
 	get version(): string | null {
 		if (this.vrs) return this.vrs;
 		const thisVersion =
-			this.selfPm.devDependencies[this.name] ??
-			this.selfPm.dependencies[this.name];
+			this.selfPm.devDependencies[this.name] ?? this.selfPm.dependencies[this.name];
 		if (thisVersion?.includes("workspace")) {
 			return this.selfPm.version;
 		}

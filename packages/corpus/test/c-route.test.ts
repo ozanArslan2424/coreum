@@ -1,5 +1,6 @@
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 
@@ -60,16 +61,13 @@ describe("C.Route", () => {
 		expect(route.model).toBeUndefined();
 	});
 
-	it.each(Object.values(TC.Method))(
-		"METHOD %s RESOLVES CORRECTLY",
-		(method) => {
-			const path = `/${method.toLowerCase()}-method-test`;
-			const route = new TC.Route({ method, path }, handler);
+	it.each(Object.values(TC.Method))("METHOD %s RESOLVES CORRECTLY", (method) => {
+		const path = `/${method.toLowerCase()}-method-test`;
+		const route = new TC.Route({ method, path }, handler);
 
-			expect(route.method).toBe(method);
-			expect(route.id).toBe(`${method} ${path}`);
-		},
-	);
+		expect(route.method).toBe(method);
+		expect(route.id).toBe(`${method} ${path}`);
+	});
 
 	it("USING EXTENDED ABSTRACT METHOD", async () => {
 		const path = "/r-extended";
@@ -82,8 +80,7 @@ describe("C.Route", () => {
 
 			definition: TC.RouteDefinition<string> = path;
 			callback: TC.RouteCallback = () => "extended";
-			model?: TC.RouteConfig<unknown, unknown, unknown, unknown> | undefined =
-				undefined;
+			model?: TC.RouteConfig<unknown, unknown, unknown, unknown> | undefined = undefined;
 		}
 
 		new MyRoute();

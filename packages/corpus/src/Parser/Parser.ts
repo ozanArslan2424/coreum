@@ -1,20 +1,18 @@
-import { Status } from "@/CResponse/Status";
-import { Method } from "@/CRequest/Method";
-import { CommonHeaders } from "@/CHeaders/CommonHeaders";
-import { CError } from "@/CError/CError";
-import type { CRequest } from "@/CRequest/CRequest";
-import type { CResponse } from "@/CResponse/CResponse";
-import type { SchemaValidator, ValidationIssues } from "corpus-utils/Schema";
-import type { UnknownObject } from "corpus-utils/UnknownObject";
 import { arrIncludes } from "corpus-utils/arrIncludes";
 import { isObjectWith } from "corpus-utils/isObjectWith";
 import { objAppendEntry } from "corpus-utils/objAppendEntry";
+import type { SchemaValidator, ValidationIssues } from "corpus-utils/Schema";
+import type { UnknownObject } from "corpus-utils/UnknownObject";
+
+import { CError } from "@/CError/CError";
+import { CommonHeaders } from "@/CHeaders/CommonHeaders";
+import type { CRequest } from "@/CRequest/CRequest";
+import { Method } from "@/CRequest/Method";
+import type { CResponse } from "@/CResponse/CResponse";
+import { Status } from "@/CResponse/Status";
 
 export class Parser {
-	static async parse<T = UnknownObject>(
-		data: unknown,
-		validate?: SchemaValidator<T>,
-	): Promise<T> {
+	static async parse<T = UnknownObject>(data: unknown, validate?: SchemaValidator<T>): Promise<T> {
 		if (!validate) return data as T;
 		const result = await validate(data);
 		if (result.issues !== undefined) {
@@ -24,16 +22,11 @@ export class Parser {
 		return result.value;
 	}
 
-	static parseSync<T = UnknownObject>(
-		data: unknown,
-		validate?: SchemaValidator<T>,
-	): T {
+	static parseSync<T = UnknownObject>(data: unknown, validate?: SchemaValidator<T>): T {
 		if (!validate) return data as T;
 		const result = validate(data);
 		if (result instanceof Promise) {
-			throw new Error(
-				"parseSync called with async validator — use a sync schema library",
-			);
+			throw new Error("parseSync called with async validator — use a sync schema library");
 		}
 		if (result.issues !== undefined) {
 			const msg = this.issuesToErrorMessage(result.issues);
@@ -82,8 +75,7 @@ export class Parser {
 	): Promise<B> {
 		let data;
 		const empty = {} as B;
-		const input =
-			r instanceof Request ? r : r instanceof Response ? r : r.response;
+		const input = r instanceof Request ? r : r instanceof Response ? r : r.response;
 
 		try {
 			switch (Parser.getNormalizedContentType(input)) {
@@ -108,10 +100,7 @@ export class Parser {
 				case "image":
 				case "audio":
 				case "video":
-					throw new CError(
-						"unprocessable.contentType",
-						Status.UNPROCESSABLE_ENTITY,
-					);
+					throw new CError("unprocessable.contentType", Status.UNPROCESSABLE_ENTITY);
 				case "no-body-allowed":
 				default:
 					return empty;
@@ -142,9 +131,7 @@ export class Parser {
 		return await req.json();
 	}
 
-	private static async getFormUrlEncodedBody(
-		input: Request | Response,
-	): Promise<unknown> {
+	private static async getFormUrlEncodedBody(input: Request | Response): Promise<unknown> {
 		const text = await input.text();
 		if (!text || text.trim().length === 0) {
 			throw new SyntaxError("Body is empty");
@@ -160,13 +147,9 @@ export class Parser {
 		return body;
 	}
 
-	private static async getFormDataBody(
-		input: Request | Response,
-	): Promise<unknown> {
+	private static async getFormDataBody(input: Request | Response): Promise<unknown> {
 		const formData = await input.formData();
-		const entries = formData.entries() as IterableIterator<
-			[string, FormDataEntryValue]
-		>;
+		const entries = formData.entries() as IterableIterator<[string, FormDataEntryValue]>;
 
 		const body: UnknownObject = {};
 
@@ -177,9 +160,7 @@ export class Parser {
 		return body;
 	}
 
-	private static async getTextBody(
-		input: Request | Response,
-	): Promise<unknown> {
+	private static async getTextBody(input: Request | Response): Promise<unknown> {
 		const contentLength = input.headers.get(CommonHeaders.ContentLength);
 		const length = contentLength ? parseInt(contentLength) : 0;
 
@@ -198,8 +179,7 @@ export class Parser {
 	}
 
 	static getNormalizedContentType(input: Request | Response): string {
-		const contentTypeHeader =
-			input.headers.get(CommonHeaders.ContentType) || "";
+		const contentTypeHeader = input.headers.get(CommonHeaders.ContentType) || "";
 
 		if (
 			"method" in input &&
@@ -216,9 +196,7 @@ export class Parser {
 
 		if (contentTypeHeader.includes("application/json")) {
 			return "json";
-		} else if (
-			contentTypeHeader.includes("application/x-www-form-urlencoded")
-		) {
+		} else if (contentTypeHeader.includes("application/x-www-form-urlencoded")) {
 			return "form-urlencoded";
 		} else if (contentTypeHeader.includes("multipart/form-data")) {
 			return "form-data";

@@ -1,5 +1,6 @@
-import { $registryTesting, TC, TX } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC, TX } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 
@@ -74,9 +75,7 @@ describe("X.RateLimiter", () => {
 		}
 
 		const res = await s.handle(makeIpReq("/rl-no-negative"));
-		expect(
-			Number(res.headers.get("RateLimit-Remaining")),
-		).toBeGreaterThanOrEqual(0);
+		expect(Number(res.headers.get("RateLimit-Remaining"))).toBeGreaterThanOrEqual(0);
 	});
 
 	// ─── Rate Limiting (429) ──────────────────────────────────────
@@ -135,12 +134,8 @@ describe("X.RateLimiter", () => {
 		new TC.Route("/rl-cf-ip", () => "ok");
 		new TX.RateLimiter({ limits: { u: 120, i: 1, f: 20 } });
 
-		await s.handle(
-			req("/rl-cf-ip", { headers: { "cf-connecting-ip": "5.5.5.5" } }),
-		);
-		const res = await s.handle(
-			req("/rl-cf-ip", { headers: { "cf-connecting-ip": "5.5.5.5" } }),
-		);
+		await s.handle(req("/rl-cf-ip", { headers: { "cf-connecting-ip": "5.5.5.5" } }));
+		const res = await s.handle(req("/rl-cf-ip", { headers: { "cf-connecting-ip": "5.5.5.5" } }));
 
 		expect(res.status).toBe(429);
 	});
@@ -150,9 +145,7 @@ describe("X.RateLimiter", () => {
 		new TX.RateLimiter({ limits: { u: 120, i: 1, f: 20 } });
 
 		await s.handle(req("/rl-real-ip", { headers: { "x-real-ip": "6.6.6.6" } }));
-		const res = await s.handle(
-			req("/rl-real-ip", { headers: { "x-real-ip": "6.6.6.6" } }),
-		);
+		const res = await s.handle(req("/rl-real-ip", { headers: { "x-real-ip": "6.6.6.6" } }));
 
 		expect(res.status).toBe(429);
 	});

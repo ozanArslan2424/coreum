@@ -1,11 +1,12 @@
-import { Method } from "@/CRequest/Method";
+import { strSplit } from "corpus-utils/strSplit";
+
+import { CHeaders } from "@/CHeaders/CHeaders";
+import type { CHeadersInit } from "@/CHeaders/CHeadersInit";
 import { CommonHeaders } from "@/CHeaders/CommonHeaders";
 import { Cookies } from "@/Cookies/Cookies";
-import { CHeaders } from "@/CHeaders/CHeaders";
 import type { CRequestInfo } from "@/CRequest/CRequestInfo";
 import type { CRequestInit } from "@/CRequest/CRequestInit";
-import type { CHeadersInit } from "@/CHeaders/CHeadersInit";
-import { strSplit } from "corpus-utils/strSplit";
+import { Method } from "@/CRequest/Method";
 
 /** CRequest includes a cookie jar, better headers, and some utilities. */
 
@@ -19,16 +20,13 @@ export class CRequest extends Request {
 
 	get isPreflight(): boolean {
 		return (
-			this.method === Method.OPTIONS &&
-			this.headers.has(CommonHeaders.AccessControlRequestMethod)
+			this.method === Method.OPTIONS && this.headers.has(CommonHeaders.AccessControlRequestMethod)
 		);
 	}
 
 	get isWebsocket(): boolean {
-		const isUpgrade =
-			this.headers.get(CommonHeaders.Connection)?.toLowerCase() === "upgrade";
-		const isWebsocket =
-			this.headers.get(CommonHeaders.Upgrade)?.toLowerCase() === "websocket";
+		const isUpgrade = this.headers.get(CommonHeaders.Connection)?.toLowerCase() === "upgrade";
+		const isWebsocket = this.headers.get(CommonHeaders.Upgrade)?.toLowerCase() === "websocket";
 		return isUpgrade && isWebsocket;
 	}
 

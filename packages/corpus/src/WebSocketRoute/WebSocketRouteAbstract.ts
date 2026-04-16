@@ -1,17 +1,16 @@
-import { $registry } from "@/index";
-import { RouteAbstract } from "@/Route/RouteAbstract";
-import { RouteVariant } from "@/Route/RouteVariant";
-import type { Context } from "@/Context/Context";
-import { Method } from "@/CRequest/Method";
-import type { WebSocketRouteDefinition } from "@/WebSocketRoute/WebSocketRouteDefinition";
 import type { Func } from "corpus-utils/Func";
 import { joinPathSegments } from "corpus-utils/joinPathSegments";
 
+import type { Context } from "@/Context/Context";
+import { Method } from "@/CRequest/Method";
+import { $registry } from "@/index";
+import { RouteAbstract } from "@/Route/RouteAbstract";
+import { RouteVariant } from "@/Route/RouteVariant";
+import type { WebSocketRouteDefinition } from "@/WebSocketRoute/WebSocketRouteDefinition";
+
 type R = WebSocketRouteAbstract;
 
-export abstract class WebSocketRouteAbstract<
-	E extends string = string,
-> extends RouteAbstract<E> {
+export abstract class WebSocketRouteAbstract<E extends string = string> extends RouteAbstract<E> {
 	// FROM CONSTRUCTOR
 	abstract readonly path: E;
 

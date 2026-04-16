@@ -1,8 +1,9 @@
 import { C, X } from "@ozanarslan/corpus";
-import { ExampleController } from "./Example/ExampleController";
-import { ExampleService } from "./Example/ExampleService";
-import { ExampleRepository } from "./Example/ExampleRepository";
+
 import { DatabaseClient } from "./Database/DatabaseClient";
+import { ExampleController } from "./Example/ExampleController";
+import { ExampleRepository } from "./Example/ExampleRepository";
+import { ExampleService } from "./Example/ExampleService";
 
 const server = new C.Server();
 

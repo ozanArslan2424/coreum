@@ -1,5 +1,5 @@
-import { log } from "corpus-utils/internalLog";
 import dts from "bun-plugin-dts";
+import { log } from "corpus-utils/internalLog";
 
 function ms(start: number) {
 	const elapsed = performance.now() - start;

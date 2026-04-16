@@ -1,10 +1,6 @@
 import { assert } from "./assert";
 
-export function strSplit(
-	mark: string,
-	input: string,
-	minLength?: number,
-): string[] {
+export function strSplit(mark: string, input: string, minLength?: number): string[] {
 	const parts = input
 		.split(mark)
 		.map((part) => part.trim())

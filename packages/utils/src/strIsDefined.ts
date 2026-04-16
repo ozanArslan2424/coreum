@@ -1,5 +1,3 @@
-export function strIsDefined(
-	input: string | undefined | null,
-): input is string {
+export function strIsDefined(input: string | undefined | null): input is string {
 	return !!input?.trim() && typeof input === "string";
 }

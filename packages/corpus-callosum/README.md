@@ -138,13 +138,7 @@ export type InitializeConfig = Partial<{
 	 *
 	 * @default null
 	 */
-	validationLibrary:
-		| "arktype"
-		| "zod"
-		| "valibot"
-		| "yup"
-		| (string & {})
-		| null;
+	validationLibrary: "arktype" | "zod" | "valibot" | "yup" | (string & {}) | null;
 
 	/**
 	 * Package manager to install any missing dependencies with.

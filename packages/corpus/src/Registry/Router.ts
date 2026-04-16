@@ -1,16 +1,17 @@
-import { $registry } from "@/index";
-import type { CRequest } from "@/CRequest/CRequest";
-import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
-import type { RouterReturn } from "@/Registry/RouterReturn";
-import type { RouterData } from "@/Registry/RouterData";
-import type { RouteInterface } from "@/Route/RouteInterface";
-import { BranchAdapter } from "@/Registry/BranchAdapter";
-import type { RouteModel } from "@/Route/RouteModel";
+import type { Func } from "corpus-utils/Func";
 import { log } from "corpus-utils/internalLog";
 import { internFunc } from "corpus-utils/internFunc";
 import { objGetKeys } from "corpus-utils/objGetKeys";
 import { strRemoveWhitespace } from "corpus-utils/strRemoveWhitespace";
-import type { Func } from "corpus-utils/Func";
+
+import type { CRequest } from "@/CRequest/CRequest";
+import { $registry } from "@/index";
+import { BranchAdapter } from "@/Registry/BranchAdapter";
+import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
+import type { RouterData } from "@/Registry/RouterData";
+import type { RouterReturn } from "@/Registry/RouterReturn";
+import type { RouteInterface } from "@/Route/RouteInterface";
+import type { RouteModel } from "@/Route/RouteModel";
 
 export class Router {
 	constructor(private adapter: RouterAdapterInterface = new BranchAdapter()) {}
@@ -56,16 +57,12 @@ export class Router {
 	list(): Array<RouterData> {
 		const fn = this.adapter.list;
 		if (!fn) {
-			log.warn(
-				"Router adapter does not support list method, returning empty array",
-			);
+			log.warn("Router adapter does not support list method, returning empty array");
 		}
 		return fn?.() ?? [];
 	}
 
-	private routeToRouterData(
-		route: RouteInterface<any, any, any, any, string>,
-	): RouterData {
+	private routeToRouterData(route: RouteInterface<any, any, any, any, string>): RouterData {
 		return {
 			id: route.id,
 			endpoint: route.endpoint,

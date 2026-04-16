@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach } from "bun:test";
-import { $registryTesting, TC } from "./_modules";
+
 import { type } from "arktype";
 import * as z from "zod";
+
+import { $registryTesting, TC } from "./_modules";
 
 beforeEach(() => $registryTesting.reset());
 

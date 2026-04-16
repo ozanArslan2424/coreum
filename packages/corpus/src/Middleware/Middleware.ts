@@ -1,6 +1,6 @@
-import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
 import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
 import type { MiddlewareOptions } from "@/Middleware/MiddlewareOptions";
+import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
 
 /**
  * Simple Middleware registration class.

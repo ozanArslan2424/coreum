@@ -1,5 +1,5 @@
-import type { CHeaders } from "@/CHeaders/CHeaders";
 import type { CHeaderKey } from "@/CHeaders/CHeaderKey";
+import type { CHeaders } from "@/CHeaders/CHeaders";
 
 export type CHeadersInit =
 	| Headers

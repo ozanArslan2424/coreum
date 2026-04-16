@@ -1,9 +1,9 @@
-import { $registry } from "@/index";
 import { Method } from "@/CRequest/Method";
-import { RouteVariant } from "@/Route/RouteVariant";
-import type { RouteModel } from "@/Route/RouteModel";
-import type { RouteInterface } from "@/Route/RouteInterface";
+import { $registry } from "@/index";
 import type { RouteHandler } from "@/Route/RouteHandler";
+import type { RouteInterface } from "@/Route/RouteInterface";
+import type { RouteModel } from "@/Route/RouteModel";
+import { RouteVariant } from "@/Route/RouteVariant";
 
 export abstract class RouteAbstract<
 	B = unknown,

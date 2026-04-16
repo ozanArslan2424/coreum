@@ -1,8 +1,11 @@
 import path from "node:path";
-import { ImportsManager } from "../ImportsManager/ImportsManager";
+
 import type { Config } from "../Config/Config";
-import { Module } from "../Module/Module";
 import { Importable } from "../Importable/Importable";
+import { ImportsManager } from "../ImportsManager/ImportsManager";
+import { Module } from "../Module/Module";
+import { Package } from "../Package/Package";
+import { PackageManager } from "../PackageManager/PackageManager";
 import { writeControllerFile } from "./writeControllerFile";
 import { writeDatabaseFile } from "./writeDatabaseFile";
 import { writeMainFile } from "./writeMainFile";
@@ -10,8 +13,6 @@ import { writeModelFile } from "./writeModelFile";
 import { writeRepositoryFile } from "./writeRepositoryFile";
 import { writeServiceFile } from "./writeServiceFile";
 import { writesTypesFile } from "./writeTypesFile";
-import { PackageManager } from "../PackageManager/PackageManager";
-import { Package } from "../Package/Package";
 
 const exampleModuleName = "example";
 

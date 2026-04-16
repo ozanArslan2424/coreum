@@ -13,16 +13,12 @@ export function manualExpect(actual: any) {
 				throw new Error(`Expected object to have property "${key}"`);
 			}
 			if (value !== undefined && actual[key] !== value) {
-				throw new Error(
-					`Expected property "${key}" to be ${value}, got ${actual[key]}`,
-				);
+				throw new Error(`Expected property "${key}" to be ${value}, got ${actual[key]}`);
 			}
 		},
 		toEqual(expected: any) {
 			if (stringify(actual) !== stringify(expected)) {
-				throw new Error(
-					`Expected ${stringify(actual)} to equal ${stringify(expected)}`,
-				);
+				throw new Error(`Expected ${stringify(actual)} to equal ${stringify(expected)}`);
 			}
 		},
 		toBeGreaterThan(expected: number) {

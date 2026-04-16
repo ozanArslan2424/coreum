@@ -1,10 +1,10 @@
-import type { ContextDataInterface } from "@/types.d.ts";
-import type { Cookies } from "@/Cookies/Cookies";
 import type { CHeaders } from "@/CHeaders/CHeaders";
+import type { Cookies } from "@/Cookies/Cookies";
 import type { CRequest } from "@/CRequest/CRequest";
 import { CResponse } from "@/CResponse/CResponse";
 import { Parser } from "@/Parser/Parser";
 import type { RouterReturn } from "@/Registry/RouterReturn";
+import type { ContextDataInterface } from "@/types.d.ts";
 
 /**
  * The context object used in Route "callback" parameter.
@@ -45,20 +45,13 @@ export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
 	data: ContextDataInterface = {};
 	res: CResponse<R>;
 
-	static async appendParsedData<
-		B = unknown,
-		S = unknown,
-		P = unknown,
-		R = unknown,
-	>(ctx: Context<B, S, P, R>, req: CRequest, data: RouterReturn) {
+	static async appendParsedData<B = unknown, S = unknown, P = unknown, R = unknown>(
+		ctx: Context<B, S, P, R>,
+		req: CRequest,
+		data: RouterReturn,
+	) {
 		ctx.body = await Parser.parseBody(req, data.route.model?.body);
-		ctx.params = await Parser.parseUrlData(
-			data.params,
-			data.route.model?.params,
-		);
-		ctx.search = await Parser.parseUrlData(
-			data.search,
-			data.route.model?.search,
-		);
+		ctx.params = await Parser.parseUrlData(data.params, data.route.model?.params);
+		ctx.search = await Parser.parseUrlData(data.search, data.route.model?.search);
 	}
 }

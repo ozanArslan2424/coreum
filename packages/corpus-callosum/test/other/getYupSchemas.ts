@@ -1,12 +1,9 @@
 import * as y from "yup";
 
 export function getYupSchemas() {
-	const numericString = () =>
-		y.number().transform((_, o) => (o === "" ? NaN : Number(o)));
+	const numericString = () => y.number().transform((_, o) => (o === "" ? NaN : Number(o)));
 
-	const Role = y
-		.mixed<"admin" | "editor" | "viewer">()
-		.oneOf(["admin", "editor", "viewer"]);
+	const Role = y.mixed<"admin" | "editor" | "viewer">().oneOf(["admin", "editor", "viewer"]);
 	const Status = y
 		.mixed<"active" | "inactive" | "banned">()
 		.oneOf(["active", "inactive", "banned"]);
@@ -53,10 +50,7 @@ export function getYupSchemas() {
 			.object({
 				views: y.number().required(),
 				likes: y.number().required(),
-				category: y
-					.mixed<"tech" | "life" | "other">()
-					.oneOf(["tech", "life", "other"])
-					.required(),
+				category: y.mixed<"tech" | "life" | "other">().oneOf(["tech", "life", "other"]).required(),
 			})
 			.required(),
 	});
@@ -82,10 +76,7 @@ export function getYupSchemas() {
 	const OrgParams = y.object({ orgId: y.string().required() });
 	const OrgBody = y.object({
 		name: y.string().required(),
-		plan: y
-			.mixed<"free" | "pro" | "enterprise">()
-			.oneOf(["free", "pro", "enterprise"])
-			.required(),
+		plan: y.mixed<"free" | "pro" | "enterprise">().oneOf(["free", "pro", "enterprise"]).required(),
 		seats: y.number().required(),
 		owner: y
 			.object({

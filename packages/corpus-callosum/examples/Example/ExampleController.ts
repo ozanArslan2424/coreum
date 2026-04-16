@@ -1,4 +1,5 @@
 import { C } from "@ozanarslan/corpus";
+
 import { ExampleModel } from "./ExampleModel";
 import type { ExampleService } from "./ExampleService";
 

@@ -5,9 +5,7 @@ export function objAppendEntry(
 ) {
 	const existing = data[key];
 	if (existing !== undefined) {
-		data[key] = Array.isArray(existing)
-			? [...existing, value]
-			: [existing, value];
+		data[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
 	} else {
 		data[key] = value;
 	}

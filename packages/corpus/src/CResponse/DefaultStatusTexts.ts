@@ -1,5 +1,6 @@
-import { Status } from "@/CResponse/Status";
 import type { ValueOf } from "corpus-utils/ValueOf";
+
+import { Status } from "@/CResponse/Status";
 
 export const DefaultStatusTexts = {
 	[Status.OK]: "OK",

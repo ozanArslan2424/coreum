@@ -2,10 +2,7 @@ import type { ImportableInterface } from "../Importable/ImportableInterface";
 import type { ModuleInterface } from "../Module/ModuleInterface";
 import { Writer } from "../Writer/Writer";
 
-export function writeDatabaseFile(
-	m: ModuleInterface,
-	database: ImportableInterface,
-) {
+export function writeDatabaseFile(m: ModuleInterface, database: ImportableInterface) {
 	const w = new Writer(database.filePath);
 
 	w.$import({

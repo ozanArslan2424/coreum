@@ -1,5 +1,6 @@
-import { $registryTesting, TX } from "./_modules";
 import { beforeEach, describe, expect, it, spyOn } from "bun:test";
+
+import { $registryTesting, TX } from "./_modules";
 
 beforeEach(() => $registryTesting.reset());
 
@@ -40,9 +41,7 @@ describe("X.Config", () => {
 	it("GET - DEFINED PARSE BOOLEAN", () => {
 		TX.Config.set(booleanKey, booleanVal);
 
-		expect(TX.Config.get(booleanKey, { parser: (v) => v === "true" })).toBe(
-			booleanVal,
-		);
+		expect(TX.Config.get(booleanKey, { parser: (v) => v === "true" })).toBe(booleanVal);
 		expect(TX.Config.get(booleanKey, { parser: Boolean })).toBe(booleanVal);
 	});
 

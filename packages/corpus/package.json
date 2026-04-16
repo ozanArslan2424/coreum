@@ -17,9 +17,11 @@
 		"type": "git",
 		"url": "git+https://github.com/ozanArslan2424/corpus.git"
 	},
-	"publishConfig": {
-		"access": "public"
-	},
+	"files": [
+		"dist",
+		"LICENSE.txt",
+		"THIRD_PARTY_LICENSES.txt"
+	],
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -30,11 +32,9 @@
 			"require": "./dist/index.cjs"
 		}
 	},
-	"files": [
-		"dist",
-		"LICENSE.txt",
-		"THIRD_PARTY_LICENSES.txt"
-	],
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"fm": "bunx --bun prettier --write .",
 		"lint": "bunx oxlint --fix",
@@ -47,13 +47,10 @@
 		"tests": "bun test --only-failures"
 	},
 	"devDependencies": {
-		"@types/bun": "^1.3.11",
 		"arktype": "^2.2.0",
 		"bun-plugin-dts": "^0.4.0",
 		"corpus-utils": "workspace:*",
 		"memoirist": "^0.4.0",
-		"oxlint": "^1.57.0",
-		"prettier": "^3.8.1",
 		"zod": "^4.3.6"
 	},
 	"peerDependencies": {

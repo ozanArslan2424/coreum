@@ -1,6 +1,6 @@
-import type { CookiesInterface } from "@/Cookies/CookiesInterface";
 import type { CookieOptions } from "@/Cookies/CookieOptions";
 import type { CookiesInit } from "@/Cookies/CookiesInit";
+import type { CookiesInterface } from "@/Cookies/CookiesInterface";
 
 export class Cookies implements CookiesInterface {
 	constructor(init?: CookiesInit | CookiesInterface) {

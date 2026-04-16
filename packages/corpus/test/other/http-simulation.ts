@@ -1,6 +1,7 @@
 import { type } from "arktype";
-import { TC } from "../_modules";
 import { TestHelper } from "corpus-utils/TestHelper";
+
+import { TC } from "../_modules";
 
 // ── config ────────────────────────────────────────────────────────────────────
 
@@ -27,11 +28,7 @@ interface Res {
 	elapsed: number;
 }
 
-async function req(
-	method: HttpMethod,
-	path: string,
-	opts: ReqOptions = {},
-): Promise<Res> {
+async function req(method: HttpMethod, path: string, opts: ReqOptions = {}): Promise<Res> {
 	const url = `${BASE_URL}${path}`;
 	T.log.step(`${method} ${url}`);
 	if (opts.body) T.log.debug("↑", T.stringify(opts.body));
@@ -85,10 +82,7 @@ async function suite(name: string, fn: () => Promise<void>) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // in-memory "db"
-const db = new Map<
-	string,
-	{ id: string; name: string; email: string; role: string }
->();
+const db = new Map<string, { id: string; name: string; email: string; role: string }>();
 let idCounter = 1;
 
 const idParam = type({ id: "string" });
@@ -420,12 +414,8 @@ await suite("ECHO - HEADERS & BODY PASSTHROUGH", async () => {
 	T.expect("echo status", res.status).toMatchStatus(200);
 	T.expect("echo.hello", res.body?.echoed?.hello).toBe("corpus");
 	T.expect("echo.nested.works", res.body?.echoed?.nested?.works).toBe(true);
-	T.expect("echo custom header", res.body?.headers?.custom).toBe(
-		"blazing-fast",
-	);
-	T.expect("echo content-type", res.body?.headers?.contentType).toContain(
-		"application/json",
-	);
+	T.expect("echo custom header", res.body?.headers?.custom).toBe("blazing-fast");
+	T.expect("echo content-type", res.body?.headers?.contentType).toContain("application/json");
 });
 
 // ── SEARCH ────────────────────────────────────────────────────────────────────
@@ -436,9 +426,7 @@ await suite("SEARCH - QUERY PARAMS", async () => {
 	T.expect("search status", res.status).toMatchStatus(200);
 	T.expect("search q", res.body?.q).toBe("alice");
 	T.expect("search results array", Array.isArray(res.body?.results)).toBe(true);
-	T.expect("search finds alice", res.body?.results?.[0]?.name).toBe(
-		"Alice Smith",
-	);
+	T.expect("search finds alice", res.body?.results?.[0]?.name).toBe("Alice Smith");
 
 	T.log.info("GET /search?q=nobody...");
 	const none = await GET("/search?q=nobody");
@@ -453,9 +441,7 @@ await suite("SEARCH - QUERY PARAMS", async () => {
 
 await suite("PERFORMANCE - CONCURRENT REQUESTS", async () => {
 	T.log.info("Firing 20 concurrent GETs at /health...");
-	const results = await Promise.all(
-		Array.from({ length: 20 }, () => GET("/health")),
-	);
+	const results = await Promise.all(Array.from({ length: 20 }, () => GET("/health")));
 	const allOk = results.every((r) => r.status === 200);
 	T.expect("all 20 returned 200", allOk).toBe(true);
 	const avg = results.reduce((s, r) => s + r.elapsed, 0) / results.length;

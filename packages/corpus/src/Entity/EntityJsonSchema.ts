@@ -1,13 +1,6 @@
 type JSONSchema = boolean | EntityJsonSchema;
 
-type SimpleType =
-	| "array"
-	| "boolean"
-	| "integer"
-	| "null"
-	| "number"
-	| "object"
-	| "string";
+type SimpleType = "array" | "boolean" | "integer" | "null" | "number" | "object" | "string";
 
 export interface EntityJsonSchema {
 	$id?: string;

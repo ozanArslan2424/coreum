@@ -1,12 +1,12 @@
-import { XConfig } from "@/XConfig/XConfig";
+import { CError } from "@/CError/CError";
 import { CRequest } from "@/CRequest/CRequest";
 import { Status } from "@/CResponse/Status";
-import { ServerAbstract } from "@/Server/ServerAbstract";
 import type { ServeArgs } from "@/Server/ServeArgs";
-import { WebSocketRoute } from "@/WebSocketRoute/WebSocketRoute";
-import { CError } from "@/CError/CError";
+import { ServerAbstract } from "@/Server/ServerAbstract";
 import type { ServerApp } from "@/Server/ServerApp";
 import type { ServerWebSocketHandler } from "@/Server/ServerWebSocketHandler";
+import { WebSocketRoute } from "@/WebSocketRoute/WebSocketRoute";
+import { XConfig } from "@/XConfig/XConfig";
 
 /**
  * Server is the entrypoint to the app. It must be initialized before registering routes and middlewares.
@@ -41,10 +41,7 @@ export class Server extends ServerAbstract {
 		});
 	}
 
-	private async fetch(
-		request: Request,
-		server: ServerApp,
-	): Promise<Response | undefined> {
+	private async fetch(request: Request, server: ServerApp): Promise<Response | undefined> {
 		const req = new CRequest(request);
 		const res = await this.handleRequest(req, (wsRoute) => {
 			const upgraded = server.upgrade(request, { data: wsRoute });

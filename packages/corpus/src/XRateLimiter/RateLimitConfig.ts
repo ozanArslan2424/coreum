@@ -1,5 +1,5 @@
-import type { RateLimitStoreInterface } from "@/XRateLimiter/RateLimitStoreInterface";
 import type { RateLimitIdPrefix } from "@/XRateLimiter/RateLimitIdPrefix";
+import type { RateLimitStoreInterface } from "@/XRateLimiter/RateLimitStoreInterface";
 
 export type RateLimitConfig = {
 	/**

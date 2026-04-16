@@ -1,8 +1,9 @@
-import { TC, TX, $registryTesting } from "./_modules";
 import { describe, expect, it, beforeEach } from "bun:test";
+import net from "node:net";
+
+import { TC, TX, $registryTesting } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
-import net from "node:net";
 
 beforeEach(() => $registryTesting.reset());
 
@@ -50,10 +51,7 @@ describe("C.Server", () => {
 	it("SET ON ERROR - CUSTOM HANDLER IS CALLED ON ERROR", async () => {
 		const s = createTestServer();
 		s.setOnError(async () => {
-			return new TC.Response(
-				{ error: true, message: "custom error" },
-				{ status: 500 },
-			);
+			return new TC.Response({ error: true, message: "custom error" }, { status: 500 });
 		});
 		new TC.Route("/srv-error", () => {
 			throw new Error("boom");
@@ -91,10 +89,7 @@ describe("C.Server", () => {
 	it("SET ON NOT FOUND - CUSTOM HANDLER IS CALLED", async () => {
 		const s = createTestServer();
 		s.setOnNotFound(async () => {
-			return new TC.Response(
-				{ error: true, message: "custom not found" },
-				{ status: 404 },
-			);
+			return new TC.Response({ error: true, message: "custom not found" }, { status: 404 });
 		});
 		const res = await s.handle(req("/srv-custom-404"));
 		expect(res.status).toBe(404);
@@ -128,9 +123,7 @@ describe("C.Server", () => {
 		const s = createTestServer();
 		s.setGlobalPrefix("/api");
 		new TC.Route("/srv-no-prefix", () => "ok");
-		const res = await s.handle(
-			new Request("http://localhost:4444/srv-no-prefix"),
-		);
+		const res = await s.handle(new Request("http://localhost:4444/srv-no-prefix"));
 		expect(res.status).toBe(404);
 		s.setGlobalPrefix("");
 	});
@@ -141,12 +134,8 @@ describe("C.Server", () => {
 		const s = createTestServer();
 		new TX.Cors({ allowedOrigins: ["https://example.com"] });
 		new TC.Route("/srv-cors", () => "ok");
-		const res = await s.handle(
-			req("/srv-cors", { headers: { origin: "https://example.com" } }),
-		);
-		expect(res.headers.get("Access-Control-Allow-Origin")).toBe(
-			"https://example.com",
-		);
+		const res = await s.handle(req("/srv-cors", { headers: { origin: "https://example.com" } }));
+		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");
 		new TX.Cors(undefined);
 	});
 
@@ -164,9 +153,7 @@ describe("C.Server", () => {
 	it("CORS - IS NOT APPLIED WHEN NOT SET", async () => {
 		const s = createTestServer();
 		new TC.Route("/srv-no-cors", () => "ok");
-		const res = await s.handle(
-			req("/srv-no-cors", { headers: { origin: "https://example.com" } }),
-		);
+		const res = await s.handle(req("/srv-no-cors", { headers: { origin: "https://example.com" } }));
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBeNull();
 	});
 

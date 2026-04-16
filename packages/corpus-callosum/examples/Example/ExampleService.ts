@@ -1,13 +1,12 @@
 import { C } from "@ozanarslan/corpus";
+
 import type { ExampleType } from "./ExampleModel";
 import type { ExampleRepository } from "./ExampleRepository";
 
 export class ExampleService {
 	constructor(private readonly repo: ExampleRepository) {}
 
-	async get(
-		params: ExampleType["get"]["params"],
-	): Promise<ExampleType["get"]["response"]> {
+	async get(params: ExampleType["get"]["params"]): Promise<ExampleType["get"]["response"]> {
 		const entity = this.repo.findById(params.id);
 		if (!entity) {
 			throw new C.Error("not found", C.Status.NOT_FOUND);
@@ -15,15 +14,11 @@ export class ExampleService {
 		return entity;
 	}
 
-	async list(
-		search: ExampleType["list"]["search"],
-	): Promise<ExampleType["list"]["response"]> {
+	async list(search: ExampleType["list"]["search"]): Promise<ExampleType["list"]["response"]> {
 		return this.repo.findMany({ page: search.page, limit: search.limit });
 	}
 
-	async create(
-		body: ExampleType["create"]["body"],
-	): Promise<ExampleType["create"]["response"]> {
+	async create(body: ExampleType["create"]["body"]): Promise<ExampleType["create"]["response"]> {
 		return this.repo.create({ name: body.name });
 	}
 

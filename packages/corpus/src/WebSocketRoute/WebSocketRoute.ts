@@ -1,9 +1,7 @@
-import type { WebSocketRouteDefinition } from "@/WebSocketRoute/WebSocketRouteDefinition";
 import { WebSocketRouteAbstract } from "@/WebSocketRoute/WebSocketRouteAbstract";
+import type { WebSocketRouteDefinition } from "@/WebSocketRoute/WebSocketRouteDefinition";
 
-export class WebSocketRoute<
-	E extends string = string,
-> extends WebSocketRouteAbstract<E> {
+export class WebSocketRoute<E extends string = string> extends WebSocketRouteAbstract<E> {
 	constructor(
 		readonly path: E,
 		definition: WebSocketRouteDefinition,

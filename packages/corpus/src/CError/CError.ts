@@ -1,5 +1,5 @@
-import { Status } from "@/CResponse/Status";
 import { CResponse } from "@/CResponse/CResponse";
+import { Status } from "@/CResponse/Status";
 
 export class CError extends Error {
 	constructor(

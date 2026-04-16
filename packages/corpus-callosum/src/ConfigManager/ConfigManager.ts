@@ -1,13 +1,15 @@
-import type { Config, PartialConfig } from "../Config/Config";
-import { ACTIONS, type Action } from "../utils/ACTIONS";
-import { logFatal, log } from "corpus-utils/internalLog";
-import path from "node:path";
 import fs from "node:fs";
+import path from "node:path";
 import { parseArgs } from "util";
+
+import * as p from "@clack/prompts";
+import { logFatal, log } from "corpus-utils/internalLog";
+
+import type { Config, PartialConfig } from "../Config/Config";
 import { ACCEPTED_PACKAGE_MANAGERS } from "../utils/ACCEPTED_PACKAGE_MANAGERS";
 import { ACCEPTED_VALIDATION_LIBS } from "../utils/ACCEPTED_VALIDATION_LIBS";
+import { ACTIONS, type Action } from "../utils/ACTIONS";
 import { registerSilentConsole } from "../utils/registerSilentConsole";
-import * as p from "@clack/prompts";
 import { Writer } from "../Writer/Writer";
 
 export class ConfigManager {
@@ -17,12 +19,8 @@ export class ConfigManager {
 
 		if (!action || !ACTIONS.includes(action)) {
 			log.bold("No action provided. Available actions:");
-			log.info(
-				"  api   — generate types and API client from your server entry file",
-			);
-			log.info(
-				"          example: corpus api -m ./src/main.ts -o ./src/corpus.gen.ts",
-			);
+			log.info("  api   — generate types and API client from your server entry file");
+			log.info("          example: corpus api -m ./src/main.ts -o ./src/corpus.gen.ts");
 			log.info("  init  — scaffold an empty Corpus project");
 			log.info("          example: corpus init");
 			logFatal("Please provide an action and try again.");
@@ -171,9 +169,7 @@ export class ConfigManager {
 			ignoreGlobalPrefix: ignoreGlobalPrefix as boolean,
 			packageManager: packageManager as Config["packageManager"],
 			validationLibrary:
-				validationLibrary === "none"
-					? null
-					: (validationLibrary as Config["validationLibrary"]),
+				validationLibrary === "none" ? null : (validationLibrary as Config["validationLibrary"]),
 			silent: silent as boolean,
 		};
 	}
@@ -182,11 +178,7 @@ export class ConfigManager {
 		const fileC = this.getFileConfig();
 		const defC = this.getDefaultConfig();
 
-		function use<T>(
-			flag: T | null | undefined,
-			file: T | null | undefined,
-			def: T,
-		): T {
+		function use<T>(flag: T | null | undefined, file: T | null | undefined, def: T): T {
 			if (flag != null && flag !== undefined) return flag;
 			if (file != null && file !== undefined) return file;
 			return def;
@@ -199,23 +191,11 @@ export class ConfigManager {
 			main: use(null, fileC.main, defC.main),
 			packageManager: use(null, fileC.packageManager, defC.packageManager),
 			pkgPath: use(null, fileC.pkgPath, defC.pkgPath),
-			validationLibrary: use(
-				null,
-				fileC.validationLibrary,
-				defC.validationLibrary,
-			),
+			validationLibrary: use(null, fileC.validationLibrary, defC.validationLibrary),
 			exportClientAs: use(null, fileC.exportClientAs, defC.exportClientAs),
-			ignoreGlobalPrefix: use(
-				null,
-				fileC.ignoreGlobalPrefix,
-				defC.ignoreGlobalPrefix,
-			),
+			ignoreGlobalPrefix: use(null, fileC.ignoreGlobalPrefix, defC.ignoreGlobalPrefix),
 			output: use(null, fileC.output, defC.output),
-			jsonSchemaOptions: use(
-				null,
-				fileC.jsonSchemaOptions,
-				defC.jsonSchemaOptions,
-			),
+			jsonSchemaOptions: use(null, fileC.jsonSchemaOptions, defC.jsonSchemaOptions),
 		};
 
 		const hasFlags = !!(
@@ -261,11 +241,7 @@ export class ConfigManager {
 				mergedDefaults.ignoreGlobalPrefix,
 			),
 			output: use(flagC.output, promptC.output, mergedDefaults.output),
-			jsonSchemaOptions: use(
-				null,
-				fileC.jsonSchemaOptions,
-				defC.jsonSchemaOptions,
-			),
+			jsonSchemaOptions: use(null, fileC.jsonSchemaOptions, defC.jsonSchemaOptions),
 		};
 
 		if (config.silent) {
@@ -295,16 +271,9 @@ export class ConfigManager {
 		w.pair("packageManager", w.str(config.packageManager ?? "bun"));
 		w.pair("casing", w.str(config.casing));
 		w.pair("output", w.str(config.output));
-		w.pair(
-			"exportClientAs",
-			config.exportClientAs ? w.str(config.exportClientAs) : "false",
-		);
-		w.$comment(
-			"Default targets arktype. The `fallback: ctx => ctx.base` strategy silently",
-		);
-		w.$comment(
-			"drops any unsupported constraint and keeps the rest of the schema intact,",
-		);
+		w.pair("exportClientAs", config.exportClientAs ? w.str(config.exportClientAs) : "false");
+		w.$comment("Default targets arktype. The `fallback: ctx => ctx.base` strategy silently");
+		w.$comment("drops any unsupported constraint and keeps the rest of the schema intact,");
 		w.$comment("which is the least-surprising behaviour for codegen purposes.");
 		w.line("jsonSchemaOptions: {");
 		w.tab(`target: "draft-07",`);

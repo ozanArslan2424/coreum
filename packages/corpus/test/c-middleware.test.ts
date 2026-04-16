@@ -1,7 +1,8 @@
-import { $registryTesting, TC, testLog } from "./_modules";
 import { describe, expect, it, spyOn, beforeEach } from "bun:test";
-import { createTestServer } from "./utils/createTestServer";
+
+import { $registryTesting, TC, testLog } from "./_modules";
 import { createTestController } from "./utils/createTestController";
+import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 
 beforeEach(() => {

@@ -1,9 +1,11 @@
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
 import type { Schema } from "corpus-utils/Schema";
+
+import { $registryTesting, TC } from "./_modules";
+import { createTestServer } from "./utils/createTestServer";
 import { TestModel } from "./utils/TestModel";
 import { TestParsingController } from "./utils/TestParsingController";
-import { createTestServer } from "./utils/createTestServer";
 
 const RAW = { hello: "1" };
 const PARSED = { hello: 1 };
@@ -38,26 +40,14 @@ describe("Parser.parse", () => {
 			expect(parse(PARSED, TestModel.zodRoute.body)).resolves.toEqual(PARSED);
 		});
 		it("ark route (referenced schemas)", async () => {
-			expect(parse(RAW, TestModel.arkRouteReferenced.params)).resolves.toEqual(
-				PARSED,
-			);
-			expect(parse(RAW, TestModel.arkRouteReferenced.search)).resolves.toEqual(
-				PARSED,
-			);
-			expect(parse(PARSED, TestModel.arkRouteReferenced.body)).resolves.toEqual(
-				PARSED,
-			);
+			expect(parse(RAW, TestModel.arkRouteReferenced.params)).resolves.toEqual(PARSED);
+			expect(parse(RAW, TestModel.arkRouteReferenced.search)).resolves.toEqual(PARSED);
+			expect(parse(PARSED, TestModel.arkRouteReferenced.body)).resolves.toEqual(PARSED);
 		});
 		it("zod route (referenced schemas)", async () => {
-			expect(parse(RAW, TestModel.zodRouteReferenced.params)).resolves.toEqual(
-				PARSED,
-			);
-			expect(parse(RAW, TestModel.zodRouteReferenced.search)).resolves.toEqual(
-				PARSED,
-			);
-			expect(parse(PARSED, TestModel.zodRouteReferenced.body)).resolves.toEqual(
-				PARSED,
-			);
+			expect(parse(RAW, TestModel.zodRouteReferenced.params)).resolves.toEqual(PARSED);
+			expect(parse(RAW, TestModel.zodRouteReferenced.search)).resolves.toEqual(PARSED);
+			expect(parse(PARSED, TestModel.zodRouteReferenced.body)).resolves.toEqual(PARSED);
 		});
 	});
 
@@ -79,26 +69,14 @@ describe("Parser.parse", () => {
 			expect(parse(BAD, TestModel.zodRoute.body)).rejects.toThrow(TC.Error);
 		});
 		it("ark route (referenced schemas)", async () => {
-			expect(parse(BAD, TestModel.arkRouteReferenced.params)).rejects.toThrow(
-				TC.Error,
-			);
-			expect(parse(BAD, TestModel.arkRouteReferenced.search)).rejects.toThrow(
-				TC.Error,
-			);
-			expect(parse(BAD, TestModel.arkRouteReferenced.body)).rejects.toThrow(
-				TC.Error,
-			);
+			expect(parse(BAD, TestModel.arkRouteReferenced.params)).rejects.toThrow(TC.Error);
+			expect(parse(BAD, TestModel.arkRouteReferenced.search)).rejects.toThrow(TC.Error);
+			expect(parse(BAD, TestModel.arkRouteReferenced.body)).rejects.toThrow(TC.Error);
 		});
 		it("zod route (referenced schemas)", async () => {
-			expect(parse(BAD, TestModel.zodRouteReferenced.params)).rejects.toThrow(
-				TC.Error,
-			);
-			expect(parse(BAD, TestModel.zodRouteReferenced.search)).rejects.toThrow(
-				TC.Error,
-			);
-			expect(parse(BAD, TestModel.zodRouteReferenced.body)).rejects.toThrow(
-				TC.Error,
-			);
+			expect(parse(BAD, TestModel.zodRouteReferenced.params)).rejects.toThrow(TC.Error);
+			expect(parse(BAD, TestModel.zodRouteReferenced.search)).rejects.toThrow(TC.Error);
+			expect(parse(BAD, TestModel.zodRouteReferenced.body)).rejects.toThrow(TC.Error);
 		});
 	});
 });

@@ -1,5 +1,6 @@
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 
@@ -119,9 +120,7 @@ describe("C.Middleware — lifecycle", () => {
 	});
 
 	it("GUARD — return response passes through (correct token)", async () => {
-		const res = await s.handle(
-			req("/protected", { headers: { authorization: "Bearer secret" } }),
-		);
+		const res = await s.handle(req("/protected", { headers: { authorization: "Bearer secret" } }));
 		expect(res.status).toBe(200);
 		const body = await TC.Parser.parseBody<{ user: string }>(res);
 		expect(body).toEqual({ user: "alice" });
@@ -155,9 +154,7 @@ describe("C.Middleware — lifecycle", () => {
 	});
 
 	it("INBOUND — request header extracted into (c.data as any)", async () => {
-		const res = await s.handle(
-			req("/inbound-headers", { headers: { "x-api-key": "key-xyz" } }),
-		);
+		const res = await s.handle(req("/inbound-headers", { headers: { "x-api-key": "key-xyz" } }));
 		const body = await TC.Parser.parseBody<{ receivedToken: string }>(res);
 		expect(body).toEqual({ receivedToken: "key-xyz" });
 	});

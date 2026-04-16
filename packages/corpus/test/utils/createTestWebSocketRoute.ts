@@ -1,4 +1,5 @@
 import type { Log } from "corpus-utils/internalLog";
+
 import { TC } from "../_modules";
 
 export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
@@ -12,9 +13,7 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 			path: string = "/ws";
 
 			onOpen?: TC.WebSocketRouteDefinition["onOpen"] | undefined = (ws) => {
-				log.info(
-					`[ws] New connection opened — remoteAddress: ${ws.remoteAddress}`,
-				);
+				log.info(`[ws] New connection opened — remoteAddress: ${ws.remoteAddress}`);
 				ws.send(
 					JSON.stringify({
 						event: "connected",
@@ -24,14 +23,8 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 				log.debug(`[ws] Sent connected greeting to ${ws.remoteAddress}`);
 			};
 
-			onClose?: TC.WebSocketRouteDefinition["onClose"] | undefined = (
-				_ws,
-				code,
-				reason,
-			) => {
-				log.info(
-					`[ws] Connection closed — code=${code} reason=${reason || "no reason provided"}`,
-				);
+			onClose?: TC.WebSocketRouteDefinition["onClose"] | undefined = (_ws, code, reason) => {
+				log.info(`[ws] Connection closed — code=${code} reason=${reason || "no reason provided"}`);
 			};
 
 			onMessage: TC.WebSocketRouteDefinition["onMessage"] = (ws, message) => {
@@ -48,20 +41,14 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 						log.info(`[ws] Client subscribing to topic: ${msg.topic}`);
 						ws.subscribe(msg.topic!);
 						ws.send(JSON.stringify({ event: "subscribed", topic: msg.topic }));
-						log.debug(
-							`[ws] Sent subscribed confirmation for topic: ${msg.topic}`,
-						);
+						log.debug(`[ws] Sent subscribed confirmation for topic: ${msg.topic}`);
 						break;
 					}
 					case "unsubscribe": {
 						log.info(`[ws] Client unsubscribing from topic: ${msg.topic}`);
 						ws.unsubscribe(msg.topic!);
-						ws.send(
-							JSON.stringify({ event: "unsubscribed", topic: msg.topic }),
-						);
-						log.debug(
-							`[ws] Sent unsubscribed confirmation for topic: ${msg.topic}`,
-						);
+						ws.send(JSON.stringify({ event: "unsubscribed", topic: msg.topic }));
+						log.debug(`[ws] Sent unsubscribed confirmation for topic: ${msg.topic}`);
 						break;
 					}
 					case "publish": {
@@ -99,9 +86,7 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 								data: ws.subscriptions,
 							}),
 						);
-						log.debug(
-							`[ws] Sent subscriptions: ${JSON.stringify(ws.subscriptions)}`,
-						);
+						log.debug(`[ws] Sent subscriptions: ${JSON.stringify(ws.subscriptions)}`);
 						break;
 					}
 					default: {
@@ -121,9 +106,7 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 	} else {
 		new TC.WebSocketRoute("/ws", {
 			onOpen: (ws) => {
-				log.info(
-					`[ws] New connection opened — remoteAddress: ${ws.remoteAddress}`,
-				);
+				log.info(`[ws] New connection opened — remoteAddress: ${ws.remoteAddress}`);
 				ws.send(
 					JSON.stringify({
 						event: "connected",
@@ -134,9 +117,7 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 			},
 
 			onClose: (_ws, code, reason) => {
-				log.info(
-					`[ws] Connection closed — code=${code} reason=${reason || "no reason provided"}`,
-				);
+				log.info(`[ws] Connection closed — code=${code} reason=${reason || "no reason provided"}`);
 			},
 
 			onMessage: (ws, message) => {
@@ -153,20 +134,14 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 						log.info(`[ws] Client subscribing to topic: ${msg.topic}`);
 						ws.subscribe(msg.topic!);
 						ws.send(JSON.stringify({ event: "subscribed", topic: msg.topic }));
-						log.debug(
-							`[ws] Sent subscribed confirmation for topic: ${msg.topic}`,
-						);
+						log.debug(`[ws] Sent subscribed confirmation for topic: ${msg.topic}`);
 						break;
 					}
 					case "unsubscribe": {
 						log.info(`[ws] Client unsubscribing from topic: ${msg.topic}`);
 						ws.unsubscribe(msg.topic!);
-						ws.send(
-							JSON.stringify({ event: "unsubscribed", topic: msg.topic }),
-						);
-						log.debug(
-							`[ws] Sent unsubscribed confirmation for topic: ${msg.topic}`,
-						);
+						ws.send(JSON.stringify({ event: "unsubscribed", topic: msg.topic }));
+						log.debug(`[ws] Sent unsubscribed confirmation for topic: ${msg.topic}`);
 						break;
 					}
 					case "publish": {
@@ -204,9 +179,7 @@ export function createTestWebSocketRoute(log: Log, withAbstract: boolean) {
 								data: ws.subscriptions,
 							}),
 						);
-						log.debug(
-							`[ws] Sent subscriptions: ${JSON.stringify(ws.subscriptions)}`,
-						);
+						log.debug(`[ws] Sent subscriptions: ${JSON.stringify(ws.subscriptions)}`);
 						break;
 					}
 					default: {

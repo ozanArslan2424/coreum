@@ -1,8 +1,10 @@
-import { join } from "path";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "path";
+
+import { logFatal } from "corpus-utils/internalLog";
+
 import type { Config } from "../Config/Config";
 import type { PackageInterface } from "../Package/PackageInterface";
-import { logFatal } from "corpus-utils/internalLog";
 
 export class PackageManager {
 	constructor(
@@ -11,11 +13,7 @@ export class PackageManager {
 	) {}
 
 	get manager(): string {
-		return (
-			this.config.packageManager ??
-			this.content.packageManager?.split("@")?.[0] ??
-			"bun"
-		);
+		return this.config.packageManager ?? this.content.packageManager?.split("@")?.[0] ?? "bun";
 	}
 
 	get path(): string {
@@ -61,8 +59,7 @@ export class PackageManager {
 
 	async add(...pkgs: PackageInterface[]) {
 		const cmd = this.manager === "npm" ? "install" : "add";
-		const fmt = (p: PackageInterface) =>
-			`${p.name}${p.version ? `@${p.version}` : ""}`;
+		const fmt = (p: PackageInterface) => `${p.name}${p.version ? `@${p.version}` : ""}`;
 
 		const dev = pkgs.filter((p) => p.dev);
 		const prod = pkgs.filter((p) => !p.dev);

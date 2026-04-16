@@ -47,17 +47,11 @@ export class TestHelper {
 		return {
 			toBe(expected: any) {
 				if (actual === expected) pass(stringify(actual));
-				else
-					fail(
-						`${label}: expected ${stringify(expected)}, got ${stringify(actual)}`,
-					);
+				else fail(`${label}: expected ${stringify(expected)}, got ${stringify(actual)}`);
 			},
 			toEqual(expected: any) {
 				if (stringify(actual) === stringify(expected)) pass(stringify(actual));
-				else
-					fail(
-						`${label}: expected ${stringify(expected)}, got ${stringify(actual)}`,
-					);
+				else fail(`${label}: expected ${stringify(expected)}, got ${stringify(actual)}`);
 			},
 			toContain(expected: string) {
 				const str = typeof actual === "string" ? actual : stringify(actual);
@@ -78,19 +72,11 @@ export class TestHelper {
 			},
 			toHaveProperty(key: string, value?: any) {
 				if (!(key in Object(actual))) {
-					fail(
-						`${label}: expected property "${key}" to exist on ${stringify(actual)}`,
-					);
+					fail(`${label}: expected property "${key}" to exist on ${stringify(actual)}`);
 				} else if (value !== undefined && actual[key] !== value) {
-					fail(
-						`${label}: expected .${key} = ${stringify(value)}, got ${stringify(actual[key])}`,
-					);
+					fail(`${label}: expected .${key} = ${stringify(value)}, got ${stringify(actual[key])}`);
 				} else {
-					pass(
-						value !== undefined
-							? `.${key} = ${stringify(value)}`
-							: `.${key} exists`,
-					);
+					pass(value !== undefined ? `.${key} = ${stringify(value)}` : `.${key} exists`);
 				}
 			},
 		};

@@ -14,8 +14,7 @@
 		<script>
 			// Load highlight.js library
 			const script = document.createElement("script");
-			script.src =
-				"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js";
+			script.src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js";
 			script.onload = () => {
 				// Load the theme CSS
 				const link = document.createElement("link");
@@ -37,20 +36,18 @@
 		</script>
 
 		<script>
-			document
-				.querySelectorAll(".code-copy .copy-btn:not([onclick])")
-				.forEach((btn) => {
-					btn.addEventListener("click", async () => {
-						const code = btn.previousElementSibling.textContent;
-						try {
-							await navigator.clipboard.writeText(code);
-							btn.classList.add("copied");
-							setTimeout(() => btn.classList.remove("copied"), 2000);
-						} catch (err) {
-							console.error("Failed to copy:", err);
-						}
-					});
+			document.querySelectorAll(".code-copy .copy-btn:not([onclick])").forEach((btn) => {
+				btn.addEventListener("click", async () => {
+					const code = btn.previousElementSibling.textContent;
+					try {
+						await navigator.clipboard.writeText(code);
+						btn.classList.add("copied");
+						setTimeout(() => btn.classList.remove("copied"), 2000);
+					} catch (err) {
+						console.error("Failed to copy:", err);
+					}
 				});
+			});
 		</script>
 
 		<script>
@@ -86,9 +83,7 @@
 
 <script>
 	const searchLinks = Array.from(document.querySelectorAll("aside nav a"))
-		.filter(
-			(a) => a.getAttribute("href") !== "#" && !a.hasAttribute("aria-disabled"),
-		)
+		.filter((a) => a.getAttribute("href") !== "#" && !a.hasAttribute("aria-disabled"))
 		.map((a) => ({
 			label: a.textContent.trim(),
 			href: a.getAttribute("href"),
@@ -112,9 +107,7 @@
 		renderResults(
 			q
 				? searchLinks.filter(
-						(l) =>
-							l.label.toLowerCase().includes(q) ||
-							l.group.toLowerCase().includes(q),
+						(l) => l.label.toLowerCase().includes(q) || l.group.toLowerCase().includes(q),
 					)
 				: searchLinks,
 		);

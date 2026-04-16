@@ -1,18 +1,19 @@
-import { CResponse } from "@/CResponse/CResponse";
-import { CError } from "@/CError/CError";
-import { Status } from "@/CResponse/Status";
-import { XFile } from "@/XFile/XFile";
-import type { Context } from "@/Context/Context";
-import { RouteAbstract } from "@/Route/RouteAbstract";
 import type { Func } from "corpus-utils/Func";
 import type { MaybePromise } from "corpus-utils/MaybePromise";
-import { RouteVariant } from "@/Route/RouteVariant";
-import { Method } from "@/CRequest/Method";
-import { XConfig } from "@/XConfig/XConfig";
-import type { CacheDirective } from "@/CHeaders/CacheDirective";
+
 import type { BundleRouteConfig } from "@/BundleRoute/BundleRouteConfig";
-import { CommonHeaders } from "@/CHeaders/CommonHeaders";
 import type { RouteModel } from "@/C";
+import { CError } from "@/CError/CError";
+import type { CacheDirective } from "@/CHeaders/CacheDirective";
+import { CommonHeaders } from "@/CHeaders/CommonHeaders";
+import type { Context } from "@/Context/Context";
+import { Method } from "@/CRequest/Method";
+import { CResponse } from "@/CResponse/CResponse";
+import { Status } from "@/CResponse/Status";
+import { RouteAbstract } from "@/Route/RouteAbstract";
+import { RouteVariant } from "@/Route/RouteVariant";
+import { XConfig } from "@/XConfig/XConfig";
+import { XFile } from "@/XFile/XFile";
 
 type R = CResponse | string;
 
@@ -70,9 +71,7 @@ export abstract class BundleRouteAbstract<
 		return async (c) => {
 			const idx = "index.html";
 			const pathname = c.req.urlObject.pathname;
-			const subPath = pathname.startsWith(this.path)
-				? pathname.slice(this.path.length)
-				: pathname;
+			const subPath = pathname.startsWith(this.path) ? pathname.slice(this.path.length) : pathname;
 
 			const relFilePath = subPath === "" || subPath === "/" ? idx : subPath;
 			const targetPath = XConfig.joinPath(this.dir, relFilePath);
@@ -102,20 +101,11 @@ export abstract class BundleRouteAbstract<
 			const cacheConfig = this.bundleConfig?.cache ?? this.defaultConfig.cache;
 
 			if (file.name === idx) {
-				res.headers.set(
-					CommonHeaders.CacheControl,
-					this.formatCacheHeader(cacheConfig.indexHtml),
-				);
+				res.headers.set(CommonHeaders.CacheControl, this.formatCacheHeader(cacheConfig.indexHtml));
 			} else if (file.path.includes("/assets/")) {
-				res.headers.set(
-					CommonHeaders.CacheControl,
-					this.formatCacheHeader(cacheConfig.assetsDir),
-				);
+				res.headers.set(CommonHeaders.CacheControl, this.formatCacheHeader(cacheConfig.assetsDir));
 			} else if (cacheConfig.fallback) {
-				res.headers.set(
-					CommonHeaders.CacheControl,
-					this.formatCacheHeader(cacheConfig.fallback),
-				);
+				res.headers.set(CommonHeaders.CacheControl, this.formatCacheHeader(cacheConfig.fallback));
 			}
 
 			return res;

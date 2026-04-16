@@ -1,4 +1,5 @@
 import { X } from "@ozanarslan/corpus";
+
 import type { ExampleType } from "./ExampleModel";
 
 export class ExampleRepository extends X.Repository {
@@ -6,10 +7,7 @@ export class ExampleRepository extends X.Repository {
 		return this.db.examples.get(id) ?? null;
 	}
 
-	findMany(filters: {
-		page?: number;
-		limit?: number;
-	}): Array<ExampleType["entity"]> {
+	findMany(filters: { page?: number; limit?: number }): Array<ExampleType["entity"]> {
 		const all = Array.from(this.db.examples.values());
 		const page = filters.page ?? 1;
 		const limit = filters.limit ?? 20;

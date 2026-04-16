@@ -43,10 +43,7 @@ export class RouterBenchmark {
 			new TC.Route({ method, path }, async () => ({ ok: true })),
 			new TC.Route(
 				{
-					method:
-						methods[methodIndex + 1] ??
-						methods[methodIndex - 1] ??
-						TC.Method.GET,
+					method: methods[methodIndex + 1] ?? methods[methodIndex - 1] ?? TC.Method.GET,
 					path,
 				},
 				async () => ({ ok: true }),
@@ -93,10 +90,7 @@ export class RouterBenchmark {
 			new TC.Route({ method, path }, async () => ({ ok: true })),
 			new TC.Route(
 				{
-					method:
-						methods[methodIndex + 1] ??
-						methods[methodIndex - 1] ??
-						TC.Method.GET,
+					method: methods[methodIndex + 1] ?? methods[methodIndex - 1] ?? TC.Method.GET,
 					path,
 				},
 				async () => ({ ok: true }),
@@ -107,10 +101,8 @@ export class RouterBenchmark {
 	setupTime = "";
 
 	setup(staticCount = 150, dynamicCount = 150) {
-		for (let i = 0; i < staticCount; i++)
-			this.routes.push(...this.buildStaticRoute());
-		for (let i = 0; i < dynamicCount; i++)
-			this.routes.push(...this.buildDynamicRoute());
+		for (let i = 0; i < staticCount; i++) this.routes.push(...this.buildStaticRoute());
+		for (let i = 0; i < dynamicCount; i++) this.routes.push(...this.buildDynamicRoute());
 
 		const t0 = performance.now();
 		for (const route of this.routes) this.router.add(route);
@@ -129,10 +121,7 @@ export class RouterBenchmark {
 		// shuffle
 		for (let i = this.requests.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1));
-			[this.requests[i], this.requests[j]] = [
-				this.requests[j]!,
-				this.requests[i]!,
-			];
+			[this.requests[i], this.requests[j]] = [this.requests[j]!, this.requests[i]!];
 		}
 	}
 

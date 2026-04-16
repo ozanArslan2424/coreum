@@ -1,19 +1,17 @@
+import type { Func } from "corpus-utils/Func";
+import type { MaybePromise } from "corpus-utils/MaybePromise";
+
+import type { RouterData } from "@/Registry/RouterData";
 import type { ErrorHandler } from "@/Server/ErrorHandler";
 import type { RequestHandler } from "@/Server/RequestHandler";
 import type { ServeArgs } from "@/Server/ServeArgs";
-import type { RouterData } from "@/Registry/RouterData";
-import type { Func } from "corpus-utils/Func";
-import type { MaybePromise } from "corpus-utils/MaybePromise";
 
 export interface ServerInterface {
 	get routes(): Array<RouterData>;
 
 	setGlobalPrefix(value: string): void;
 
-	listen(
-		port: ServeArgs["port"],
-		hostname?: ServeArgs["hostname"],
-	): Promise<void>;
+	listen(port: ServeArgs["port"], hostname?: ServeArgs["hostname"]): Promise<void>;
 
 	close(closeActiveConnections?: boolean): Promise<void>;
 

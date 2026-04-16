@@ -147,11 +147,7 @@ return err.res;
 // → CResponse with body { error: true, message: "Not found" }
 
 // With CResponse data
-const err = new C.Error(
-	"Failed",
-	C.Status.BAD_REQUEST,
-	new C.Response("custom"),
-);
+const err = new C.Error("Failed", C.Status.BAD_REQUEST, new C.Response("custom"));
 return err.res; // → The passed CResponse with status 400
 ```
 

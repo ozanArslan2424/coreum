@@ -1,5 +1,6 @@
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC } from "./_modules";
 
 beforeEach(() => $registryTesting.reset());
 

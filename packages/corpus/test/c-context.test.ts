@@ -1,8 +1,10 @@
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { type } from "arktype";
+
+import { $registryTesting, TC } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
-import { type } from "arktype";
 
 beforeEach(() => $registryTesting.reset());
 
@@ -220,9 +222,7 @@ describe("C.Context", () => {
 		});
 
 		const res = await s.handle(req("/ctx-res-cookie"));
-		expect(res.headers.get(TC.CommonHeaders.SetCookie)).toContain(
-			"session=abc123",
-		);
+		expect(res.headers.get(TC.CommonHeaders.SetCookie)).toContain("session=abc123");
 	});
 
 	it("REQ - READ COOKIE", async () => {

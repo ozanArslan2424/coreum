@@ -1,9 +1,11 @@
-import type { Env } from "@/types.d.ts";
-import { log } from "corpus-utils/internalLog";
-import { strIsDefined } from "corpus-utils/strIsDefined";
-import type { Func } from "corpus-utils/Func";
-import type { OrString } from "corpus-utils/OrString";
 import path from "path";
+
+import type { Func } from "corpus-utils/Func";
+import { log } from "corpus-utils/internalLog";
+import type { OrString } from "corpus-utils/OrString";
+import { strIsDefined } from "corpus-utils/strIsDefined";
+
+import type { Env } from "@/types.d.ts";
 
 export class XConfig {
 	static get runtime(): string {
@@ -15,9 +17,7 @@ export class XConfig {
 			return "node";
 		}
 
-		log.warn(
-			"⚠️ Runtime isn't Bun or NodeJS. Features may not be available. App might not start.",
-		);
+		log.warn("⚠️ Runtime isn't Bun or NodeJS. Features may not be available. App might not start.");
 		return "unknown";
 	}
 
@@ -32,9 +32,7 @@ export class XConfig {
 			case "node":
 				return process.env;
 			default:
-				log.warn(
-					"⚠️ process.env wasn't available. Your environment variables are in memory.",
-				);
+				log.warn("⚠️ process.env wasn't available. Your environment variables are in memory.");
 				return {};
 		}
 	}

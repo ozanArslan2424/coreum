@@ -1,8 +1,9 @@
-import { DynamicRoute } from "@/DynamicRoute/DynamicRoute";
-import { StaticRoute } from "@/StaticRoute/StaticRoute";
-import { Method } from "@/CRequest/Method";
 import { joinPathSegments } from "corpus-utils/joinPathSegments";
+
+import { Method } from "@/CRequest/Method";
+import { DynamicRoute } from "@/DynamicRoute/DynamicRoute";
 import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
+import { StaticRoute } from "@/StaticRoute/StaticRoute";
 import { WebSocketRoute } from "@/WebSocketRoute/WebSocketRoute";
 
 /**
@@ -38,21 +39,12 @@ export abstract class Controller {
 	 * Registers a dynamic route under this controller. Behaves identically to {@link DynamicRoute}
 	 * but automatically prepends the controller prefix and runs `beforeEach` before the handler.
 	 */
-	protected route<
-		B = unknown,
-		S = unknown,
-		P = unknown,
-		R = unknown,
-		E extends string = string,
-	>(
+	protected route<B = unknown, S = unknown, P = unknown, R = unknown, E extends string = string>(
 		...args: ConstructorParameters<typeof DynamicRoute<B, S, P, R, E>>
 	): DynamicRoute<B, S, P, R, E> {
 		const [def, handler, model] = args;
 		const method = typeof def === "string" ? Method.GET : def.method;
-		const path = joinPathSegments<E>(
-			this.prefix,
-			typeof def === "string" ? def : def.path,
-		);
+		const path = joinPathSegments<E>(this.prefix, typeof def === "string" ? def : def.path);
 		const route = new DynamicRoute(
 			{ method, path },
 			async (ctx) => {
@@ -69,12 +61,7 @@ export abstract class Controller {
 	 * Registers a static file route under this controller. Behaves identically to {@link StaticRoute}
 	 * but automatically prepends the controller prefix.
 	 */
-	protected staticRoute<
-		B = unknown,
-		S = unknown,
-		P = unknown,
-		E extends string = string,
-	>(
+	protected staticRoute<B = unknown, S = unknown, P = unknown, E extends string = string>(
 		...args: ConstructorParameters<typeof StaticRoute<B, S, P, E>>
 	): StaticRoute<B, S, P, E> {
 		const [path, ...rest] = args;

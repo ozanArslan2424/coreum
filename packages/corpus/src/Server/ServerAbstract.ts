@@ -1,21 +1,22 @@
-import { $registry } from "@/index";
-import { Context } from "@/Context/Context";
-import { Status } from "@/CResponse/Status";
+import type { Func } from "corpus-utils/Func";
+import { log, logFatal } from "corpus-utils/internalLog";
+import type { MaybePromise } from "corpus-utils/MaybePromise";
+
 import { CError } from "@/CError/CError";
+import { Context } from "@/Context/Context";
 import { CRequest } from "@/CRequest/CRequest";
 import { CResponse } from "@/CResponse/CResponse";
+import { Status } from "@/CResponse/Status";
+import { $registry } from "@/index";
+import { Router } from "@/Registry/Router";
+import type { RouterData } from "@/Registry/RouterData";
+import { RouteVariant } from "@/Route/RouteVariant";
 import type { ErrorHandler } from "@/Server/ErrorHandler";
 import type { RequestHandler } from "@/Server/RequestHandler";
 import type { ServeArgs } from "@/Server/ServeArgs";
 import type { ServerInterface } from "@/Server/ServerInterface";
-import { Router } from "@/Registry/Router";
 import type { ServerOptions } from "@/Server/ServerOptions";
 import { WebSocketRoute } from "@/WebSocketRoute/WebSocketRoute";
-import type { RouterData } from "@/Registry/RouterData";
-import { RouteVariant } from "@/Route/RouteVariant";
-import type { MaybePromise } from "corpus-utils/MaybePromise";
-import type { Func } from "corpus-utils/Func";
-import { log, logFatal } from "corpus-utils/internalLog";
 
 export abstract class ServerAbstract implements ServerInterface {
 	protected abstract serve(options: ServeArgs): void;
@@ -148,8 +149,7 @@ export abstract class ServerAbstract implements ServerInterface {
 		);
 	};
 
-	protected handleNotFound: RequestHandler = (req) =>
-		this.defaultNotFoundHandler(req);
+	protected handleNotFound: RequestHandler = (req) => this.defaultNotFoundHandler(req);
 	setOnNotFound(handler: RequestHandler): void {
 		this.handleNotFound = handler;
 	}

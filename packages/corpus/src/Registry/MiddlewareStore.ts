@@ -1,25 +1,20 @@
-import { Controller } from "@/Controller/Controller";
-import type { MiddlewareInterface } from "@/Middleware/MiddlwareInterface";
-import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
-import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
-import type { MiddlewareStoreReturn } from "@/Registry/MiddlewareStoreReturn";
 import { compile } from "corpus-utils/compile";
-import { RouteAbstract } from "@/Route/RouteAbstract";
+
+import { Controller } from "@/Controller/Controller";
+import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
 import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
+import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
+import type { MiddlewareInterface } from "@/Middleware/MiddlwareInterface";
+import type { MiddlewareStoreReturn } from "@/Registry/MiddlewareStoreReturn";
+import { RouteAbstract } from "@/Route/RouteAbstract";
 
 export class MiddlewareStore {
 	private inboundMap = new Map<string, Array<MiddlewareHandler>>();
 	private outboundMap = new Map<string, Array<MiddlewareHandler>>();
 
 	add(middleware: MiddlewareInterface): void {
-		const resolved = MiddlewareStore.resolveRouteIds(
-			middleware.useOn,
-			middleware.variant,
-		);
-		const map =
-			resolved.variant === MiddlewareVariant.inbound
-				? this.inboundMap
-				: this.outboundMap;
+		const resolved = MiddlewareStore.resolveRouteIds(middleware.useOn, middleware.variant);
+		const map = resolved.variant === MiddlewareVariant.inbound ? this.inboundMap : this.outboundMap;
 
 		if (resolved.isGlobal) {
 			const existing = map.get("*") ?? [];

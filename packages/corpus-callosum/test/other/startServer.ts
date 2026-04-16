@@ -1,4 +1,5 @@
 import { C } from "@ozanarslan/corpus";
+
 import { getSchemas } from "./getSchemas";
 
 const {
@@ -83,11 +84,9 @@ export async function startServer(PORT: number) {
 	);
 
 	// DELETE /users/:id
-	new C.Route(
-		{ method: "DELETE", path: "/users/:id" },
-		(c) => ({ deleted: c.params.id }),
-		{ params: UserParams },
-	);
+	new C.Route({ method: "DELETE", path: "/users/:id" }, (c) => ({ deleted: c.params.id }), {
+		params: UserParams,
+	});
 
 	// POST /users/:id/posts — create post for user
 	new C.Route(

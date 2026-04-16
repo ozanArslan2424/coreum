@@ -1,8 +1,6 @@
 import { log } from "./internalLog";
 
-export type Func<Args extends any[] = any[], Return = any> = (
-	...args: Args
-) => Return;
+export type Func<Args extends any[] = any[], Return = any> = (...args: Args) => Return;
 
 export namespace Func {
 	export function time<F extends Func>(name: string, fn: F): F {
@@ -20,10 +18,7 @@ export namespace Func {
 		} as F;
 	}
 
-	export function timeReturn<F extends Func>(
-		name: string,
-		fn: F,
-	): ReturnType<F> {
+	export function timeReturn<F extends Func>(name: string, fn: F): ReturnType<F> {
 		return time(name, fn)();
 	}
 }

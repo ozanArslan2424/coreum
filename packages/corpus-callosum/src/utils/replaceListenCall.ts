@@ -1,5 +1,6 @@
-import { logFatal } from "corpus-utils/internalLog";
 import { readFileSync, writeFileSync } from "fs";
+
+import { logFatal } from "corpus-utils/internalLog";
 
 export function replaceListenCall(mainPath: string, replacement: string) {
 	console.log(`📄 Reading main file: ${mainPath}`);

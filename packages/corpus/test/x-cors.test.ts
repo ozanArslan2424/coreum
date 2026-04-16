@@ -1,5 +1,6 @@
-import { $registryTesting, TC, TX } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC, TX } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 
@@ -16,9 +17,7 @@ describe("X.Cors", () => {
 		new TX.Cors({ allowedOrigins: [allowedOrigin] });
 		new TC.Route("/cors-origin-allowed", () => "ok");
 
-		const res = await s.handle(
-			req("/cors-origin-allowed", { headers: { origin: allowedOrigin } }),
-		);
+		const res = await s.handle(req("/cors-origin-allowed", { headers: { origin: allowedOrigin } }));
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBe(allowedOrigin);
 	});
 
@@ -47,9 +46,7 @@ describe("X.Cors", () => {
 		new TX.Cors({ allowedOrigins: [] });
 		new TC.Route("/cors-origin-empty", () => "ok");
 
-		const res = await s.handle(
-			req("/cors-origin-empty", { headers: { origin: allowedOrigin } }),
-		);
+		const res = await s.handle(req("/cors-origin-empty", { headers: { origin: allowedOrigin } }));
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBeNull();
 	});
 
@@ -59,9 +56,7 @@ describe("X.Cors", () => {
 		new TX.Cors({ allowedOrigins: [allowedOrigin, secondOrigin] });
 		new TC.Route("/cors-origin-multi", () => "ok");
 
-		const res = await s.handle(
-			req("/cors-origin-multi", { headers: { origin: secondOrigin } }),
-		);
+		const res = await s.handle(req("/cors-origin-multi", { headers: { origin: secondOrigin } }));
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBe(secondOrigin);
 	});
 
@@ -102,9 +97,7 @@ describe("X.Cors", () => {
 		new TC.Route("/cors-headers", () => "ok");
 
 		const res = await s.handle(req("/cors-headers"));
-		expect(res.headers.get("Access-Control-Allow-Headers")).toBe(
-			"Content-Type, Authorization",
-		);
+		expect(res.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type, Authorization");
 	});
 
 	it("HEADERS - DOES NOT SET HEADER WHEN HEADERS ARE EMPTY", async () => {
@@ -157,14 +150,10 @@ describe("X.Cors", () => {
 		});
 		new TC.Route("/cors-combined", () => "ok");
 
-		const res = await s.handle(
-			req("/cors-combined", { headers: { origin: allowedOrigin } }),
-		);
+		const res = await s.handle(req("/cors-combined", { headers: { origin: allowedOrigin } }));
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBe(allowedOrigin);
 		expect(res.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST");
-		expect(res.headers.get("Access-Control-Allow-Headers")).toBe(
-			"Content-Type",
-		);
+		expect(res.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type");
 		expect(res.headers.get("Access-Control-Allow-Credentials")).toBe("true");
 	});
 });

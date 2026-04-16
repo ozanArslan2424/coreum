@@ -1,9 +1,10 @@
-import type { CRequest } from "@/CRequest/CRequest";
-import type { RouterReturn } from "@/Registry/RouterReturn";
-import type { RouterData } from "@/Registry/RouterData";
 import type { Func } from "corpus-utils/Func";
-import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
+
+import type { CRequest } from "@/CRequest/CRequest";
 import type { Method } from "@/CRequest/Method";
+import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
+import type { RouterData } from "@/Registry/RouterData";
+import type { RouterReturn } from "@/Registry/RouterReturn";
 
 type Store = Map<Method, RouterData>;
 
@@ -85,12 +86,10 @@ export class BranchAdapter implements RouterAdapterInterface {
 
 		const walk = (branch: Branch) => {
 			if (branch.store !== null) routes.push(...branch.store.values());
-			if (branch.wildcardStore !== null)
-				routes.push(...branch.wildcardStore.values());
+			if (branch.wildcardStore !== null) routes.push(...branch.wildcardStore.values());
 
 			if (branch.paramBranch !== null) {
-				if (branch.paramBranch.store !== null)
-					routes.push(...branch.paramBranch.store.values());
+				if (branch.paramBranch.store !== null) routes.push(...branch.paramBranch.store.values());
 				if (branch.paramBranch.wildcardStore !== null)
 					routes.push(...branch.paramBranch.wildcardStore.values());
 				if (branch.paramBranch.branch !== null) walk(branch.paramBranch.branch);
@@ -192,10 +191,7 @@ export class BranchAdapter implements RouterAdapterInterface {
 
 					Object.assign(
 						branch,
-						this.createBranch(branch.part.slice(0, j), [
-							existingChild,
-							newChild,
-						]),
+						this.createBranch(branch.part.slice(0, j), [existingChild, newChild]),
 					);
 
 					branch = newChild;
@@ -350,18 +346,10 @@ export class BranchAdapter implements RouterAdapterInterface {
 						};
 					}
 				} else if (paramBranch.branch !== null) {
-					const route = this.findResult(
-						url,
-						urlLength,
-						paramBranch.branch,
-						slashIndex,
-					);
+					const route = this.findResult(url, urlLength, paramBranch.branch, slashIndex);
 
 					if (route !== null) {
-						route.params[paramBranch.paramName] = url.slice(
-							startIndex,
-							slashIndex,
-						);
+						route.params[paramBranch.paramName] = url.slice(startIndex, slashIndex);
 						return route;
 					}
 				}

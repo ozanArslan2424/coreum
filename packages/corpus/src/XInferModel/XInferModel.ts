@@ -1,28 +1,16 @@
-import type { InferSchemaOut, Schema } from "corpus-utils/Schema";
-import type { RouteModel } from "@/Route/RouteModel";
 import type { Prettify } from "corpus-utils/Prettify";
+import type { InferSchemaOut, Schema } from "corpus-utils/Schema";
+
+import type { RouteModel } from "@/Route/RouteModel";
 
 /** If you prefer to put all schemas into a single object, this will be helpful */
 export type XInferModel<T extends Record<string, any>> = {
-	[K in keyof T as K extends "prototype" ? never : K]: T[K] extends RouteModel<
-		any,
-		any,
-		any,
-		any
-	>
+	[K in keyof T as K extends "prototype" ? never : K]: T[K] extends RouteModel<any, any, any, any>
 		? Prettify<
-				(T[K]["body"] extends Schema
-					? { body: InferSchemaOut<T[K]["body"]> }
-					: {}) &
-					(T[K]["search"] extends Schema
-						? { search: InferSchemaOut<T[K]["search"]> }
-						: {}) &
-					(T[K]["params"] extends Schema
-						? { params: InferSchemaOut<T[K]["params"]> }
-						: {}) &
-					(T[K]["response"] extends Schema
-						? { response: InferSchemaOut<T[K]["response"]> }
-						: {})
+				(T[K]["body"] extends Schema ? { body: InferSchemaOut<T[K]["body"]> } : {}) &
+					(T[K]["search"] extends Schema ? { search: InferSchemaOut<T[K]["search"]> } : {}) &
+					(T[K]["params"] extends Schema ? { params: InferSchemaOut<T[K]["params"]> } : {}) &
+					(T[K]["response"] extends Schema ? { response: InferSchemaOut<T[K]["response"]> } : {})
 			>
 		: T[K] extends Schema
 			? InferSchemaOut<T[K]>

@@ -3,9 +3,6 @@
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
-	"scripts": {
-		"build": "tsdown"
-	},
 	"exports": {
 		"./arrIncludes": "./dist/arrIncludes.mjs",
 		"./assert": "./dist/assert.mjs",
@@ -43,10 +40,12 @@
 		"./ValueOf": "./dist/ValueOf.mjs",
 		"./package.json": "./package.json"
 	},
+	"scripts": {
+		"build": "tsdown"
+	},
 	"devDependencies": {
 		"@standard-schema/spec": "^1.1.0",
-		"@types/bun": "^1.3.11",
-		"tsdown": "^0.21.7",
+		"tsdown": "^0.21.9",
 		"typescript": "^6.0.2"
 	},
 	"inlinedDependencies": {

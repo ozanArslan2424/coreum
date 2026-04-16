@@ -1,9 +1,10 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import type { Config } from "../Config/Config";
 import { toCamelCase } from "../utils/toCamelCase";
 import { toKebabCase } from "../utils/toKebabCase";
 import { toPascalCase } from "../utils/toPascalCase";
-import fs from "node:fs";
-import path from "node:path";
 
 export class ImportsManager {
 	constructor(
@@ -43,15 +44,10 @@ export class ImportsManager {
 
 	makeImportPath(inFile: string, importedFile: string): string {
 		if (this.srcAlias && importedFile.startsWith(this.srcDir)) {
-			const rel = importedFile
-				.replace(this.srcDir, "")
-				.replace(/^\//, "")
-				.replace(/\.ts$/, "");
+			const rel = importedFile.replace(this.srcDir, "").replace(/^\//, "").replace(/\.ts$/, "");
 			return `${this.srcAlias}/${rel}`;
 		} else {
-			const rel = path
-				.relative(path.dirname(inFile), importedFile)
-				.replace(/\.ts$/, "");
+			const rel = path.relative(path.dirname(inFile), importedFile).replace(/\.ts$/, "");
 			return rel.startsWith(".") ? rel : `./${rel}`;
 		}
 	}

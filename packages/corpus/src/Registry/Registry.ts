@@ -1,9 +1,10 @@
+import { logFatal } from "corpus-utils/internalLog";
+
+import { EntityStore } from "@/Registry/EntityStore";
 import { MiddlewareStore } from "@/Registry/MiddlewareStore";
 import type { Router } from "@/Registry/Router";
-import type { XCors } from "@/XCors/XCors";
 import type { RouteModel } from "@/Route/RouteModel";
-import { logFatal } from "corpus-utils/internalLog";
-import { EntityStore } from "@/Registry/EntityStore";
+import type { XCors } from "@/XCors/XCors";
 
 type DocEntry = {
 	id: string;
@@ -23,9 +24,7 @@ export class Registry {
 	private _initialRouter: Router | null = null;
 	get router(): Router {
 		if (!this._router)
-			logFatal(
-				"Router instance missing. Create a Server instance before any routes.",
-			);
+			logFatal("Router instance missing. Create a Server instance before any routes.");
 		return this._router;
 	}
 	set router(value: Router | null) {

@@ -1,6 +1,7 @@
+import { strIsDefined } from "corpus-utils/strIsDefined";
+
 import type { CHeaderKey } from "@/CHeaders/CHeaderKey";
 import type { CHeadersInit } from "@/CHeaders/CHeadersInit";
-import { strIsDefined } from "corpus-utils/strIsDefined";
 
 /** Headers is extended to include helpers and intellisense for common header names. */
 
@@ -52,9 +53,7 @@ export class CHeaders extends Headers {
 	}
 
 	setMany(
-		init:
-			| [string, string][]
-			| (Record<string, string> & Partial<Record<CHeaderKey, string>>),
+		init: [string, string][] | (Record<string, string> & Partial<Record<CHeaderKey, string>>),
 	): void {
 		const entries = Array.isArray(init) ? init : Object.entries(init);
 		for (const [key, value] of entries) {

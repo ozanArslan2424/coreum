@@ -1,9 +1,8 @@
 import { log } from "corpus-utils/internalLog";
+
 import { TC } from "../_modules";
 
-export function createTestServer(
-	opts?: TC.ServerOptions & { withLogging?: boolean },
-) {
+export function createTestServer(opts?: TC.ServerOptions & { withLogging?: boolean }) {
 	const { withLogging, ...serverOpts } = opts ?? {
 		withLogging: false,
 	};

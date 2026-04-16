@@ -1,6 +1,7 @@
-import { createTestWebSocketRoute } from "../utils/createTestWebSocketRoute";
 import { TestHelper } from "corpus-utils/TestHelper";
+
 import { TC } from "../_modules";
+import { createTestWebSocketRoute } from "../utils/createTestWebSocketRoute";
 
 const PORT = 9876;
 const BASE_URL = `ws://localhost:${PORT}`;
@@ -35,9 +36,7 @@ async function run(withAbstract: boolean) {
 		});
 	}
 
-	function makeClient(
-		label: string,
-	): Promise<{ ws: WebSocket; next: () => Promise<any> }> {
+	function makeClient(label: string): Promise<{ ws: WebSocket; next: () => Promise<any> }> {
 		T.log.info(`Creating client: ${label}`);
 		return new Promise((resolve, reject) => {
 			const ws = new WebSocket(WS_URL);
@@ -88,18 +87,9 @@ async function run(withAbstract: boolean) {
 		T.log.debug("[bob]   greeting:", bobGreeting);
 		T.log.debug("[carol] greeting:", carolGreeting);
 
-		T.expect("alice greeting event", aliceGreeting).toHaveProperty(
-			"event",
-			"connected",
-		);
-		T.expect("bob greeting event", bobGreeting).toHaveProperty(
-			"event",
-			"connected",
-		);
-		T.expect("carol greeting event", carolGreeting).toHaveProperty(
-			"event",
-			"connected",
-		);
+		T.expect("alice greeting event", aliceGreeting).toHaveProperty("event", "connected");
+		T.expect("bob greeting event", bobGreeting).toHaveProperty("event", "connected");
+		T.expect("carol greeting event", carolGreeting).toHaveProperty("event", "connected");
 		T.log.success("All clients received connected greetings");
 
 		// ── ping / pong ───────────────────────────────────────────────────────────
@@ -138,14 +128,8 @@ async function run(withAbstract: boolean) {
 		await send(carol, { event: "subscribe", topic: "news" });
 		const carolSubNews = await carolNext();
 		T.log.info("[carol] subscribed to news:", carolSubNews);
-		T.expect("carol sub news event", carolSubNews).toHaveProperty(
-			"event",
-			"subscribed",
-		);
-		T.expect("carol sub news topic", carolSubNews).toHaveProperty(
-			"topic",
-			"news",
-		);
+		T.expect("carol sub news event", carolSubNews).toHaveProperty("event", "subscribed");
+		T.expect("carol sub news topic", carolSubNews).toHaveProperty("topic", "news");
 		T.log.success("Carol subscribed to news");
 
 		// ── query subscriptions ───────────────────────────────────────────────────
@@ -153,10 +137,7 @@ async function run(withAbstract: boolean) {
 		await send(carol, { event: "subscriptions" });
 		const carolSubs = (await carolNext()) as any;
 		T.log.info("[carol] active subscriptions:", carolSubs);
-		T.expect("carol subs event", carolSubs).toHaveProperty(
-			"event",
-			"subscriptions",
-		);
+		T.expect("carol subs event", carolSubs).toHaveProperty("event", "subscriptions");
 		T.expect("carol subs data", carolSubs.data).toEqual(["sports", "news"]);
 		T.expect("carol subs length", carolSubs.data?.length).toBe(2);
 		T.log.success("Subscription query successful");
@@ -188,9 +169,7 @@ async function run(withAbstract: boolean) {
 		T.expect("bob news headline", bobNews.data?.headline).toBe("corpus ships");
 		T.expect("carol news event", carolNews).toHaveProperty("event", "message");
 		T.expect("carol news topic", carolNews).toHaveProperty("topic", "news");
-		T.expect("carol news headline", carolNews.data?.headline).toBe(
-			"corpus ships",
-		);
+		T.expect("carol news headline", carolNews.data?.headline).toBe("corpus ships");
 		T.log.success("Both Bob and Carol received the news message");
 
 		// ── carol publishes to "sports" (only carol is subscribed, she doesn't receive her own) ─
@@ -202,14 +181,8 @@ async function run(withAbstract: boolean) {
 		});
 		const carolSportsAck = (await carolNext()) as any;
 		T.log.info("[carol] sports publish ack:", carolSportsAck);
-		T.expect("carol sports ack event", carolSportsAck).toHaveProperty(
-			"event",
-			"published",
-		);
-		T.expect("carol sports ack topic", carolSportsAck).toHaveProperty(
-			"topic",
-			"sports",
-		);
+		T.expect("carol sports ack event", carolSportsAck).toHaveProperty("event", "published");
+		T.expect("carol sports ack topic", carolSportsAck).toHaveProperty("topic", "sports");
 		T.expect("carol sports ack bytes", carolSportsAck.bytes).toBe(0);
 		T.log.success("Sports publish successful");
 
@@ -218,17 +191,12 @@ async function run(withAbstract: boolean) {
 		await send(bob, { event: "unsubscribe", topic: "news" });
 		const bobUnsub = await bobNext();
 		T.log.info("[bob]   unsubscribed:", bobUnsub);
-		T.expect("bob unsub event", bobUnsub).toHaveProperty(
-			"event",
-			"unsubscribed",
-		);
+		T.expect("bob unsub event", bobUnsub).toHaveProperty("event", "unsubscribed");
 		T.expect("bob unsub topic", bobUnsub).toHaveProperty("topic", "news");
 		T.log.success("Bob unsubscribed successfully");
 
 		// ── alice publishes to "news" again — only carol should receive ───────────
-		T.log.info(
-			"Testing publish after unsubscribe (only Carol should receive)...",
-		);
+		T.log.info("Testing publish after unsubscribe (only Carol should receive)...");
 		const carolReceives2 = carolNext();
 
 		await send(alice, {
@@ -242,22 +210,12 @@ async function run(withAbstract: boolean) {
 		T.log.info("[alice] publish ack 2:", aliceAck2);
 		T.log.info("[carol] received news after bob left:", carolNews2);
 
-		T.expect("alice ack2 event", aliceAck2).toHaveProperty(
-			"event",
-			"published",
-		);
-		T.expect("carol news2 event", carolNews2).toHaveProperty(
-			"event",
-			"message",
-		);
+		T.expect("alice ack2 event", aliceAck2).toHaveProperty("event", "published");
+		T.expect("carol news2 event", carolNews2).toHaveProperty("event", "message");
 		T.expect("carol news2 topic", carolNews2).toHaveProperty("topic", "news");
-		T.expect("carol news2 headline", carolNews2.data?.headline).toBe(
-			"bob missed this",
-		);
+		T.expect("carol news2 headline", carolNews2.data?.headline).toBe("bob missed this");
 
-		T.log.info(
-			"Only Carol received the second message (Bob correctly unsubscribed)",
-		);
+		T.log.info("Only Carol received the second message (Bob correctly unsubscribed)");
 
 		// ── unknown event ─────────────────────────────────────────────────────────
 		T.log.info("Testing unknown event handling...");

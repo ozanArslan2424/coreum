@@ -1,7 +1,7 @@
-import type { RouteModel } from "@/Route/RouteModel";
-import type { DynamicRouteDefinition } from "@/DynamicRoute/DynamicRouteDefinition";
 import { DynamicRouteAbstract } from "@/DynamicRoute/DynamicRouteAbstract";
 import type { DynamicRouteCallback } from "@/DynamicRoute/DynamicRouteCallback";
+import type { DynamicRouteDefinition } from "@/DynamicRoute/DynamicRouteDefinition";
+import type { RouteModel } from "@/Route/RouteModel";
 
 /**
  * Defines an HTTP endpoint. Accepts a {@link DynamicRouteDefinition} which can either be a plain

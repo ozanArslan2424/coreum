@@ -1,4 +1,5 @@
 import { log, logFatal } from "corpus-utils/internalLog";
+
 import { TC } from "../_modules";
 import { RouterBenchmark } from "../utils/RouterBenchmark";
 

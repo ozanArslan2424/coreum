@@ -1,21 +1,23 @@
-import type { RateLimitStoreInterface } from "@/XRateLimiter/RateLimitStoreInterface";
-import type { RateLimitIdPrefix } from "@/XRateLimiter/RateLimitIdPrefix";
-import type { RateLimitConfig } from "@/XRateLimiter/RateLimitConfig";
-import { CHeaders } from "@/CHeaders/CHeaders";
-import { CError } from "@/CError/CError";
-import { RateLimiterFileStore } from "@/XRateLimiter/RateLimiterFileStore";
-import { RateLimiterMemoryStore } from "@/XRateLimiter/RateLimiterMemoryStore";
-import { Status } from "@/CResponse/Status";
-import { CommonHeaders } from "@/CHeaders/CommonHeaders";
-import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
-import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
-import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
-import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
+import crypto from "crypto";
+
 import { logFatal } from "corpus-utils/internalLog";
 import { strIsDefined } from "corpus-utils/strIsDefined";
-import crypto from "crypto";
+
+import { CError } from "@/CError/CError";
+import { CHeaders } from "@/CHeaders/CHeaders";
+import { CommonHeaders } from "@/CHeaders/CommonHeaders";
+import { Status } from "@/CResponse/Status";
 import { $registry } from "@/index";
+import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
+import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
+import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
+import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
 import { RouteVariant } from "@/Route/RouteVariant";
+import type { RateLimitConfig } from "@/XRateLimiter/RateLimitConfig";
+import { RateLimiterFileStore } from "@/XRateLimiter/RateLimiterFileStore";
+import { RateLimiterMemoryStore } from "@/XRateLimiter/RateLimiterMemoryStore";
+import type { RateLimitIdPrefix } from "@/XRateLimiter/RateLimitIdPrefix";
+import type { RateLimitStoreInterface } from "@/XRateLimiter/RateLimitStoreInterface";
 
 export class XRateLimiter extends MiddlewareAbstract {
 	constructor(config: Partial<RateLimitConfig> = {}) {
@@ -38,10 +40,7 @@ export class XRateLimiter extends MiddlewareAbstract {
 		const result = await this.getResult(c.headers);
 		c.res.headers.innerCombine(result.headers);
 		const exposedHeaders = Object.values(this.config.headerNames);
-		c.res.headers.append(
-			CommonHeaders.AccessControlExposeHeaders,
-			exposedHeaders,
-		);
+		c.res.headers.append(CommonHeaders.AccessControlExposeHeaders, exposedHeaders);
 
 		if (!result.success) {
 			throw new CError("Too many requests", Status.TOO_MANY_REQUESTS, c.res);
@@ -176,8 +175,7 @@ export class XRateLimiter extends MiddlewareAbstract {
 	private async maybeCleanStore(): Promise<void> {
 		const currentSize = await this.store.size();
 		const shouldClean =
-			Math.random() < this.config.cleanProbability ||
-			currentSize > this.config.maxStoreSize;
+			Math.random() < this.config.cleanProbability || currentSize > this.config.maxStoreSize;
 
 		if (shouldClean) await this.cleanStore();
 	}

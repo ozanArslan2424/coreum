@@ -1,9 +1,10 @@
+import { convertSchema as yupToJsonSchema } from "@sodaru/yup-to-json-schema";
+import type { Type } from "arktype";
+import { compile } from "json-schema-to-typescript";
+import z from "zod";
+
 import type { Config } from "../Config/Config";
 import type { Schema } from "../utils/Schema";
-import { compile } from "json-schema-to-typescript";
-import { convertSchema as yupToJsonSchema } from "@sodaru/yup-to-json-schema";
-import z from "zod";
-import type { Type } from "arktype";
 // TODO:
 // import { toJsonSchema as valibotToJsonSchema } from "@valibot/to-json-schema";
 
@@ -20,10 +21,7 @@ export class SchemaManager {
 		const lib = confLib !== vendor ? vendor : (confLib ?? vendor);
 		switch (lib) {
 			case "yup":
-				return yupToJsonSchema(schema as any, this.options) as Record<
-					string,
-					unknown
-				>;
+				return yupToJsonSchema(schema as any, this.options) as Record<string, unknown>;
 
 			case "zod":
 				return z.toJSONSchema(schema as any, {
@@ -42,16 +40,12 @@ export class SchemaManager {
 	}
 
 	async toInterface(jsonSchema: Record<string, unknown>, name?: string) {
-		const schemaType = await compile(
-			jsonSchema,
-			name ?? "DoesnTMatterWillBeDeleted",
-			{
-				bannerComment: "",
-				format: false,
-				ignoreMinAndMaxItems: true,
-				additionalProperties: false,
-			},
-		);
+		const schemaType = await compile(jsonSchema, name ?? "DoesnTMatterWillBeDeleted", {
+			bannerComment: "",
+			format: false,
+			ignoreMinAndMaxItems: true,
+			additionalProperties: false,
+		});
 
 		if (!name) {
 			// const clean = schemaType

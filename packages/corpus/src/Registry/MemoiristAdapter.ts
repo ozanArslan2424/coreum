@@ -1,9 +1,10 @@
+import type { Func } from "corpus-utils/Func";
 import Memoirist from "memoirist";
+
+import type { CRequest } from "@/CRequest/CRequest";
 import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
 import type { RouterData } from "@/Registry/RouterData";
 import type { RouterReturn } from "@/Registry/RouterReturn";
-import type { CRequest } from "@/CRequest/CRequest";
-import type { Func } from "corpus-utils/Func";
 
 /**
  * Router adapter wrapping the "memoirist" package.

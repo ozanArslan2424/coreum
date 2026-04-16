@@ -1,14 +1,16 @@
-import { readFileSync, unlinkSync, writeFileSync } from "fs";
 import { spawnSync } from "child_process";
-import { logFatal } from "corpus-utils/internalLog";
+import { readFileSync, unlinkSync, writeFileSync } from "fs";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
+
+import { logFatal } from "corpus-utils/internalLog";
+
+import type { Config } from "../Config/Config";
 import {
 	DIST_API_GENERATOR_FILE,
 	API_GENERATOR_CLASS_NAME,
 } from "../utils/DIST_API_GENERATOR_FILE";
 import { hoistFunctionBody } from "./hoistFunctionBody";
-import type { Config } from "../Config/Config";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -16,9 +18,7 @@ export async function generateApiClient(config: Config) {
 	const mainPath = resolve(config.main);
 
 	const cliOverrides = Object.fromEntries(
-		Object.entries(config).filter(
-			([k, v]) => v !== undefined && k !== "jsonSchemaOptions",
-		),
+		Object.entries(config).filter(([k, v]) => v !== undefined && k !== "jsonSchemaOptions"),
 	);
 
 	const tempPath = mainPath.replace(/\.ts$/, ".gen.ts");
@@ -26,9 +26,7 @@ export async function generateApiClient(config: Config) {
 	try {
 		const lines: string[] = [`import { $registry } from "${config.pkgPath}";`];
 		const generatorPath = join(__dirname, DIST_API_GENERATOR_FILE);
-		lines.push(
-			`import { ${API_GENERATOR_CLASS_NAME} } from "${generatorPath}";`,
-		);
+		lines.push(`import { ${API_GENERATOR_CLASS_NAME} } from "${generatorPath}";`);
 		console.log(`📄 Reading main file: ${mainPath}`);
 		const mainFileContents = readFileSync(mainPath, "utf-8");
 		const REPLACE_TARGET = /^(void|await)?\s*\w+\.listen\(.*?\);.*$/m;

@@ -1,17 +1,18 @@
-import { Method } from "@/CRequest/Method";
-import { CResponse } from "@/CResponse/CResponse";
-import { CError } from "@/CError/CError";
-import { RouteVariant } from "@/Route/RouteVariant";
-import { RouteAbstract } from "@/Route/RouteAbstract";
-import { XFile } from "@/XFile/XFile";
-import { Status } from "@/CResponse/Status";
-import { CommonHeaders } from "@/CHeaders/CommonHeaders";
-import type { Context } from "@/Context/Context";
-import type { StaticRouteDefinition } from "@/StaticRoute/StaticRouteDefinition";
-import type { StaticRouteCallback } from "@/StaticRoute/StaticRouteCallback";
 import type { Func } from "corpus-utils/Func";
 import type { MaybePromise } from "corpus-utils/MaybePromise";
+
+import { CError } from "@/CError/CError";
 import type { CacheDirective } from "@/CHeaders/CacheDirective";
+import { CommonHeaders } from "@/CHeaders/CommonHeaders";
+import type { Context } from "@/Context/Context";
+import { Method } from "@/CRequest/Method";
+import { CResponse } from "@/CResponse/CResponse";
+import { Status } from "@/CResponse/Status";
+import { RouteAbstract } from "@/Route/RouteAbstract";
+import { RouteVariant } from "@/Route/RouteVariant";
+import type { StaticRouteCallback } from "@/StaticRoute/StaticRouteCallback";
+import type { StaticRouteDefinition } from "@/StaticRoute/StaticRouteDefinition";
+import { XFile } from "@/XFile/XFile";
 
 type R = CResponse | string;
 
@@ -35,9 +36,7 @@ export abstract class StaticRouteAbstract<
 	};
 
 	protected get filePath(): string {
-		return typeof this.definition === "string"
-			? this.definition
-			: this.definition.filePath;
+		return typeof this.definition === "string" ? this.definition : this.definition.filePath;
 	}
 
 	// ROUTE BASE PROPERTIES
@@ -59,9 +58,7 @@ export abstract class StaticRouteAbstract<
 			maxAge: 3600, // 1 hour - safe middle ground
 			noCache: false,
 		};
-		const caching = isStrDef
-			? defaultCaching
-			: (this.definition.cache ?? defaultCaching);
+		const caching = isStrDef ? defaultCaching : (this.definition.cache ?? defaultCaching);
 
 		return async (c) => {
 			const file = new XFile(this.filePath);
@@ -88,10 +85,7 @@ export abstract class StaticRouteAbstract<
 				res = await CResponse.file(file);
 			}
 
-			res.headers.set(
-				CommonHeaders.CacheControl,
-				this.formatCacheHeader(caching),
-			);
+			res.headers.set(CommonHeaders.CacheControl, this.formatCacheHeader(caching));
 			return res;
 		};
 	}

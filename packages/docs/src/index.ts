@@ -1,4 +1,5 @@
 import { C, X } from "@ozanarslan/corpus";
+
 import { convertMD } from "./convertMD";
 
 async function main() {
@@ -37,24 +38,19 @@ async function main() {
 	}
 
 	function addTime(result: string, time: number) {
-		return (
-			result + `<script>console.log("took ${time.toFixed(2)}ms");</script>`
-		);
+		return result + `<script>console.log("took ${time.toFixed(2)}ms");</script>`;
 	}
 
 	const topbar = await fileCache.get(addr("html", "header.html"));
 	const sidebar = await fileCache.get(addr("html", "sidebar.html"));
 	const index = await fileCache.get(addr("html", "index.html"));
 
-	new C.Route<unknown, unknown, { file: string }>(
-		"/styles/:file",
-		async (c) => {
-			const content = await fileCache.get(addr("css", c.params.file));
-			c.res.headers.set(C.CommonHeaders.ContentType, "text/css");
-			c.res.headers.set(C.CommonHeaders.ContentLength, content.length);
-			return content;
-		},
-	);
+	new C.Route<unknown, unknown, { file: string }>("/styles/:file", async (c) => {
+		const content = await fileCache.get(addr("css", c.params.file));
+		c.res.headers.set(C.CommonHeaders.ContentType, "text/css");
+		c.res.headers.set(C.CommonHeaders.ContentLength, content.length);
+		return content;
+	});
 
 	new C.StaticRoute("/", addr("html", "layout.html"), (_, layout) => {
 		const start = performance.now();

@@ -1,4 +1,5 @@
 import { type } from "arktype";
+
 import { TC } from "../_modules";
 import { createTestServer } from "../utils/createTestServer";
 import { TEST_PORT } from "../utils/req";
@@ -154,11 +155,9 @@ new TC.Route(
 );
 
 // DELETE /users/:id
-new TC.Route(
-	{ method: "DELETE", path: "/users/:id" },
-	(c) => ({ deleted: c.params.id }),
-	{ params: UserParams },
-);
+new TC.Route({ method: "DELETE", path: "/users/:id" }, (c) => ({ deleted: c.params.id }), {
+	params: UserParams,
+});
 
 // POST /users/:id/posts — create post for user
 new TC.Route(

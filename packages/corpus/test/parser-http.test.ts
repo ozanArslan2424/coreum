@@ -1,10 +1,12 @@
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { joinPathSegments } from "corpus-utils/joinPathSegments";
+
+import { $registryTesting, TC } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { reqPath } from "./utils/req";
-import { joinPathSegments } from "corpus-utils/joinPathSegments";
-import { TestParsingController } from "./utils/TestParsingController";
 import { TestModel } from "./utils/TestModel";
+import { TestParsingController } from "./utils/TestParsingController";
 
 const s = createTestServer();
 
@@ -21,18 +23,10 @@ beforeEach(() => {
 
 const postRoute = (
 	routePath: string,
-	{
-		param,
-		search,
-		body,
-	}: { param: string | number; search: string; body: object },
+	{ param, search, body }: { param: string | number; search: string; body: object },
 ) => {
 	const url = new URL(
-		reqPath(
-			joinPathSegments(
-				...routePath.replace(/:hello/, String(param)).split("/"),
-			),
-		),
+		reqPath(joinPathSegments(...routePath.replace(/:hello/, String(param)).split("/"))),
 	);
 	url.searchParams.set("hello", search);
 	return s.handle(
@@ -54,16 +48,8 @@ describe("real HTTP requests", () => {
 	const schemaVariants = [
 		["ark route", "/success/ark/:hello", TestModel.arkRoute],
 		["zod route", "/success/zod/:hello", TestModel.zodRoute],
-		[
-			"ark route (referenced)",
-			"/success/arkRef/:hello",
-			TestModel.arkRouteReferenced,
-		],
-		[
-			"zod route (referenced)",
-			"/success/zodRef/:hello",
-			TestModel.zodRouteReferenced,
-		],
+		["ark route (referenced)", "/success/arkRef/:hello", TestModel.arkRouteReferenced],
+		["zod route (referenced)", "/success/zodRef/:hello", TestModel.zodRouteReferenced],
 		["combined (ark + zod)", "/success/combined/:hello", TestModel.combined],
 	] as const;
 
@@ -106,16 +92,8 @@ describe("real HTTP requests", () => {
 		const failVariants = [
 			["ark route", "/fail/ark/:hello", TestModel.arkRoute],
 			["zod route", "/fail/zod/:hello", TestModel.zodRoute],
-			[
-				"ark route (referenced)",
-				"/fail/arkRef/:hello",
-				TestModel.arkRouteReferenced,
-			],
-			[
-				"zod route (referenced)",
-				"/fail/zodRef/:hello",
-				TestModel.zodRouteReferenced,
-			],
+			["ark route (referenced)", "/fail/arkRef/:hello", TestModel.arkRouteReferenced],
+			["zod route (referenced)", "/fail/zodRef/:hello", TestModel.zodRouteReferenced],
 			["combined (ark + zod)", "/fail/combined/:hello", TestModel.combined],
 		] as const;
 

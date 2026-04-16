@@ -1,6 +1,7 @@
-import { createTestServer } from "./utils/createTestServer";
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC } from "./_modules";
+import { createTestServer } from "./utils/createTestServer";
 
 beforeEach(() => $registryTesting.reset());
 
@@ -26,10 +27,7 @@ describe("MemoiristAdapter - Route Collision Detection", () => {
 	});
 	it("STATIC - IDENTICAL ROUTES DIFFERENT METHOD - SHOULD NOT CLASH", () => {
 		expect(
-			makeRoutes(
-				{ path: "/b", method: TC.Method.GET },
-				{ path: "/b", method: TC.Method.POST },
-			),
+			makeRoutes({ path: "/b", method: TC.Method.GET }, { path: "/b", method: TC.Method.POST }),
 		).not.toThrow();
 	});
 	it("STATIC - DIFFERENT ROUTES SAME METHOD - SHOULD NOT CLASH", () => {

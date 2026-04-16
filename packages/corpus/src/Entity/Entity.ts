@@ -1,12 +1,9 @@
-import type { EntityJsonSchema } from "@/Entity/EntityJsonSchema";
-import { Parser } from "@/Parser/Parser";
-import type {
-	InferSchemaIn,
-	InferSchemaOut,
-	Schema,
-} from "corpus-utils/Schema";
+import type { InferSchemaIn, InferSchemaOut, Schema } from "corpus-utils/Schema";
+
 import type { EntityDefinition } from "@/Entity/EntityDefinition";
+import type { EntityJsonSchema } from "@/Entity/EntityJsonSchema";
 import { $registry } from "@/index";
+import { Parser } from "@/Parser/Parser";
 
 export function Entity<T extends Schema = Schema>(def: EntityDefinition<T>) {
 	$registry.entities.add(def);
@@ -24,6 +21,5 @@ export function Entity<T extends Schema = Schema>(def: EntityDefinition<T>) {
 		}
 	}
 
-	return Base as (new (values: InferSchemaIn<T>) => Base & InferSchemaOut<T>) &
-		EntityDefinition<T>;
+	return Base as (new (values: InferSchemaIn<T>) => Base & InferSchemaOut<T>) & EntityDefinition<T>;
 }

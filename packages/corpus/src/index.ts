@@ -1,6 +1,5 @@
-import { Registry } from "./Registry/Registry";
-
 import * as C from "./C";
+import { Registry } from "./Registry/Registry";
 import * as X from "./X";
 
 export { Router } from "./Registry/Router";

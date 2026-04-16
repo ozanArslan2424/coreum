@@ -1,5 +1,6 @@
-import { $registryTesting, TC, TX } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC, TX } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
 
@@ -33,12 +34,7 @@ describe("C.StaticRoute", () => {
 
 	it("STATIC ROUTE - WITH MODEL", () => {
 		const model = { response: undefined };
-		const route = new TC.StaticRoute(
-			"/sr6",
-			f("sample.html"),
-			undefined,
-			model,
-		);
+		const route = new TC.StaticRoute("/sr6", f("sample.html"), undefined, model);
 		expect(route.model).toBe(model);
 	});
 
@@ -168,17 +164,10 @@ describe("C.StaticRoute", () => {
 
 			definition: TC.StaticRouteDefinition = f("sample.txt");
 
-			override callback?:
-				| TC.StaticRouteCallback<unknown, unknown, unknown>
-				| undefined = () => "";
+			override callback?: TC.StaticRouteCallback<unknown, unknown, unknown> | undefined = () => "";
 
 			override model?:
-				| TC.RouteConfig<
-						unknown,
-						unknown,
-						unknown,
-						string | TC.Response<unknown>
-				  >
+				| TC.RouteConfig<unknown, unknown, unknown, string | TC.Response<unknown>>
 				| undefined;
 		}
 

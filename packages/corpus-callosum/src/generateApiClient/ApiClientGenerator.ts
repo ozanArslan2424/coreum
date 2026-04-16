@@ -1,12 +1,14 @@
 import fs from "node:fs";
 import path from "path";
-import type { Schema } from "../utils/Schema";
-import type { Config, PartialConfig } from "../Config/Config";
-import { Writer } from "../Writer/Writer";
-import { SchemaManager } from "../SchemaManager/SchemaManager";
-import { ConfigManager } from "../ConfigManager/ConfigManager";
+
 import type { EntityDefinition } from "@ozanarslan/corpus";
+
+import type { Config, PartialConfig } from "../Config/Config";
+import { ConfigManager } from "../ConfigManager/ConfigManager";
+import { SchemaManager } from "../SchemaManager/SchemaManager";
+import type { Schema } from "../utils/Schema";
 import { toPascalCase } from "../utils/toPascalCase";
+import { Writer } from "../Writer/Writer";
 
 type DocEntry = { id: string; endpoint: string; method: string; model?: any };
 type MapEntry = {
@@ -123,18 +125,13 @@ export class ApiClientGenerator {
 		});
 	}
 
-	private async writeEntitiesNamespace(
-		w: Writer,
-		map: Map<string, EntityDefinition>,
-	) {
+	private async writeEntitiesNamespace(w: Writer, map: Map<string, EntityDefinition>) {
 		const types = new Map<string, string>();
 		for (const def of map.values()) {
 			if (def.jsonSchema) {
 				types.set(
 					def.name,
-					await this.buildJsonSchemaType(
-						def.jsonSchema as Record<string, unknown>,
-					),
+					await this.buildJsonSchemaType(def.jsonSchema as Record<string, unknown>),
 				);
 			} else {
 				types.set(def.name, await this.buildSchemaType(def.schema));
@@ -159,10 +156,7 @@ export class ApiClientGenerator {
 	private async writeModelsNamespace(w: Writer, map: Map<string, MapEntry>) {
 		const models = new Map<
 			string,
-			Record<
-				"body" | "search" | "params" | "response",
-				{ opt: boolean; type: string }
-			>
+			Record<"body" | "search" | "params" | "response", { opt: boolean; type: string }>
 		>();
 
 		for (const r of map.values()) {
@@ -280,27 +274,22 @@ export class ApiClientGenerator {
 						w.line(`let body: RequestInit["body"];`);
 
 						w.$if(`args.search`).then((w) => {
-							w.$for(
-								[`const`, `[key, val]`, `of`, `Object.entries(args.search)`],
-								(w) => {
-									w.$if(`val == null`).then((w) => w.line(`continue;`));
-									w.line(
-										`url.searchParams.append(key, typeof val === "object" ? JSON.stringify(val as object) : String(val as _Prim));`,
-									);
-								},
-							);
+							w.$for([`const`, `[key, val]`, `of`, `Object.entries(args.search)`], (w) => {
+								w.$if(`val == null`).then((w) => w.line(`continue;`));
+								w.line(
+									`url.searchParams.append(key, typeof val === "object" ? JSON.stringify(val as object) : String(val as _Prim));`,
+								);
+							});
 						});
 
 						w.$if(`args.body`).then((w) => {
-							w.$if(
-								`!headers.has("Content-Type")`,
-								`||`,
-								`!headers.has("content-type")`,
-							).then((w) => {
-								w.$if(`!(args.body instanceof FormData)`).then((w) => {
-									w.line(`headers.set("Content-Type", "application/json");`);
-								});
-							});
+							w.$if(`!headers.has("Content-Type")`, `||`, `!headers.has("content-type")`).then(
+								(w) => {
+									w.$if(`!(args.body instanceof FormData)`).then((w) => {
+										w.line(`headers.set("Content-Type", "application/json");`);
+									});
+								},
+							);
 							w.line(
 								`body = args.body instanceof FormData ? args.body : JSON.stringify(args.body);`,
 							);
@@ -308,8 +297,7 @@ export class ApiClientGenerator {
 
 						w.$const({
 							name: "req",
-							value:
-								"new Request(url, { method, headers, body, ...args.init })",
+							value: "new Request(url, { method, headers, body, ...args.init })",
 						});
 						w.$const({ name: "res", value: "await fetch(req)" });
 						w.$const({
@@ -317,12 +305,8 @@ export class ApiClientGenerator {
 							value: `res.headers.get("content-type")`,
 						});
 
-						w.line(
-							`if (contentType?.includes("application/json")) return await res.json();`,
-						);
-						w.line(
-							`if (contentType?.includes("text/")) return await res.text();`,
-						);
+						w.line(`if (contentType?.includes("application/json")) return await res.json();`);
+						w.line(`if (contentType?.includes("text/")) return await res.text();`);
 						w.line(`return await res.blob();`);
 					},
 				});
@@ -374,12 +358,8 @@ export class ApiClientGenerator {
 											`\`${r.endpoint
 												.split(/:([a-zA-Z_][a-zA-Z0-9_]*)/)
 												.map((part, i) => {
-													if (i % 2 === 1)
-														return `\${String(args.params.${part})}`;
-													return part.replace(
-														"*",
-														`\${String(args.params["*"])}`,
-													);
+													if (i % 2 === 1) return `\${String(args.params.${part})}`;
+													return part.replace("*", `\${String(args.params["*"])}`);
 												})
 												.join("")}\``,
 										);
@@ -413,9 +393,7 @@ export class ApiClientGenerator {
 	}
 
 	private extractParams(path: string): string[] {
-		const named =
-			path.match(/:([a-zA-Z_][a-zA-Z0-9_]*)/g)?.map((p) => p.substring(1)) ||
-			[];
+		const named = path.match(/:([a-zA-Z_][a-zA-Z0-9_]*)/g)?.map((p) => p.substring(1)) || [];
 		if (path.includes("*")) named.push("*");
 		return named;
 	}
@@ -428,9 +406,7 @@ export class ApiClientGenerator {
 		const globalPrefix = this.registry.prefix;
 		let path = endpoint;
 		if (this.config.ignoreGlobalPrefix && globalPrefix) {
-			const prefixWithSlash = globalPrefix.startsWith("/")
-				? globalPrefix
-				: `/${globalPrefix}`;
+			const prefixWithSlash = globalPrefix.startsWith("/") ? globalPrefix : `/${globalPrefix}`;
 			if (path.startsWith(prefixWithSlash)) {
 				path = path.slice(prefixWithSlash.length);
 			}
@@ -454,14 +430,10 @@ export class ApiClientGenerator {
 		let result = processedParts.join("");
 		if (/^\d/.test(result)) result = "_" + result;
 
-		return (
-			result + method.slice(0, 1).toUpperCase() + method.slice(1).toLowerCase()
-		);
+		return result + method.slice(0, 1).toUpperCase() + method.slice(1).toLowerCase();
 	}
 
-	private async buildJsonSchemaType(
-		json: Record<string, unknown>,
-	): Promise<string> {
+	private async buildJsonSchemaType(json: Record<string, unknown>): Promise<string> {
 		try {
 			const inter = await this.schemaManager.toInterface(json);
 			return inter;

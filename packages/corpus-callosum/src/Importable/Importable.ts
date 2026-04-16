@@ -1,9 +1,10 @@
-import { toPascalCase } from "../utils/toPascalCase";
-import type { ImportsManager } from "../ImportsManager/ImportsManager";
 import fs from "node:fs";
 import path from "node:path";
-import type { ImportableInterface } from "./ImportableInterface";
+
+import type { ImportsManager } from "../ImportsManager/ImportsManager";
 import { toCamelCase } from "../utils/toCamelCase";
+import { toPascalCase } from "../utils/toPascalCase";
+import type { ImportableInterface } from "./ImportableInterface";
 
 export class Importable implements ImportableInterface {
 	constructor(
@@ -28,11 +29,7 @@ export class Importable implements ImportableInterface {
 	}
 
 	get filePath(): string {
-		return path.join(
-			this.im.targetDir,
-			this.im.convertCase(this.moduleName),
-			this.fileName,
-		);
+		return path.join(this.im.targetDir, this.im.convertCase(this.moduleName), this.fileName);
 	}
 
 	import(inFile: string): string {

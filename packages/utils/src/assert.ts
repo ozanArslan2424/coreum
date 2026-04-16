@@ -1,7 +1,4 @@
-export function assert<T>(
-	condition: T | null | undefined,
-	message?: string,
-): asserts condition {
+export function assert<T>(condition: T | null | undefined, message?: string): asserts condition {
 	const conditionName = String(condition);
 	if (!condition) {
 		if (!message) {

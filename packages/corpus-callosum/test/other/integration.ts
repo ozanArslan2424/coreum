@@ -1,5 +1,6 @@
-import { CorpusApi } from "./generated";
 import { TestHelper } from "corpus-utils/TestHelper";
+
+import { CorpusApi } from "./generated";
 import { startServer } from "./startServer";
 
 const PORT = 9876;
@@ -122,9 +123,7 @@ const api = new CorpusApi(BASE_URL);
 	const res = await api.usersGet({
 		search: { page: 1, limit: 5, role: "editor" },
 	});
-	T.expect("usersGet with role filter returns array", Array.isArray(res)).toBe(
-		true,
-	);
+	T.expect("usersGet with role filter returns array", Array.isArray(res)).toBe(true);
 }
 
 {
@@ -147,10 +146,7 @@ const api = new CorpusApi(BASE_URL);
 		},
 	});
 	T.expect("usersIdPut has id", res).toHaveProperty("id", "1");
-	T.expect("usersIdPut has updated name", res).toHaveProperty(
-		"name",
-		"ozan updated",
-	);
+	T.expect("usersIdPut has updated name", res).toHaveProperty("name", "ozan updated");
 	T.expect("usersIdPut has updated role", res).toHaveProperty("role", "editor");
 }
 
@@ -170,14 +166,8 @@ const api = new CorpusApi(BASE_URL);
 		},
 	});
 	T.expect("usersIdPostsPost has id", res).toHaveProperty("id");
-	T.expect("usersIdPostsPost has authorId", res).toHaveProperty(
-		"authorId",
-		"42",
-	);
-	T.expect("usersIdPostsPost has title", res).toHaveProperty(
-		"title",
-		"Hello World",
-	);
+	T.expect("usersIdPostsPost has authorId", res).toHaveProperty("authorId", "42");
+	T.expect("usersIdPostsPost has title", res).toHaveProperty("title", "Hello World");
 	T.expect("usersIdPostsPost has metadata", res).toHaveProperty("metadata");
 }
 
@@ -191,14 +181,13 @@ const api = new CorpusApi(BASE_URL);
 			metadata: { category: "life", likes: 5, views: 100 },
 		},
 	});
-	T.expect(
-		"usersIdPostsPost unpublished has published=false",
-		res,
-	).toHaveProperty("published", false);
-	T.expect(
-		"usersIdPostsPost unpublished has category=life",
-		(res as any)?.metadata?.category,
-	).toBe("life");
+	T.expect("usersIdPostsPost unpublished has published=false", res).toHaveProperty(
+		"published",
+		false,
+	);
+	T.expect("usersIdPostsPost unpublished has category=life", (res as any)?.metadata?.category).toBe(
+		"life",
+	);
 }
 
 // ── Org routes ────────────────────────────────────────────────────────────────
@@ -245,18 +234,9 @@ const api = new CorpusApi(BASE_URL);
 		params: { orgId: "org1", memberId: "m1" },
 		formData,
 	});
-	T.expect("orgsOrgIdMembersMemberIdPut has orgId", res).toHaveProperty(
-		"orgId",
-		"org1",
-	);
-	T.expect("orgsOrgIdMembersMemberIdPut has memberId", res).toHaveProperty(
-		"memberId",
-		"m1",
-	);
-	T.expect("orgsOrgIdMembersMemberIdPut has role", res).toHaveProperty(
-		"role",
-		"editor",
-	);
+	T.expect("orgsOrgIdMembersMemberIdPut has orgId", res).toHaveProperty("orgId", "org1");
+	T.expect("orgsOrgIdMembersMemberIdPut has memberId", res).toHaveProperty("memberId", "m1");
+	T.expect("orgsOrgIdMembersMemberIdPut has role", res).toHaveProperty("role", "editor");
 }
 
 {
@@ -264,20 +244,17 @@ const api = new CorpusApi(BASE_URL);
 		params: { orgId: "org1", memberId: "m2" },
 		body: { role: "viewer", status: "inactive" },
 	});
-	T.expect(
-		"orgsOrgIdMembersMemberIdPut inactive has status",
-		res,
-	).toHaveProperty("status", "inactive");
+	T.expect("orgsOrgIdMembersMemberIdPut inactive has status", res).toHaveProperty(
+		"status",
+		"inactive",
+	);
 }
 
 {
 	const res = await api.orgsOrgIdMembersMemberIdDelete({
 		params: { orgId: "org1", memberId: "m1" },
 	});
-	T.expect("orgsOrgIdMembersMemberIdDelete has removed", res).toHaveProperty(
-		"removed",
-		"m1",
-	);
+	T.expect("orgsOrgIdMembersMemberIdDelete has removed", res).toHaveProperty("removed", "m1");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

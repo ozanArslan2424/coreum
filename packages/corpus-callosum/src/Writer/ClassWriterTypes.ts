@@ -1,4 +1,5 @@
 import type { OrString } from "corpus-utils/OrString";
+
 import type { BaseWriterTypes as B } from "./BaseWriterTypes";
 
 export namespace ClassWriterTypes {

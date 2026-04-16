@@ -1,15 +1,16 @@
-import { $registry } from "@/index";
-import type { XCorsOptions } from "@/XCors/XCorsOptions";
-import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
-import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
-import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
-import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
-import { CResponse } from "@/CResponse/CResponse";
-import { Status } from "@/CResponse/Status";
-import { CommonHeaders } from "@/CHeaders/CommonHeaders";
-import type { RequestHandler } from "@/Server/RequestHandler";
 import { boolToString } from "corpus-utils/boolToString";
 import { isSomeArray } from "corpus-utils/isSomeArray";
+
+import { CommonHeaders } from "@/CHeaders/CommonHeaders";
+import { CResponse } from "@/CResponse/CResponse";
+import { Status } from "@/CResponse/Status";
+import { $registry } from "@/index";
+import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
+import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
+import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
+import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
+import type { RequestHandler } from "@/Server/RequestHandler";
+import type { XCorsOptions } from "@/XCors/XCorsOptions";
 
 /** Simple cors helper to set CORS headers. Also provides a preflight handler for the Server. */
 export class XCors extends MiddlewareAbstract {
@@ -25,11 +26,7 @@ export class XCors extends MiddlewareAbstract {
 	};
 
 	/** Applies CORS headers to a Headers object given the request origin. */
-	private applyHeaders(
-		headers: Headers,
-		reqOrigin: string,
-		includeMaxAge = false,
-	): void {
+	private applyHeaders(headers: Headers, reqOrigin: string, includeMaxAge = false): void {
 		const {
 			allowedOrigins,
 			allowedMethods,
@@ -54,34 +51,22 @@ export class XCors extends MiddlewareAbstract {
 		}
 
 		if (isSomeArray(allowedMethods)) {
-			headers.set(
-				CommonHeaders.AccessControlAllowMethods,
-				allowedMethods.join(", "),
-			);
+			headers.set(CommonHeaders.AccessControlAllowMethods, allowedMethods.join(", "));
 		}
 
 		if (isSomeArray(allowedHeaders)) {
-			headers.set(
-				CommonHeaders.AccessControlAllowHeaders,
-				allowedHeaders.join(", "),
-			);
+			headers.set(CommonHeaders.AccessControlAllowHeaders, allowedHeaders.join(", "));
 		}
 
 		if (isSomeArray(exposedHeaders)) {
-			headers.set(
-				CommonHeaders.AccessControlExposeHeaders,
-				exposedHeaders.join(", "),
-			);
+			headers.set(CommonHeaders.AccessControlExposeHeaders, exposedHeaders.join(", "));
 		}
 
 		if (includeMaxAge) {
 			headers.set(CommonHeaders.AccessControlMaxAge, maxAge.toString());
 		}
 
-		headers.set(
-			CommonHeaders.AccessControlAllowCredentials,
-			boolToString(credentials),
-		);
+		headers.set(CommonHeaders.AccessControlAllowCredentials, boolToString(credentials));
 	}
 
 	/** Preflight handler for OPTIONS requests. */

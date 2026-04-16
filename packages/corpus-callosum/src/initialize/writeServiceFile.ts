@@ -19,9 +19,7 @@ export function writeServiceFile(c: Config, m: ModuleInterface) {
 		isExported: true,
 		name: m.service.name,
 		constr: {
-			args: [
-				{ keyword: "private readonly", key: "repo", type: m.repository.name },
-			],
+			args: [{ keyword: "private readonly", key: "repo", type: m.repository.name }],
 		},
 		body: (w) => {
 			w.$method({
@@ -47,9 +45,7 @@ export function writeServiceFile(c: Config, m: ModuleInterface) {
 				args: [`search: ${m.modelTypeName}["list"]["search"]`],
 				type: `Promise<${m.modelTypeName}["list"]["response"]>`,
 				body: (w) => {
-					w.$return(
-						"this.repo.findMany({ page: search.page, limit: search.limit })",
-					);
+					w.$return("this.repo.findMany({ page: search.page, limit: search.limit })");
 				},
 			});
 

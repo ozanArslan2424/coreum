@@ -1,5 +1,6 @@
-import { $registryTesting, TC } from "./_modules";
 import { beforeEach, describe, expect, it } from "bun:test";
+
+import { $registryTesting, TC } from "./_modules";
 
 beforeEach(() => $registryTesting.reset());
 
@@ -181,14 +182,10 @@ describe("C.Response", () => {
 
 		expect(res.status).toBe(TC.Status.OK);
 		expect(res.body).toBeInstanceOf(ReadableStream);
-		expect(res.headers.get(TC.CommonHeaders.ContentType)).toBe(
-			"text/event-stream",
-		);
+		expect(res.headers.get(TC.CommonHeaders.ContentType)).toBe("text/event-stream");
 		expect(res.headers.get(TC.CommonHeaders.CacheControl)).toBe("no-cache");
 		expect(res.headers.get(TC.CommonHeaders.Connection)).toBe("keep-alive");
-		expect(response.headers.get(TC.CommonHeaders.ContentType)).toBe(
-			"text/event-stream",
-		);
+		expect(response.headers.get(TC.CommonHeaders.ContentType)).toBe("text/event-stream");
 	});
 
 	it("SSE - STREAM EMITS CORRECT CHUNKS", async () => {
@@ -277,9 +274,7 @@ describe("C.Response", () => {
 		expect(res.status).toBe(TC.Status.OK);
 		const text = await response.text();
 		expect(text).toBe("name=corpus");
-		expect(response.headers.get(ctHeader)).toContain(
-			"application/x-www-form-urlencoded",
-		);
+		expect(response.headers.get(ctHeader)).toContain("application/x-www-form-urlencoded");
 	});
 
 	it("NDJSON - RETURNS STREAM WITH CORRECT HEADERS", async () => {
@@ -352,19 +347,14 @@ describe("C.Response", () => {
 	});
 
 	it("STREAM FILE - INLINE DISPOSITION", async () => {
-		const res = await TC.Response.streamFile(
-			"test/fixtures/sample.txt",
-			"inline",
-		);
+		const res = await TC.Response.streamFile("test/fixtures/sample.txt", "inline");
 		expect(res.headers.get(TC.CommonHeaders.ContentDisposition)).toBe(
 			'inline; filename="sample.txt"',
 		);
 	});
 
 	it("STREAM FILE - THROWS NOT FOUND FOR MISSING FILE", async () => {
-		expect(
-			TC.Response.streamFile("test/fixtures/does-not-exist.txt"),
-		).rejects.toThrow();
+		expect(TC.Response.streamFile("test/fixtures/does-not-exist.txt")).rejects.toThrow();
 	});
 
 	it("STREAM FILE - BODY CONTAINS FILE CONTENT", async () => {

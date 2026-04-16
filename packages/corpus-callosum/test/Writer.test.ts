@@ -1,6 +1,7 @@
 import { describe, it, expect } from "bun:test";
-import { Writer } from "../src/Writer/Writer";
 import { unlinkSync, readFileSync, writeFileSync } from "node:fs";
+
+import { Writer } from "../src/Writer/Writer";
 
 describe("Writer core", () => {
 	it("write joins with newline by default", () => {

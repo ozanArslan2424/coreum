@@ -111,14 +111,8 @@ The WebSocket lifecycle definition object.
 ```ts
 type WebSocketRouteDefinition = {
 	onOpen?: Func<[ws: CWebSocketInterface], MaybePromise<void>>;
-	onClose?: Func<
-		[ws: CWebSocketInterface, code?: number, reason?: string],
-		MaybePromise<void>
-	>;
-	onMessage: Func<
-		[ws: CWebSocketInterface, message: string | Buffer],
-		MaybePromise<void>
-	>;
+	onClose?: Func<[ws: CWebSocketInterface, code?: number, reason?: string], MaybePromise<void>>;
+	onMessage: Func<[ws: CWebSocketInterface, message: string | Buffer], MaybePromise<void>>;
 };
 ```
 
