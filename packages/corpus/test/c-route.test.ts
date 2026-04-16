@@ -80,7 +80,7 @@ describe("C.Route", () => {
 
 			definition: TC.RouteDefinition<string> = path;
 			callback: TC.RouteCallback = () => "extended";
-			model?: TC.RouteConfig<unknown, unknown, unknown, unknown> | undefined = undefined;
+			model?: TC.RouteModel<unknown, unknown, unknown, unknown> | undefined = undefined;
 		}
 
 		new MyRoute();
