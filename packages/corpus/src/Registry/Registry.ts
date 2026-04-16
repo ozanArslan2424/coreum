@@ -38,5 +38,6 @@ export class Registry {
 		this._router = this._initialRouter;
 		this.cors = null;
 		this.middlewares = new MiddlewareStore();
+		this.entities = new EntityStore();
 	}
 }

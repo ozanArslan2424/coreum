@@ -11,6 +11,7 @@ import type { StaticRouteDefinition } from "@/StaticRoute/StaticRouteDefinition"
 import type { StaticRouteCallback } from "@/StaticRoute/StaticRouteCallback";
 import type { Func } from "corpus-utils/Func";
 import type { MaybePromise } from "corpus-utils/MaybePromise";
+import type { CacheDirective } from "@/CHeaders/CacheDirective";
 
 type R = CResponse | string;
 
@@ -52,27 +53,61 @@ export abstract class StaticRouteAbstract<
 
 	get handler(): Func<[Context<B, S, P, R>], MaybePromise<R>> {
 		const customHandler = this.callback;
+		const isStrDef = typeof this.definition === "string";
+		const defaultCaching: CacheDirective = {
+			public: true,
+			maxAge: 3600, // 1 hour - safe middle ground
+			noCache: false,
+		};
+		const caching = isStrDef
+			? defaultCaching
+			: (this.definition.cache ?? defaultCaching);
 
-		if (customHandler !== undefined) {
-			return async (c) => {
-				const file = new XFile(this.filePath);
-				const exists = await file.exists();
-				if (!exists) {
-					return await this.onFileNotFound();
-				}
+		return async (c) => {
+			const file = new XFile(this.filePath);
+			const exists = await file.exists();
+			if (!exists) {
+				return await this.onFileNotFound();
+			}
+
+			if (customHandler !== undefined) {
 				const content = await file.text();
 				c.res.headers.setMany({
 					[CommonHeaders.ContentType]: file.mimeType,
 					[CommonHeaders.ContentLength]: content.length.toString(),
+					[CommonHeaders.CacheControl]: this.formatCacheHeader(caching),
 				});
-				return customHandler(c, content);
-			};
-		}
+				return await customHandler(c, content);
+			}
 
-		if (typeof this.definition === "string") {
-			return async () => await CResponse.file(this.filePath);
-		}
+			let res: CResponse;
 
-		return async () => await CResponse.streamFile(this.filePath);
+			if (!isStrDef && this.definition.stream) {
+				res = await CResponse.streamFile(file, this.definition.disposition);
+			} else {
+				res = await CResponse.file(file);
+			}
+
+			res.headers.set(
+				CommonHeaders.CacheControl,
+				this.formatCacheHeader(caching),
+			);
+			return res;
+		};
+	}
+
+	// PRIVATE
+
+	private formatCacheHeader(config: CacheDirective | "no-cache"): string {
+		if (config === "no-cache") return "no-cache";
+
+		const parts: string[] = [];
+		if (config.noStore) return "no-store";
+		if (config.noCache) return "no-cache";
+		if (config.public) parts.push("public");
+		if (config.maxAge !== undefined) parts.push(`max-age=${config.maxAge}`);
+		if (config.immutable) parts.push("immutable");
+
+		return parts.join(", ");
 	}
 }

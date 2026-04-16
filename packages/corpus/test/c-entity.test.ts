@@ -1,9 +1,9 @@
-import { describe, it, expect } from "bun:test";
-import { TC } from "./_modules";
+import { describe, it, expect, beforeEach } from "bun:test";
+import { $registryTesting, TC } from "./_modules";
 import { type } from "arktype";
 import * as z from "zod";
 
-// ─── schemas ─────────────────────────────────────────────────────────────────
+beforeEach(() => $registryTesting.reset());
 
 const arkSimple = type({ name: "string", age: "number" });
 const zodSimple = z.object({ name: z.string(), age: z.number() });
