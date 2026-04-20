@@ -2,6 +2,7 @@ import type { Func } from "corpus-utils/Func";
 import { log, logFatal } from "corpus-utils/internalLog";
 import type { MaybePromise } from "corpus-utils/MaybePromise";
 
+import { RouteVariant } from "@/BaseRoute/RouteVariant";
 import { Context } from "@/Context/Context";
 import { Exception } from "@/Exception/Exception";
 import { $registry } from "@/index";
@@ -9,7 +10,6 @@ import { Router } from "@/Registry/Router";
 import type { RouterData } from "@/Registry/RouterData";
 import { Req } from "@/Req/Req";
 import { Res } from "@/Res/Res";
-import { RouteVariant } from "@/BaseRoute/RouteVariant";
 import type { ErrorHandler } from "@/Server/ErrorHandler";
 import type { RequestHandler } from "@/Server/RequestHandler";
 import type { ServeArgs } from "@/Server/ServeArgs";

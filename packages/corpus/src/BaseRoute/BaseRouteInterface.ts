@@ -1,7 +1,7 @@
-import type { Method } from "@/Method/Method";
 import type { BaseRouteHandler } from "@/BaseRoute/BaseRouteHandler";
 import type { RouteModel } from "@/BaseRoute/RouteModel";
 import type { RouteVariant } from "@/BaseRoute/RouteVariant";
+import type { Method } from "@/Method/Method";
 
 export interface BaseRouteInterface<
 	B = unknown,

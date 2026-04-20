@@ -4,8 +4,8 @@ export function getArkSchemas() {
 	const Role = type("'admin' | 'editor' | 'viewer'");
 	const Status = type("'active' | 'inactive' | 'banned'");
 	const Pagination = type({
-		page: type("string").pipe(Number),
-		limit: type("string").pipe(Number),
+		page: "number",
+		limit: "number",
 	});
 	const Timestamp = type({ createdAt: "string", updatedAt: "string" });
 	const UserParams = type({ id: "string" });

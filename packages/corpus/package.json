@@ -1,7 +1,7 @@
 {
 	"$schema": "https://www.schemastore.org/package.json",
 	"name": "@ozanarslan/corpus",
-	"version": "0.5.2",
+	"version": "0.5.3",
 	"description": "Small Typescript backend framework with only core utilities",
 	"keywords": [
 		"backend framework",
@@ -37,8 +37,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"fm": "bunx --bun prettier --write .",
-		"lint": "bunx oxlint --fix",
 		"build": "bun run build.ts",
 		"test:serve": "bun run test/other/test-server.ts",
 		"test:http": "bun run test/other/http-simulation.ts",

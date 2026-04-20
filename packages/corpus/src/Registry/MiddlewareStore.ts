@@ -1,12 +1,12 @@
 import { compile } from "corpus-utils/compile";
 
+import { BaseRouteAbstract } from "@/BaseRoute/BaseRouteAbstract";
 import { Controller } from "@/Controller/Controller";
 import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
 import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
 import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
 import type { MiddlewareInterface } from "@/Middleware/MiddlwareInterface";
 import type { MiddlewareStoreReturn } from "@/Registry/MiddlewareStoreReturn";
-import { BaseRouteAbstract } from "@/BaseRoute/BaseRouteAbstract";
 
 export class MiddlewareStore {
 	private inboundMap = new Map<string, Array<MiddlewareHandler>>();

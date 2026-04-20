@@ -4,8 +4,8 @@ export function getZodSchemas() {
 	const Role = z.enum(["admin", "editor", "viewer"]);
 	const Status = z.enum(["active", "inactive", "banned"]);
 	const Pagination = z.object({
-		page: z.string().transform(Number),
-		limit: z.string().transform(Number),
+		page: z.number(),
+		limit: z.number(),
 	});
 	const Timestamp = z.object({ createdAt: z.string(), updatedAt: z.string() });
 	const UserParams = z.object({ id: z.string() });

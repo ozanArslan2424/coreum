@@ -77,14 +77,14 @@ void server.listen(3000);
 
 Either "inbound" or "outbound". Defaults to "inbound". Inbound middlewares run before the handlers and outbound middlewares run after. Mental model if coming from NestJS:
 
-| Corpus                                  | NestJS                                           |
-| --------------------------------------- | ------------------------------------------------ |
-| Inbound Middleware returning void       | Middleware (calling `next()`)                    |
-| Outbound Middleware returning void      | Interceptor (post-handler, returning observable) |
-| Inbound Middleware returning Res  | Guard returning `false` or throwing              |
-| Outbound Middleware returning Res | Exception Filter catching and transforming       |
-| Inbound Middleware throwing             | Guard or Middleware throwing                     |
-| Outbound Middleware throwing            | Interceptor or Exception Filter throwing         |
+| Corpus                             | NestJS                                           |
+| ---------------------------------- | ------------------------------------------------ |
+| Inbound Middleware returning void  | Middleware (calling `next()`)                    |
+| Outbound Middleware returning void | Interceptor (post-handler, returning observable) |
+| Inbound Middleware returning Res   | Guard returning `false` or throwing              |
+| Outbound Middleware returning Res  | Exception Filter catching and transforming       |
+| Inbound Middleware throwing        | Guard or Middleware throwing                     |
+| Outbound Middleware throwing       | Interceptor or Exception Filter throwing         |
 
 </section>
 

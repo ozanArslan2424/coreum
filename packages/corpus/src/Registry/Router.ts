@@ -4,14 +4,14 @@ import { internFunc } from "corpus-utils/internFunc";
 import { objGetKeys } from "corpus-utils/objGetKeys";
 import { strRemoveWhitespace } from "corpus-utils/strRemoveWhitespace";
 
+import type { BaseRouteInterface } from "@/BaseRoute/BaseRouteInterface";
+import type { RouteModel } from "@/BaseRoute/RouteModel";
 import { $registry } from "@/index";
 import { BranchAdapter } from "@/Registry/BranchAdapter";
 import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
 import type { RouterData } from "@/Registry/RouterData";
 import type { RouterReturn } from "@/Registry/RouterReturn";
 import type { Req } from "@/Req/Req";
-import type { BaseRouteInterface } from "@/BaseRoute/BaseRouteInterface";
-import type { RouteModel } from "@/BaseRoute/RouteModel";
 
 export class Router {
 	constructor(private adapter: RouterAdapterInterface = new BranchAdapter()) {}

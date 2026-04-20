@@ -1,6 +1,8 @@
 import type { Func } from "corpus-utils/Func";
 import type { MaybePromise } from "corpus-utils/MaybePromise";
 
+import { BaseRouteAbstract } from "@/BaseRoute/BaseRouteAbstract";
+import { RouteVariant } from "@/BaseRoute/RouteVariant";
 import type { BundleRouteConfig } from "@/BundleRoute/BundleRouteConfig";
 import type { RouteModel } from "@/C";
 import type { CacheDirective } from "@/CommonHeaders/CacheDirective";
@@ -9,8 +11,6 @@ import type { Context } from "@/Context/Context";
 import { Exception } from "@/Exception/Exception";
 import { Method } from "@/Method/Method";
 import { Res } from "@/Res/Res";
-import { BaseRouteAbstract } from "@/BaseRoute/BaseRouteAbstract";
-import { RouteVariant } from "@/BaseRoute/RouteVariant";
 import { Status } from "@/Status/Status";
 import { XConfig } from "@/XConfig/XConfig";
 import { XFile } from "@/XFile/XFile";

@@ -103,10 +103,10 @@ See [Extensibility](/docs/intro#extensibility) for other extendable interfaces.
 
 Context is typically not instantiated directly — it is created by the framework. The constructor parameters are:
 
-| Parameter | Type      | Description                                            |
-| --------- | --------- | ------------------------------------------------------ |
-| req       | Req  | The incoming request instance                          |
-| res       | Res | Optional response instance (defaults to new Res) |
+| Parameter | Type | Description                                      |
+| --------- | ---- | ------------------------------------------------ |
+| req       | Req  | The incoming request instance                    |
+| res       | Res  | Optional response instance (defaults to new Res) |
 
 </section>
 
@@ -116,14 +116,14 @@ Context is typically not instantiated directly — it is created by the framewor
 
 | Property | Type                 | Description                                        |
 | -------- | -------------------- | -------------------------------------------------- |
-| req      | Req             | The request instance with raw access               |
+| req      | Req                  | The request instance with raw access               |
 | url      | URL                  | Standard Web API URL object                        |
 | headers  | CHeaders             | Request headers                                    |
 | cookies  | Cookies              | Request cookies                                    |
 | body     | B                    | Parsed and validated request body                  |
 | search   | S                    | Parsed and validated URL search parameters         |
 | params   | P                    | Parsed and validated URL path parameters           |
-| res      | Res            | Response builder for setting status, headers, etc. |
+| res      | Res                  | Response builder for setting status, headers, etc. |
 | data     | ContextDataInterface | Custom data storage for middleware communication   |
 
 </section>

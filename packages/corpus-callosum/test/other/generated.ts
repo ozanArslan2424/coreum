@@ -122,8 +122,8 @@ namespace Models {
 	>;
 	export type UsersGet = Prettify<{
 		search: {
-			limit: string;
-			page: string;
+			limit: number;
+			page: number;
 			role?: "admin" | "editor" | "viewer";
 			status?: "active" | "banned" | "inactive";
 		};
@@ -254,8 +254,8 @@ namespace Models {
 	>;
 	export type OrgsOrgIdMembersGet = Prettify<{
 		search: {
-			limit: string;
-			page: string;
+			limit: number;
+			page: number;
 		};
 		params: {
 			orgId: string;

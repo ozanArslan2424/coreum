@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { logFatal } from "corpus-utils/internalLog";
 import { strIsDefined } from "corpus-utils/strIsDefined";
 
+import { RouteVariant } from "@/BaseRoute/RouteVariant";
 import { CHeaders } from "@/CHeaders/CHeaders";
 import { CommonHeaders } from "@/CommonHeaders/CommonHeaders";
 import { Exception } from "@/Exception/Exception";
@@ -11,7 +12,6 @@ import { MiddlewareAbstract } from "@/Middleware/MiddlewareAbstract";
 import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
 import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
 import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
-import { RouteVariant } from "@/BaseRoute/RouteVariant";
 import { Status } from "@/Status/Status";
 import type { RateLimitConfig } from "@/XRateLimiter/RateLimitConfig";
 import { RateLimiterFileStore } from "@/XRateLimiter/RateLimiterFileStore";

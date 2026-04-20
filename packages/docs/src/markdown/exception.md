@@ -120,12 +120,12 @@ Additional data to include in the response. If a `Res` is passed, it will be mod
 
 <section>
 
-| Property | Type        | Description                                |
-| -------- | ----------- | ------------------------------------------ |
-| message  | `string`    | Error message (inherited from Error)       |
-| status   | `Status`    | HTTP status code                           |
-| data     | `unknown`   | Optional additional payload                |
-| response      | `Res` | Getter to transform to Res, see below |
+| Property | Type      | Description                           |
+| -------- | --------- | ------------------------------------- |
+| message  | `string`  | Error message (inherited from Error)  |
+| status   | `Status`  | HTTP status code                      |
+| data     | `unknown` | Optional additional payload           |
+| response | `Res`     | Getter to transform to Res, see below |
 
 </section>
 

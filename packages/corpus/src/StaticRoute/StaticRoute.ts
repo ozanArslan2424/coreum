@@ -1,5 +1,5 @@
-import { Res } from "@/Res/Res";
 import type { RouteModel } from "@/BaseRoute/RouteModel";
+import { Res } from "@/Res/Res";
 import { StaticRouteAbstract } from "@/StaticRoute/StaticRouteAbstract";
 import type { StaticRouteCallback } from "@/StaticRoute/StaticRouteCallback";
 import type { StaticRouteDefinition } from "@/StaticRoute/StaticRouteDefinition";

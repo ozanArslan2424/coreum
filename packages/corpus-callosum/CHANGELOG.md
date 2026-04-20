@@ -1,5 +1,11 @@
 # @ozanarslan/corpus-callosum
 
+## 0.5.3
+
+### Patch Changes
+
+- crucial name changes and deleted random extras from before
+
 ## 0.5.2
 
 ### Patch Changes

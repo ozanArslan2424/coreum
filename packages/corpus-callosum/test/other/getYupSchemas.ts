@@ -1,15 +1,13 @@
 import * as y from "yup";
 
 export function getYupSchemas() {
-	const numericString = () => y.number().transform((_, o) => (o === "" ? NaN : Number(o)));
-
 	const Role = y.mixed<"admin" | "editor" | "viewer">().oneOf(["admin", "editor", "viewer"]);
 	const Status = y
 		.mixed<"active" | "inactive" | "banned">()
 		.oneOf(["active", "inactive", "banned"]);
 	const Pagination = y.object({
-		page: numericString().required(),
-		limit: numericString().required(),
+		page: y.number().required(),
+		limit: y.number().required(),
 	});
 	const Timestamp = y.object({
 		createdAt: y.string().required(),

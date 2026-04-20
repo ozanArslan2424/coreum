@@ -168,6 +168,6 @@ All constructor options are stored as readonly properties after resolve methods:
 | `handler`        | `Func<[Context<B, S, P, R>, string], MaybePromise<R>>` | The route handler function (file serve or custom) |
 | `model`          | `RouteModel \| undefined`                              | Validation model if provided                      |
 | `variant`        | `RouteVariant.static`                                  | Fixed to `static` for this class                  |
-| `onFileNotFound` | `Func<[],Promise<Res                             | never>>`                                          | override to change file not found behavior |
+| `onFileNotFound` | `Func<[],Promise<Res                                   | never>>`                                          | override to change file not found behavior |
 
 </section>

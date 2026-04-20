@@ -1,8 +1,8 @@
 import type { SchemaValidator } from "corpus-utils/Schema";
 
-import type { Method } from "@/Method/Method";
 import type { BaseRouteHandler } from "@/BaseRoute/BaseRouteHandler";
 import type { RouteVariant } from "@/BaseRoute/RouteVariant";
+import type { Method } from "@/Method/Method";
 
 export type RouterData = {
 	variant: RouteVariant;
