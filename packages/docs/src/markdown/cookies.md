@@ -2,6 +2,8 @@
 
 The `Cookies` class provides a unified interface for managing HTTP cookies with support for parsing request cookies and generating `Set-Cookie` headers. It wraps the underlying platform cookie implementation (Bun's CookieMap) with a consistent API.
 
+> Cookie values are not decoded by default. This is on purpose, [RFC 6265](https://datatracker.ietf.org/doc/html/rfc6265) does not specify URI encoding/decoding standards. it's up to the consumer (you).
+
 <section class="table-of-contents">
 
 ##### Contents

@@ -40,40 +40,40 @@ type FindResultReturn = {
  * types and variables to fit this package's conventions, and minor adjustments to
  * a handful of methods.
  *
- * BranchAdapter benchmark results: (300 routes)
- * Setup Time:    0.36
- * Lookups:       30,000
- * Hit rate:      100.00%
- * Accuracy:      100.00%
- * Avg:           0.0001ms
- * Min:           0.0000ms
- * Max:           0.1229ms
- * P95:           0.0000ms
- * P99:           0.0005ms
- * RPS:           17335289
+ * BranchAdapter benchmark results: (600 routes)
+ * Setup Time: 1.20
+ * Lookups:    60,000
+ * Hit rate:   100.00%
+ * Accuracy:   100.00%
+ * Avg:        0.0000ms
+ * Min:        0.0000ms
+ * Max:        0.1079ms
+ * P95:        0.0000ms
+ * P99:        0.0006ms
+ * RPS:        20426881
  */
 export class BranchAdapter implements RouterAdapterInterface {
-	__brand: string = "BranchAdapter";
-	private _root: Branch = this.createBranch("/", null);
+	public readonly __brand: string = "BranchAdapter";
+	private readonly WILD = "*";
+	private readonly EMPTY = "";
+	private readonly SLASH = "/";
+	private readonly SLASH_CHAR_CODE = 47;
+
+	private _root: Branch = this.createBranch(this.SLASH, null);
 	private storeFactory: Func<[], Store> = () => new Map();
 
 	find(req: CRequest): RouterReturn | null {
 		const method = req.method.toUpperCase() as Method;
 		const pathname = req.urlObject.pathname;
-		const pathlength = pathname.length;
-		const searchParams = req.urlObject.searchParams;
 
-		const result = this.findResult(pathname, pathlength, this._root, 0);
+		const result = this.findResult(pathname, pathname.length, this._root, 0);
 		if (!result) return null;
 
 		const route = result.store.get(method);
 		if (!route) return null;
+		const params = result.params;
 
-		return {
-			route,
-			params: result.params,
-			search: Object.fromEntries(searchParams),
-		};
+		return { route, params };
 	}
 
 	add(data: RouterData): void {
@@ -106,13 +106,113 @@ export class BranchAdapter implements RouterAdapterInterface {
 		return routes;
 	};
 
-	private createBranchStore(path: string) {
-		// begin with slash
-		if (path === "" || path[0] !== "/") {
-			path = `/${path}`;
+	private findResult(
+		url: string,
+		urlLength: number,
+		branch: Branch,
+		startIndex: number,
+	): FindResultReturn {
+		const part = branch.part;
+		const pathPartLen = part.length;
+		const pathPartEndIndex = startIndex + pathPartLen;
+
+		// Only check the pathPart if its length is > 1 since the parent has
+		// already checked that the url matches the first character
+		if (pathPartLen > 1) {
+			if (pathPartEndIndex > urlLength) {
+				return null;
+			}
+
+			if (pathPartLen < 15) {
+				// Using a loop is faster for short strings
+				for (let i = 1, j = startIndex + 1; i < pathPartLen; ++i, ++j) {
+					if (part[i] !== url[j]) {
+						return null;
+					}
+				}
+			} else if (url.slice(startIndex, pathPartEndIndex) !== part) {
+				return null;
+			}
 		}
 
-		const endsWithWildcard = path.endsWith("*");
+		startIndex = pathPartEndIndex;
+
+		if (startIndex === urlLength) {
+			// Reached the end of the URL
+			if (branch.store !== null) {
+				return {
+					store: branch.store,
+					params: {},
+				};
+			}
+
+			if (branch.wildcardStore !== null) {
+				return {
+					store: branch.wildcardStore,
+					params: { [this.WILD]: this.EMPTY },
+				};
+			}
+
+			return null;
+		}
+
+		if (branch.children !== null) {
+			const staticChild = branch.children.get(url.charCodeAt(startIndex));
+
+			if (staticChild !== undefined) {
+				const route = this.findResult(url, urlLength, staticChild, startIndex);
+
+				if (route !== null) {
+					return route;
+				}
+			}
+		}
+
+		if (branch.paramBranch !== null) {
+			const paramBranch = branch.paramBranch;
+			const slashIndex = url.indexOf(this.SLASH, startIndex);
+
+			if (slashIndex !== startIndex) {
+				// Params cannot be empty
+				if (slashIndex === -1 || slashIndex >= urlLength) {
+					if (paramBranch.store !== null) {
+						const params: Record<string, string> = {};
+						params[paramBranch.paramName] = url.slice(startIndex, urlLength);
+						return {
+							store: paramBranch.store,
+							params,
+						};
+					}
+				} else if (paramBranch.branch !== null) {
+					const route = this.findResult(url, urlLength, paramBranch.branch, slashIndex);
+
+					if (route !== null) {
+						route.params[paramBranch.paramName] = url.slice(startIndex, slashIndex);
+						return route;
+					}
+				}
+			}
+		}
+
+		if (branch.wildcardStore !== null) {
+			return {
+				store: branch.wildcardStore,
+				params: {
+					[this.WILD]: url.slice(startIndex, urlLength),
+				},
+			};
+		}
+
+		return null;
+	}
+
+	private createBranchStore(path: string) {
+		// begin with slash
+		if (path === this.EMPTY || path.charCodeAt(0) !== this.SLASH_CHAR_CODE) {
+			path = this.SLASH + path;
+		}
+
+		const endsWithWildcard = path.endsWith(this.WILD);
 
 		if (endsWithWildcard) {
 			path = path.slice(0, -1); // Slice off trailing '*'
@@ -122,7 +222,7 @@ export class BranchAdapter implements RouterAdapterInterface {
 		const paramParts = path.match(/:.+?(?=\/|$)/g) || [];
 
 		// remove last part if empty
-		if (staticParts[staticParts.length - 1] === "") {
+		if (staticParts[staticParts.length - 1] === this.EMPTY) {
 			staticParts.pop();
 		}
 
@@ -266,105 +366,5 @@ export class BranchAdapter implements RouterAdapterInterface {
 			branch: null,
 			wildcardStore: null,
 		};
-	}
-
-	private findResult(
-		url: string,
-		urlLength: number,
-		branch: Branch,
-		startIndex: number,
-	): FindResultReturn {
-		const part = branch.part;
-		const pathPartLen = part.length;
-		const pathPartEndIndex = startIndex + pathPartLen;
-
-		// Only check the pathPart if its length is > 1 since the parent has
-		// already checked that the url matches the first character
-		if (pathPartLen > 1) {
-			if (pathPartEndIndex > urlLength) {
-				return null;
-			}
-
-			if (pathPartLen < 15) {
-				// Using a loop is faster for short strings
-				for (let i = 1, j = startIndex + 1; i < pathPartLen; ++i, ++j) {
-					if (part[i] !== url[j]) {
-						return null;
-					}
-				}
-			} else if (url.slice(startIndex, pathPartEndIndex) !== part) {
-				return null;
-			}
-		}
-
-		startIndex = pathPartEndIndex;
-
-		if (startIndex === urlLength) {
-			// Reached the end of the URL
-			if (branch.store !== null) {
-				return {
-					store: branch.store,
-					params: {},
-				};
-			}
-
-			if (branch.wildcardStore !== null) {
-				return {
-					store: branch.wildcardStore,
-					params: { "*": "" },
-				};
-			}
-
-			return null;
-		}
-
-		if (branch.children !== null) {
-			const staticChild = branch.children.get(url.charCodeAt(startIndex));
-
-			if (staticChild !== undefined) {
-				const route = this.findResult(url, urlLength, staticChild, startIndex);
-
-				if (route !== null) {
-					return route;
-				}
-			}
-		}
-
-		if (branch.paramBranch !== null) {
-			const paramBranch = branch.paramBranch;
-			const slashIndex = url.indexOf("/", startIndex);
-
-			if (slashIndex !== startIndex) {
-				// Params cannot be empty
-				if (slashIndex === -1 || slashIndex >= urlLength) {
-					if (paramBranch.store !== null) {
-						const params: Record<string, string> = {};
-						params[paramBranch.paramName] = url.slice(startIndex, urlLength);
-						return {
-							store: paramBranch.store,
-							params,
-						};
-					}
-				} else if (paramBranch.branch !== null) {
-					const route = this.findResult(url, urlLength, paramBranch.branch, slashIndex);
-
-					if (route !== null) {
-						route.params[paramBranch.paramName] = url.slice(startIndex, slashIndex);
-						return route;
-					}
-				}
-			}
-		}
-
-		if (branch.wildcardStore !== null) {
-			return {
-				store: branch.wildcardStore,
-				params: {
-					"*": url.slice(startIndex, urlLength),
-				},
-			};
-		}
-
-		return null;
 	}
 }

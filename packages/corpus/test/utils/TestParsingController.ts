@@ -34,7 +34,7 @@ export class TestParsingController extends TC.Controller {
 
 	optional = this.route("/optional", (c) => c.search, {
 		search: type({
-			"groupId?": type("string | undefined").pipe((v) => (v ? Number(v) : v)),
+			"groupId?": type("number | undefined").pipe((v) => (v ? Number(v) : v)),
 		}),
 	});
 

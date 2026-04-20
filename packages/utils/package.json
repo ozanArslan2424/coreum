@@ -8,7 +8,6 @@
 		"./arrIncludes": "./dist/arrIncludes.mjs",
 		"./assert": "./dist/assert.mjs",
 		"./boolToString": "./dist/boolToString.mjs",
-		"./Branded": "./dist/Branded.mjs",
 		"./compile": "./dist/compile.mjs",
 		"./ConstructorOf": "./dist/ConstructorOf.mjs",
 		"./Func": "./dist/Func.mjs",

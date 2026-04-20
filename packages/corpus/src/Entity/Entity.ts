@@ -16,7 +16,7 @@ export function Entity<T extends Schema = Schema>(def: EntityDefinition<T>) {
 		constructor(values: InferSchemaIn<T>) {
 			const data = def.disableParsing
 				? values
-				: Parser.parseSync(values, def.schema["~standard"].validate);
+				: Parser.schemaParser.parseSync(def.name, values, def.schema["~standard"].validate);
 			Object.assign(this, data);
 		}
 	}

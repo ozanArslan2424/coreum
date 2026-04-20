@@ -55,7 +55,6 @@ export * from "./Server/ServerOptions";
 export * from "./Server/ServeArgs";
 export * from "./Server/Server";
 
-export * from "./Registry/MemoiristAdapter";
 export * from "./Registry/BranchAdapter";
 export * from "./Registry/RouterAdapterInterface";
 export * from "./Registry/RouterReturn";

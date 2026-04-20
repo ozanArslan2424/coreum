@@ -19,9 +19,9 @@ beforeEach(() => {
 });
 
 const parse = (data: unknown, schema: Schema) =>
-	TC.Parser.parse(data, schema["~standard"].validate);
+	TC.Parser.schemaParser.parse("test", data, schema["~standard"].validate);
 
-describe("Parser.parse", () => {
+describe("Parser unit", () => {
 	describe("success", () => {
 		it("ark object", async () => {
 			expect(parse(PARSED, TestModel.arkObject)).resolves.toEqual(PARSED);
@@ -31,22 +31,22 @@ describe("Parser.parse", () => {
 		});
 		it("ark route — coerces params and search, passes body through", async () => {
 			expect(parse(RAW, TestModel.arkRoute.params)).resolves.toEqual(PARSED);
-			expect(parse(RAW, TestModel.arkRoute.search)).resolves.toEqual(PARSED);
+			expect(parse(PARSED, TestModel.arkRoute.search)).resolves.toEqual(PARSED);
 			expect(parse(PARSED, TestModel.arkRoute.body)).resolves.toEqual(PARSED);
 		});
 		it("zod route — coerces params and search, passes body through", async () => {
 			expect(parse(RAW, TestModel.zodRoute.params)).resolves.toEqual(PARSED);
-			expect(parse(RAW, TestModel.zodRoute.search)).resolves.toEqual(PARSED);
+			expect(parse(PARSED, TestModel.zodRoute.search)).resolves.toEqual(PARSED);
 			expect(parse(PARSED, TestModel.zodRoute.body)).resolves.toEqual(PARSED);
 		});
 		it("ark route (referenced schemas)", async () => {
 			expect(parse(RAW, TestModel.arkRouteReferenced.params)).resolves.toEqual(PARSED);
-			expect(parse(RAW, TestModel.arkRouteReferenced.search)).resolves.toEqual(PARSED);
+			expect(parse(PARSED, TestModel.arkRouteReferenced.search)).resolves.toEqual(PARSED);
 			expect(parse(PARSED, TestModel.arkRouteReferenced.body)).resolves.toEqual(PARSED);
 		});
 		it("zod route (referenced schemas)", async () => {
 			expect(parse(RAW, TestModel.zodRouteReferenced.params)).resolves.toEqual(PARSED);
-			expect(parse(RAW, TestModel.zodRouteReferenced.search)).resolves.toEqual(PARSED);
+			expect(parse(PARSED, TestModel.zodRouteReferenced.search)).resolves.toEqual(PARSED);
 			expect(parse(PARSED, TestModel.zodRouteReferenced.body)).resolves.toEqual(PARSED);
 		});
 	});

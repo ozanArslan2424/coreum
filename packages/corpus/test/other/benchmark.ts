@@ -2,9 +2,10 @@ import { log, logFatal } from "corpus-utils/internalLog";
 
 import { TC } from "../_modules";
 import { RouterBenchmark } from "../utils/RouterBenchmark";
+import { MemoiristAdapter } from "./MemoiristAdapter";
 
 async function main() {
-	const adapters = [new TC.MemoiristAdapter(), new TC.BranchAdapter()];
+	const adapters = [new MemoiristAdapter(), new TC.BranchAdapter()];
 	const results: string[] = [];
 	for (const adapter of adapters) {
 		const bench = new RouterBenchmark(adapter);

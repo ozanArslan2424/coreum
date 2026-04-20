@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 
 import { $registryTesting, TC } from "./_modules";
+import { createTestServer } from "./utils/createTestServer";
+import { req } from "./utils/req";
 
 beforeEach(() => $registryTesting.reset());
 
@@ -126,5 +128,15 @@ describe("Cookies", () => {
 		expect(cookies.keys()).toBeArrayOfSize(0);
 		expect(cookies.values()).toBeArrayOfSize(0);
 		expect(cookies.toSetCookieHeaders()).toBeArrayOfSize(0);
+	});
+
+	it("ENCODED URL STRINGS ARE NOT DECODED", async () => {
+		const s = createTestServer();
+		new TC.Route("/url-cookie", (c) => c.cookies.get("username"));
+		const r = req("/url-cookie", {
+			headers: { cookie: `username=${encodeURIComponent("Ozan Arslan")}` },
+		});
+		const res = await s.handle(r);
+		expect(res.text()).resolves.toBe(encodeURIComponent("Ozan Arslan"));
 	});
 });

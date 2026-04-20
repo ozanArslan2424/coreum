@@ -1,13 +1,14 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 
 import { $registryTesting, TC } from "./_modules";
+import { MemoiristAdapter } from "./other/MemoiristAdapter";
 import { createTestServer } from "./utils/createTestServer";
 
 beforeEach(() => $registryTesting.reset());
 
 describe("MemoiristAdapter - Route Collision Detection", () => {
 	createTestServer({
-		adapter: new TC.MemoiristAdapter(),
+		adapter: new MemoiristAdapter(),
 	});
 
 	function makeRoutes(

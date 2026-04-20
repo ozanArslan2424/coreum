@@ -36,7 +36,6 @@ describe("C.Context", () => {
 		});
 		const fakeRouterReturn: TC.RouterReturn = {
 			params: { id: "randomID" },
-			search: { a: "b" },
 			route: {
 				endpoint: "/hello/:id",
 				id: "POST /hello/:id",
@@ -55,7 +54,6 @@ describe("C.Context", () => {
 		await TC.Context.appendParsedData(c, r, fakeRouterReturn);
 
 		expect(c.body).toEqual({ hello: "world" });
-		expect(c.search).toEqual(fakeRouterReturn.search);
 		expect(c.params).toEqual(fakeRouterReturn.params);
 	});
 
@@ -85,7 +83,7 @@ describe("C.Context", () => {
 			{
 				body: type({
 					name: "string",
-					age: type("string").pipe(Number),
+					age: "number",
 				}),
 			},
 		);
@@ -119,41 +117,6 @@ describe("C.Context", () => {
 		const res = await s.handle(req("/ctx-search-string?q=hello"));
 		expect(res.status).toBe(TC.Status.OK);
 	});
-
-	// NOTE:
-	// These used to be possible by processing raw string,
-	// i removed that because it wasn't a good idea to process raw string.
-	// Consumer should do that in the schema
-	//
-	// it("SEARCH - COERCES NUMBER", async () => {
-	// 	new C.Route("/ctx-search-number", (c) => {
-	// 		expect(c.search).toEqual({ page: 1 });
-	// 		return "ok";
-	// 	});
-	//
-	// 	const res = await s.handle(req("/ctx-search-number?page=1"));
-	// 	expect(res.status).toBe(C.Status.OK);
-	// });
-	//
-	// it("SEARCH - COERCES BOOLEAN", async () => {
-	// 	new C.Route("/ctx-search-bool", (c) => {
-	// 		expect(c.search).toEqual({ active: true });
-	// 		return "ok";
-	// 	});
-	//
-	// 	const res = await s.handle(req("/ctx-search-bool?active=true"));
-	// 	expect(res.status).toBe(C.Status.OK);
-	// });
-	//
-	// it("PARAMS - COERCES NUMBER", async () => {
-	// 	new C.Route("/ctx-params-num/:id", (c) => {
-	// 		expect(c.params).toEqual({ id: 42 });
-	// 		return "ok";
-	// 	});
-	//
-	// 	const res = await s.handle(req("/ctx-params-num/42"));
-	// 	expect(res.status).toBe(C.Status.OK);
-	// });
 
 	it("SEARCH - EMPTY WHEN NO PARAMS", async () => {
 		new TC.Route("/ctx-search-empty", (c) => {

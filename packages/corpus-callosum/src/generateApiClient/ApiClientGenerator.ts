@@ -143,10 +143,11 @@ export class ApiClientGenerator {
 			body: (w) => {
 				for (const [name, typedef] of types.entries()) {
 					const pascalKey = toPascalCase(name);
-					w.$type({
+					w.$type({ isExported: true, name: pascalKey, value: typedef });
+					w.$const({
 						isExported: true,
 						name: pascalKey,
-						value: typedef,
+						value: `(class { constructor(values: ${pascalKey}) { Object.assign(this, values); } }) as unknown as new (values: ${pascalKey}) => ${pascalKey}`,
 					});
 				}
 			},

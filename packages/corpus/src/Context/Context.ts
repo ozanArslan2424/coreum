@@ -51,7 +51,12 @@ export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
 		data: RouterReturn,
 	) {
 		ctx.body = await Parser.parseBody(req, data.route.model?.body);
-		ctx.params = await Parser.parseUrlData(data.params, data.route.model?.params);
-		ctx.search = await Parser.parseUrlData(data.search, data.route.model?.search);
+
+		ctx.search = await Parser.parseSearchParams(
+			req.urlObject.searchParams,
+			data.route.model?.search,
+		);
+
+		ctx.params = await Parser.parseUrlParams(data.params, data.route.model?.params);
 	}
 }

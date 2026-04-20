@@ -45,7 +45,7 @@
 		"test:ws": "bun run test/other/ws-simulation.ts",
 		"test:benchmark": "bun run test/other/benchmark.ts",
 		"test:all": "bun run build && bun test --only-failures && bun test:http -s && bun test:ws -s && bun test:benchmark",
-		"tests": "bun test --only-failures"
+		"tests": "pnpm run build && bun test --only-failures"
 	},
 	"devDependencies": {
 		"arktype": "^2.2.0",
@@ -55,12 +55,6 @@
 		"zod": "^4.3.6"
 	},
 	"peerDependencies": {
-		"memoirist": "^0.4.0",
 		"typescript": "^6.0.2"
-	},
-	"peerDependenciesMeta": {
-		"memoirist": {
-			"optional": true
-		}
 	}
 }

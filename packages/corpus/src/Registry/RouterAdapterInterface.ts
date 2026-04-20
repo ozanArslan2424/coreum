@@ -1,6 +1,6 @@
-import type { Branded } from "corpus-utils/Branded";
 import type { Func } from "corpus-utils/Func";
 
+import type { Branded } from "@/Branding/Branded";
 import type { CRequest } from "@/CRequest/CRequest";
 import type { RouterData } from "@/Registry/RouterData";
 import type { RouterReturn } from "@/Registry/RouterReturn";

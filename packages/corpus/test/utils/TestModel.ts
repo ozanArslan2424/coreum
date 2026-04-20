@@ -19,7 +19,7 @@ export class TestModel {
 	// route schemas (params/search coerce, body does not)
 	static arkRoute = {
 		params: type({ hello: this.ark.stringToNumber }),
-		search: type({ hello: this.ark.stringToNumber }),
+		search: type({ hello: this.ark.number }),
 		body: type({ hello: this.ark.number }),
 		response: type({
 			params: type({ hello: this.ark.number }),
@@ -29,7 +29,7 @@ export class TestModel {
 	};
 	static zodRoute = {
 		params: z.object({ hello: this.zod.stringToNumber }),
-		search: z.object({ hello: this.zod.stringToNumber }),
+		search: z.object({ hello: this.zod.number }),
 		body: z.object({ hello: this.zod.number }),
 	};
 
@@ -46,7 +46,7 @@ export class TestModel {
 
 	static combined = {
 		params: type({ hello: this.ark.stringToNumber }),
-		search: z.object({ hello: this.zod.stringToNumber }),
+		search: z.object({ hello: this.zod.number }),
 		body: this.arkRoute.body,
 	};
 }

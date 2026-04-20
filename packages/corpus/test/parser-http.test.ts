@@ -4,14 +4,14 @@ import { joinPathSegments } from "corpus-utils/joinPathSegments";
 
 import { $registryTesting, TC } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
+import { parseBody } from "./utils/parse";
 import { reqPath } from "./utils/req";
 import { TestModel } from "./utils/TestModel";
 import { TestParsingController } from "./utils/TestParsingController";
 
 const s = createTestServer();
 
-const RAW = { hello: "1" };
-const PARSED = { hello: 1 };
+const GOOD = { hello: 1 };
 const BAD = { unknown: "object" };
 
 beforeEach(() => {
@@ -23,12 +23,12 @@ beforeEach(() => {
 
 const postRoute = (
 	routePath: string,
-	{ param, search, body }: { param: string | number; search: string; body: object },
+	{ param, search, body }: { param: string | number; search: string | number; body: object },
 ) => {
 	const url = new URL(
 		reqPath(joinPathSegments(...routePath.replace(/:hello/, String(param)).split("/"))),
 	);
-	url.searchParams.set("hello", search);
+	url.searchParams.set("hello", search.toString());
 	return s.handle(
 		new Request(url, {
 			method: "POST",
@@ -39,9 +39,9 @@ const postRoute = (
 };
 
 type RouteOutput = {
-	params: typeof PARSED;
-	search: typeof PARSED;
-	body: typeof PARSED;
+	params: typeof GOOD;
+	search: typeof GOOD;
+	body: typeof GOOD;
 };
 
 describe("real HTTP requests", () => {
@@ -62,28 +62,28 @@ describe("real HTTP requests", () => {
 					schema,
 				);
 				const res = await postRoute(path, {
-					param: PARSED.hello,
-					search: RAW.hello,
-					body: PARSED,
+					param: GOOD.hello,
+					search: GOOD.hello,
+					body: GOOD,
 				});
-				expect(await TC.Parser.parseBody<RouteOutput>(res)).toEqual({
-					params: PARSED,
-					search: PARSED,
-					body: PARSED,
+				expect(await parseBody<RouteOutput>(res)).toEqual({
+					params: GOOD,
+					search: GOOD,
+					body: GOOD,
 				});
 			});
 		}
 
 		it("controller combined route", async () => {
 			const res = await postRoute("/controller/combined/:hello", {
-				param: PARSED.hello,
-				search: RAW.hello,
-				body: PARSED,
+				param: GOOD.hello,
+				search: GOOD.hello,
+				body: GOOD,
 			});
-			expect(await TC.Parser.parseBody<RouteOutput>(res)).toEqual({
-				params: PARSED,
-				search: PARSED,
-				body: PARSED,
+			expect(await parseBody<RouteOutput>(res)).toEqual({
+				params: GOOD,
+				search: GOOD,
+				body: GOOD,
 			});
 		});
 	});
@@ -120,7 +120,7 @@ describe("real HTTP requests", () => {
 			const url = new URL(reqPath(joinPathSegments("controller", "optional")));
 			url.searchParams.set("groupId", "8");
 			const res = await s.handle(new Request(url));
-			expect(await TC.Parser.parseBody<{ groupId: number }>(res)).toEqual({
+			expect(await parseBody<{ groupId: number }>(res)).toEqual({
 				groupId: 8,
 			});
 		});
@@ -128,7 +128,7 @@ describe("real HTTP requests", () => {
 		it("optional search param — omitted", async () => {
 			const url = new URL(reqPath(joinPathSegments("controller", "optional")));
 			const res = await s.handle(new Request(url));
-			expect(await TC.Parser.parseBody<{}>(res)).toBeEmptyObject();
+			expect(await parseBody<{}>(res)).toBeEmptyObject();
 		});
 
 		it("missing required route param — fails", async () => {

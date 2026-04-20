@@ -28,13 +28,14 @@ The default router adapter, based on [@medley/router](https://github.com/medleyj
 
 ### MemoiristAdapter
 
-An alternative adapter layer for [memoirist](https://github.com/SaltyAom/memoirist) by [SaltyAom](https://github.com/SaltyAom). This is the router used in ElysiaJS. Requires the optional `memoirist` dependency. Also extremely fast.
+An alternative adapter layer for [memoirist](https://github.com/SaltyAom/memoirist) by [SaltyAom](https://github.com/SaltyAom). This is the router used in ElysiaJS. Requires the `memoirist` dependency. Also extremely fast. Copy and paste from [Router DIY](/docs/router/diy/memoirist-adapter) and pass to the adapter parameter.
 
 ```ts
 import { C } from "@ozanarslan/corpus";
+import { MemoiristAdapter } from "./MemoiristAdapter";
 
 const server = new C.Server({
-	adapter: new C.MemoiristAdapter(),
+	adapter: new MemoiristAdapter(),
 });
 ```
 
@@ -42,7 +43,7 @@ const server = new C.Server({
 
 ## Creating Your Own Adapter
 
-You can implement a custom router adapter by satisfying the `RouterAdapterInterface`. The interface and supporting types are exported by name from the package.
+You can implement a custom router adapter by satisfying the `RouterAdapterInterface`. The interface and supporting types are exported by name from the package. You can also see the example from the DIY tab.
 
 ```ts
 import { C } from "@ozanarslan/corpus";
@@ -60,7 +61,7 @@ class MyAdapter implements RouterAdapterInterface {
 	}
 
 	// optionally return all registered routes
-	list: () => Array<RouterData> | undefined;
+	list: (() => Array<RouterData>) | undefined;
 }
 
 const server = new C.Server({
