@@ -1,4 +1,4 @@
-# @ozanarslan/corpus-callosum
+# @ozanarslan/corpus-cli
 
 This package is still a WIP. `corpus api` correctly generates api client however, `corpus init` only initializes an example project in an empty directory.
 CLI for [@ozanarslan/corpus](https://github.com/ozanArslan2424/corpus) that generates TypeScript client code from your Corpus server.
@@ -6,13 +6,13 @@ CLI for [@ozanarslan/corpus](https://github.com/ozanArslan2424/corpus) that gene
 ## Usage
 
 ```bash
-pnpx @ozanarslan/corpus-callosum api -m ./src/main.ts
+pnpx @ozanarslan/corpus-cli api -m ./src/main.ts
 ```
 
 Or install as a dev dependency:
 
 ```bash
-pnpm add -D @ozanarslan/corpus-callosum
+pnpm add -D @ozanarslan/corpus-cli
 ```
 
 ```json

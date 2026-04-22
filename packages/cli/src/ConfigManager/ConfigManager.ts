@@ -259,7 +259,7 @@ export class ConfigManager {
 
 		w.$import({
 			keys: ["defineConfig"],
-			from: "@ozanarslan/corpus-callosum/config",
+			from: "@ozanarslan/corpus-cli/config",
 		});
 		w.line("export default defineConfig({");
 		w.pair("main", w.str(config.main));

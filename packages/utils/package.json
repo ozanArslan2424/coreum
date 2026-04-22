@@ -46,7 +46,7 @@
 	"devDependencies": {
 		"@standard-schema/spec": "^1.1.0",
 		"tsdown": "^0.21.9",
-		"typescript": "^6.0.2"
+		"typescript": "^6.0.3"
 	},
 	"inlinedDependencies": {
 		"@standard-schema/spec": "1.1.0"

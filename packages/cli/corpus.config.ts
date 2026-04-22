@@ -1,4 +1,4 @@
-import { defineConfig } from "@ozanarslan/corpus-callosum/config";
+import { defineConfig } from "@ozanarslan/corpus-cli/config";
 export default defineConfig({
 	main: "./test/other/startServer.ts",
 	pkgPath: "@ozanarslan/corpus",

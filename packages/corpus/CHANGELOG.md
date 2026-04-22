@@ -1,5 +1,17 @@
 # @ozanarslan/corpus
 
+## 0.5.6
+
+### Patch Changes
+
+- cli renamed
+
+## 0.5.5
+
+### Patch Changes
+
+- cli renamed
+
 ## 0.5.4
 
 ### Patch Changes

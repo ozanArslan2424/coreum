@@ -1,4 +1,16 @@
-# @ozanarslan/corpus-callosum
+# @ozanarslan/corpus-cli
+
+## 0.5.6
+
+### Patch Changes
+
+- cli renamed
+
+## 0.5.5
+
+### Patch Changes
+
+- cli renamed
 
 ## 0.5.4
 
