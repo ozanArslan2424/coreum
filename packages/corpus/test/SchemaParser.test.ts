@@ -26,7 +26,7 @@ const parse = (data: unknown, schema: Schema) =>
 // Inline sync and async validators for parser.parseSync tests.
 // These mimic the Standard Schema validator shape.
 const syncValidator: SchemaValidator<typeof GOOD> = (input) => {
-	if (input && typeof input === "object" && "hello" in input && (input as any).hello === 1) {
+	if (input && typeof input === "object" && "hello" in input && input.hello === 1) {
 		return { value: input as typeof GOOD };
 	}
 	return {

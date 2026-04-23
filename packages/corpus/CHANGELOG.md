@@ -1,5 +1,11 @@
 # @ozanarslan/corpus
 
+## 0.5.7
+
+### Patch Changes
+
+- Plug and play registry
+
 ## 0.5.6
 
 ### Patch Changes
