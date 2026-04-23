@@ -2,11 +2,6 @@ import { beforeEach, describe, expect, it } from "bun:test";
 
 import { type } from "arktype";
 
-import { BodyParser } from "@/Parser/BodyParser";
-import { FormDataParser } from "@/Parser/FormDataParser";
-import { SearchParamsParser } from "@/Parser/SearchParamsParser";
-import { URLParamsParser } from "@/Parser/URLParamsParser";
-
 import { $registryTesting, TC } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { req } from "./utils/req";
@@ -56,19 +51,7 @@ describe("C.Context", () => {
 		expect(c.search).toBeEmptyObject();
 		expect(c.params).toBeEmptyObject();
 
-		const urlParamsParser = new URLParamsParser();
-		const formDataParser = new FormDataParser();
-		const searchParamsParser = new SearchParamsParser();
-		const bodyParser = new BodyParser(formDataParser, searchParamsParser);
-
-		await TC.Context.appendParsedData(
-			c,
-			r,
-			fakeRouterReturn,
-			urlParamsParser,
-			searchParamsParser,
-			bodyParser,
-		);
+		await TC.Context.appendParsedData(c, fakeRouterReturn);
 
 		expect(c.body).toEqual({ hello: "world" });
 		expect(c.params).toEqual(fakeRouterReturn.params);

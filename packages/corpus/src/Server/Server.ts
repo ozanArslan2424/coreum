@@ -7,14 +7,9 @@ import { RouteVariant } from "@/BaseRoute/RouteVariant";
 import { Context } from "@/Context/Context";
 import { Exception } from "@/Exception/Exception";
 import { $registry } from "@/index";
-import { BodyParser } from "@/Parser/BodyParser";
-import { FormDataParser } from "@/Parser/FormDataParser";
-import { SearchParamsParser } from "@/Parser/SearchParamsParser";
-import { URLParamsParser } from "@/Parser/URLParamsParser";
-import { Router } from "@/Registry/Router";
-import type { RouterData } from "@/Registry/RouterData";
 import { Req } from "@/Req/Req";
 import { Res } from "@/Res/Res";
+import type { RouterData } from "@/Router/RouterData";
 import type { ErrorHandler } from "@/Server/ErrorHandler";
 import type { RequestHandler } from "@/Server/RequestHandler";
 import type { ServerApp } from "@/Server/ServerApp";
@@ -30,19 +25,9 @@ import { XConfig } from "@/XConfig/XConfig";
  */
 
 export class Server implements ServerInterface {
-	constructor(protected readonly opts?: ServerOptions) {
-		$registry.router = new Router(opts?.adapter);
-		this.urlParamsParser = new URLParamsParser();
-		this.searchParamsParser = new SearchParamsParser();
-		this.formDataParser = new FormDataParser();
-		this.bodyParser = new BodyParser(this.formDataParser, this.searchParamsParser);
-	}
+	constructor(protected readonly opts?: ServerOptions) {}
 
 	protected app: ServerApp | undefined;
-	protected readonly urlParamsParser: URLParamsParser;
-	protected readonly searchParamsParser: SearchParamsParser;
-	protected readonly formDataParser: FormDataParser;
-	protected readonly bodyParser: BodyParser;
 
 	get routes(): Array<RouterData> {
 		return $registry.router.list();
@@ -60,27 +45,8 @@ export class Server implements ServerInterface {
 			process.on("SIGINT", () => this.close());
 			process.on("SIGTERM", () => this.close());
 			log.log(`Listening on ${hostname}:${port}`);
-
 			await this.handleBeforeListen?.();
-
-			this.app = Bun.serve<WebSocketRoute>({
-				port,
-				hostname,
-				idleTimeout: this.opts?.idleTimeout,
-				tls: this.opts?.tls,
-				fetch: (r, s) => this.fetch(r, s),
-				websocket: {
-					async open(ws) {
-						await ws.data.onOpen?.(ws);
-					},
-					async message(ws, message) {
-						await ws.data.onMessage(ws, message);
-					},
-					async close(ws, code, reason) {
-						await ws.data.onClose?.(ws, code, reason);
-					},
-				},
-			});
+			this.app = this.createApp(port, hostname);
 		} catch (err) {
 			log.error("Server unable to start:", err);
 			await this.close();
@@ -90,22 +56,7 @@ export class Server implements ServerInterface {
 	async close(closeActiveConnections: boolean = true): Promise<void> {
 		await this.handleBeforeClose?.();
 		await this.app?.stop(closeActiveConnections);
-		if (XConfig.nodeEnv !== "test") {
-			process.exit(0);
-		}
-	}
-
-	// Undefined runs the websocket callback
-	protected async fetch(request: Request, server: ServerApp): Promise<Response | undefined> {
-		const req = new Req(request);
-		const res = await this.handleRequest(req, (wsRoute) => {
-			const upgraded = server.upgrade(request, { data: wsRoute });
-			if (!upgraded) {
-				throw new Exception("Upgrade failed", Status.UPGRADE_REQUIRED);
-			}
-			return null;
-		});
-		return res?.response;
+		if (XConfig.nodeEnv !== "test") process.exit(0);
 	}
 
 	async handle(request: Request): Promise<Response> {
@@ -115,6 +66,40 @@ export class Server implements ServerInterface {
 			logFatal("WebSocket requests cannot be handled with this method.");
 		}
 		return res.response;
+	}
+
+	private createApp(
+		port: number,
+		hostname?: OrString<"0.0.0.0" | "127.0.0.1" | "localhost">,
+	): ServerApp {
+		return Bun.serve<WebSocketRoute>({
+			port,
+			hostname,
+			idleTimeout: this.opts?.idleTimeout,
+			tls: this.opts?.tls,
+			fetch: async (request, server) => {
+				const req = new Req(request);
+				const res = await this.handleRequest(req, (wsRoute) => {
+					const upgraded = server.upgrade(request, { data: wsRoute });
+					if (!upgraded) {
+						throw new Exception("Upgrade failed", Status.UPGRADE_REQUIRED);
+					}
+					return null;
+				});
+				return res?.response;
+			},
+			websocket: {
+				async open(ws) {
+					await ws.data.onOpen?.(ws);
+				},
+				async message(ws, message) {
+					await ws.data.onMessage(ws, message);
+				},
+				async close(ws, code, reason) {
+					await ws.data.onClose?.(ws, code, reason);
+				},
+			},
+		});
 	}
 
 	// gmw: global middlewares
@@ -147,18 +132,11 @@ export class Server implements ServerInterface {
 				const lmwir = await lmw.inbound(ctx);
 				if (lmwir instanceof Res) return lmwir;
 
-				await Context.appendParsedData(
-					ctx,
-					req,
-					match,
-					this.urlParamsParser,
-					this.searchParamsParser,
-					this.bodyParser,
-				);
+				await Context.appendParsedData(ctx, match);
 
 				const routeResult = await match.route.handler(ctx);
 
-				if (match.route.variant === RouteVariant.websocket && req.isWebsocket) {
+				if (match.route.variant === RouteVariant.websocket && ctx.req.isWebsocket) {
 					return onUpgrade(routeResult);
 				} else if (routeResult instanceof Res) {
 					ctx.res = routeResult;
@@ -198,10 +176,7 @@ export class Server implements ServerInterface {
 		this.handleError = handler;
 	}
 	defaultErrorHandler: ErrorHandler = (err) => {
-		if (err instanceof Exception) {
-			return err.response;
-		}
-
+		if (err instanceof Exception) return err.response;
 		return new Res(
 			{ error: err, message: "message" in err ? err.message : "Unknown" },
 			{ status: Status.INTERNAL_SERVER_ERROR },

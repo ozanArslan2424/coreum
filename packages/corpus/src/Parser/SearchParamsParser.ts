@@ -3,7 +3,7 @@ import type { UnknownObject } from "corpus-utils/UnknownObject";
 import { ObjectParserAbstract } from "@/Parser/ObjectParserAbstract";
 
 export class SearchParamsParser extends ObjectParserAbstract<URLSearchParams> {
-	toObject(searchParams: URLSearchParams): UnknownObject {
+	parse(searchParams: URLSearchParams): UnknownObject {
 		const result = this.newSafeObject();
 
 		searchParams.forEach((entry, key) => {

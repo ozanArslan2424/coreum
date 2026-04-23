@@ -34,14 +34,14 @@ describe("FormDataParser", () => {
 
 	describe("toObject", () => {
 		it("handles empty FormData", () => {
-			expect(parser.toObject(new FormData())).toEqual({});
+			expect(parser.parse(new FormData())).toEqual({});
 		});
 
 		it("handles flat fields", () => {
 			const fd = new FormData();
 			fd.set("title", "hello");
 			fd.set("count", "5");
-			expect(parser.toObject(fd)).toEqual({ title: "hello", count: 5 });
+			expect(parser.parse(fd)).toEqual({ title: "hello", count: 5 });
 		});
 
 		it("handles flat array via repeated keys", () => {
@@ -49,14 +49,14 @@ describe("FormDataParser", () => {
 			fd.append("ids", "1");
 			fd.append("ids", "2");
 			fd.append("ids", "3");
-			expect(parser.toObject(fd)).toEqual({ ids: [1, 2, 3] });
+			expect(parser.parse(fd)).toEqual({ ids: [1, 2, 3] });
 		});
 
 		it("handles indexed array", () => {
 			const fd = new FormData();
 			fd.append("ids[0]", "1");
 			fd.append("ids[1]", "2");
-			expect(parser.toObject(fd)).toEqual({ ids: [1, 2] });
+			expect(parser.parse(fd)).toEqual({ ids: [1, 2] });
 		});
 
 		it("handles array of objects via dot notation", () => {
@@ -65,7 +65,7 @@ describe("FormDataParser", () => {
 			fd.append("items[0].qty", "2");
 			fd.append("items[1].name", "bar");
 			fd.append("items[1].qty", "3");
-			expect(parser.toObject(fd)).toEqual({
+			expect(parser.parse(fd)).toEqual({
 				items: [
 					{ name: "foo", qty: 2 },
 					{ name: "bar", qty: 3 },
@@ -77,7 +77,7 @@ describe("FormDataParser", () => {
 			const fd = new FormData();
 			fd.append("items[0][name]", "foo");
 			fd.append("items[0][qty]", "2");
-			expect(parser.toObject(fd)).toEqual({
+			expect(parser.parse(fd)).toEqual({
 				items: [{ name: "foo", qty: 2 }],
 			});
 		});
@@ -85,7 +85,7 @@ describe("FormDataParser", () => {
 		it("handles json string value", () => {
 			const fd = new FormData();
 			fd.set("data", JSON.stringify({ materialId: 3, quantity: 1 }));
-			expect(parser.toObject(fd)).toEqual({
+			expect(parser.parse(fd)).toEqual({
 				data: { materialId: 3, quantity: 1 },
 			});
 		});
@@ -94,7 +94,7 @@ describe("FormDataParser", () => {
 			const fd = new FormData();
 			fd.append("items[0]", JSON.stringify({ materialId: 3, quantity: 1 }));
 			fd.append("items[1]", JSON.stringify({ materialId: 5, quantity: 2 }));
-			expect(parser.toObject(fd)).toEqual({
+			expect(parser.parse(fd)).toEqual({
 				items: [
 					{ materialId: 3, quantity: 1 },
 					{ materialId: 5, quantity: 2 },
@@ -105,7 +105,7 @@ describe("FormDataParser", () => {
 		it("handles nested dot notation", () => {
 			const fd = new FormData();
 			fd.set("a.b.c", "deep");
-			expect(parser.toObject(fd)).toEqual({ a: { b: { c: "deep" } } });
+			expect(parser.parse(fd)).toEqual({ a: { b: { c: "deep" } } });
 		});
 
 		it("handles mixed flat and nested fields", () => {
@@ -116,7 +116,7 @@ describe("FormDataParser", () => {
 			fd.append("deletedIds[1]", "2");
 			fd.append("newItems[0].materialId", "3");
 			fd.append("newItems[0].quantity", "1.5");
-			expect(parser.toObject(fd)).toEqual({
+			expect(parser.parse(fd)).toEqual({
 				title: "recipe",
 				isPublic: true,
 				deletedIds: [1, 2],
@@ -128,7 +128,7 @@ describe("FormDataParser", () => {
 			const fd = new FormData();
 			const file = new File([""], "image.png", { type: "image/png" });
 			fd.set("image", file);
-			const result = parser.toObject(fd);
+			const result = parser.parse(fd);
 			expect(result.image).toBeInstanceOf(File);
 		});
 
@@ -136,7 +136,7 @@ describe("FormDataParser", () => {
 			const fd = new FormData();
 			const file = new File(["123"], "x.txt", { type: "text/plain" });
 			fd.set("upload", file);
-			const parsed = parser.toObject(fd).upload;
+			const parsed = parser.parse(fd).upload;
 			expect(parsed).toBeInstanceOf(File);
 			expect(parsed).toEqual(file);
 		});
@@ -147,7 +147,7 @@ describe("FormDataParser", () => {
 			const fd = new FormData();
 			fd.append("a.b", "x");
 			fd.append("a.b", "y");
-			expect(parser.toObject(fd)).toEqual({ a: { b: ["x", "y"] } });
+			expect(parser.parse(fd)).toEqual({ a: { b: ["x", "y"] } });
 		});
 
 		it("merges three+ duplicate nested keys into a single array", () => {
@@ -155,14 +155,14 @@ describe("FormDataParser", () => {
 			fd.append("a.b", "x");
 			fd.append("a.b", "y");
 			fd.append("a.b", "z");
-			expect(parser.toObject(fd)).toEqual({ a: { b: ["x", "y", "z"] } });
+			expect(parser.parse(fd)).toEqual({ a: { b: ["x", "y", "z"] } });
 		});
 
 		it("merges duplicate bracket-indexed keys at the same slot", () => {
 			const fd = new FormData();
 			fd.append("a[0]", "x");
 			fd.append("a[0]", "y");
-			expect(parser.toObject(fd)).toEqual({ a: [["x", "y"]] });
+			expect(parser.parse(fd)).toEqual({ a: [["x", "y"]] });
 		});
 	});
 
@@ -170,7 +170,7 @@ describe("FormDataParser", () => {
 		it("does not pollute Object.prototype via __proto__ key", () => {
 			const fd = new FormData();
 			fd.set("__proto__.polluted", "yes");
-			parser.toObject(fd);
+			parser.parse(fd);
 			// @ts-expect-error intentional probe
 			expect({}.polluted).toBeUndefined();
 		});
@@ -178,7 +178,7 @@ describe("FormDataParser", () => {
 		it("does not pollute Object.prototype via nested __proto__ key", () => {
 			const fd = new FormData();
 			fd.set("a.__proto__.polluted", "yes");
-			parser.toObject(fd);
+			parser.parse(fd);
 			// @ts-expect-error intentional probe
 			expect({}.polluted).toBeUndefined();
 		});
@@ -186,14 +186,14 @@ describe("FormDataParser", () => {
 		it("produces null-prototype root object", () => {
 			const fd = new FormData();
 			fd.set("x", "1");
-			const result = parser.toObject(fd);
+			const result = parser.parse(fd);
 			expect(Object.getPrototypeOf(result)).toBeNull();
 		});
 
 		it("produces null-prototype nested objects", () => {
 			const fd = new FormData();
 			fd.set("a.b.c", "deep");
-			const result = parser.toObject(fd) as { a: { b: {} } };
+			const result = parser.parse(fd) as { a: { b: {} } };
 			expect(Object.getPrototypeOf(result.a)).toBeNull();
 			expect(Object.getPrototypeOf(result.a.b)).toBeNull();
 		});

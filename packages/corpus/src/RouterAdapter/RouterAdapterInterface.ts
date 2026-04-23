@@ -1,8 +1,8 @@
 import type { Func } from "corpus-utils/Func";
 
-import type { RouterData } from "@/Registry/RouterData";
-import type { RouterReturn } from "@/Registry/RouterReturn";
 import type { Req } from "@/Req/Req";
+import type { RouterData } from "@/Router/RouterData";
+import type { RouterReturn } from "@/Router/RouterReturn";
 
 export interface RouterAdapterInterface {
 	readonly __brand: string;

@@ -1,7 +1,7 @@
 import type { Func } from "corpus-utils/Func";
 import type { MaybePromise } from "corpus-utils/MaybePromise";
 
-import type { RouterData } from "@/Registry/RouterData";
+import type { RouterData } from "@/Router/RouterData";
 import type { ErrorHandler } from "@/Server/ErrorHandler";
 import type { RequestHandler } from "@/Server/RequestHandler";
 import type { ServerOpenArgs } from "@/Server/ServerOpenArgs";

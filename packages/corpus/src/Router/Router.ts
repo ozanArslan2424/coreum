@@ -7,14 +7,14 @@ import { strRemoveWhitespace } from "corpus-utils/strRemoveWhitespace";
 import type { BaseRouteInterface } from "@/BaseRoute/BaseRouteInterface";
 import type { RouteModel } from "@/BaseRoute/RouteModel";
 import { $registry } from "@/index";
-import { BranchAdapter } from "@/Registry/BranchAdapter";
-import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
-import type { RouterData } from "@/Registry/RouterData";
-import type { RouterReturn } from "@/Registry/RouterReturn";
 import type { Req } from "@/Req/Req";
+import type { RouterData } from "@/Router/RouterData";
+import type { RouterInterface } from "@/Router/RouterInterface";
+import type { RouterReturn } from "@/Router/RouterReturn";
+import type { RouterAdapterInterface } from "@/RouterAdapter/RouterAdapterInterface";
 
-export class Router {
-	constructor(private readonly adapter: RouterAdapterInterface = new BranchAdapter()) {}
+export class Router implements RouterInterface {
+	constructor(private readonly adapter: RouterAdapterInterface) {}
 
 	private readonly cache = new WeakMap<Req, RouterReturn>();
 	private readonly funcMap = new Map<string, Func>();
@@ -23,7 +23,6 @@ export class Router {
 		const data = this.routeToRouterData(route);
 		if (route.model) {
 			data.model ??= {};
-			// const modelData: RouterData["model"] = {};
 			for (const key of objGetKeys<keyof RouteModel>(route.model)) {
 				if (key === "response") continue;
 				const schema = route.model[key];
@@ -56,11 +55,12 @@ export class Router {
 		const fn = this.adapter.list;
 		if (!fn) {
 			log.warn("Router adapter does not support list method, returning empty array");
+			return [];
 		}
-		return fn?.() ?? [];
+		return fn();
 	}
 
-	private routeToRouterData(route: BaseRouteInterface<any, any, any, any>): RouterData {
+	private routeToRouterData(route: BaseRouteInterface): RouterData {
 		return {
 			id: route.id,
 			endpoint: route.endpoint,

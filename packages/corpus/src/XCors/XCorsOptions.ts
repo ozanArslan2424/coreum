@@ -21,4 +21,5 @@ export type XCorsOptions = {
 
 	/** How long (in seconds) browsers can cache preflight results. Default: 86400 (24 hours) */
 	maxAge?: number;
+	includeMaxAgeResponseHeader?: boolean;
 };

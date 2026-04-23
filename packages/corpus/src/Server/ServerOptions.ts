@@ -1,4 +1,4 @@
-import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
+import type { RouterAdapterInterface } from "@/RouterAdapter/RouterAdapterInterface";
 
 export type ServerOptions = {
 	adapter?: RouterAdapterInterface;

@@ -1,4 +1,4 @@
-import type { RouterData } from "@/Registry/RouterData";
+import type { RouterData } from "@/Router/RouterData";
 
 export type RouterReturn = {
 	route: RouterData;

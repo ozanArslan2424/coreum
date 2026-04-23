@@ -4,8 +4,8 @@ import type { UnknownObject } from "corpus-utils/UnknownObject";
 
 import { CommonHeaders } from "@/CommonHeaders/CommonHeaders";
 import { Method } from "@/Method/Method";
-import { FormDataParser } from "@/Parser/FormDataParser";
-import { SearchParamsParser } from "@/Parser/SearchParamsParser";
+import type { BodyParserInterface } from "@/Parser/BodyParserInterface";
+import type { ObjectParserInterface } from "@/Parser/ObjectParserInterface";
 import type { Req } from "@/Req/Req";
 import type { Res } from "@/Res/Res";
 
@@ -22,10 +22,10 @@ type NormalizedContentType =
 	| "video"
 	| "unknown";
 
-export class BodyParser {
+export class BodyParser implements BodyParserInterface {
 	constructor(
-		private readonly formDataParser: FormDataParser,
-		private readonly searchParamsParser: SearchParamsParser,
+		private readonly formDataParser: ObjectParserInterface<FormData>,
+		private readonly searchParamsParser: ObjectParserInterface<URLSearchParams>,
 	) {}
 
 	/** This can be used for both request and response bodies */
@@ -69,7 +69,7 @@ export class BodyParser {
 		return r instanceof Request ? r : r instanceof Response ? r : r.response;
 	}
 
-	getContentTypeDisco(input: Request | Response): NormalizedContentType {
+	private getContentTypeDisco(input: Request | Response): NormalizedContentType {
 		const contentTypeHeader = input.headers.get(CommonHeaders.ContentType) ?? "";
 
 		if (contentTypeHeader.includes("application/json")) {
@@ -121,12 +121,12 @@ export class BodyParser {
 		}
 
 		const searchParams = new URLSearchParams(text);
-		return this.searchParamsParser.toObject(searchParams);
+		return this.searchParamsParser.parse(searchParams);
 	}
 
 	private async getFormDataBody(input: Request | Response): Promise<UnknownObject> {
 		const formData = await input.formData();
-		return this.formDataParser.toObject(formData);
+		return this.formDataParser.parse(formData);
 	}
 
 	private async getTextBody(input: Request | Response): Promise<string> {

@@ -50,10 +50,10 @@ export * from "./Server/ServerOptions";
 export * from "./Server/ServerOpenArgs";
 export * from "./Server/Server";
 
-export * from "./Registry/BranchAdapter";
-export * from "./Registry/RouterAdapterInterface";
-export * from "./Registry/RouterReturn";
-export * from "./Registry/RouterData";
+export * from "./RouterAdapter/BranchAdapter";
+export * from "./RouterAdapter/RouterAdapterInterface";
+export * from "./Router/RouterReturn";
+export * from "./Router/RouterData";
 
 export * from "./Entity/Entity";
 export * from "./Entity/EntityDefinition";

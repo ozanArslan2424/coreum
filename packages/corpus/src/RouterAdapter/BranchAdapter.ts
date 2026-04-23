@@ -1,10 +1,10 @@
 import type { Func } from "corpus-utils/Func";
 
 import type { Method } from "@/Method/Method";
-import type { RouterAdapterInterface } from "@/Registry/RouterAdapterInterface";
-import type { RouterData } from "@/Registry/RouterData";
-import type { RouterReturn } from "@/Registry/RouterReturn";
 import type { Req } from "@/Req/Req";
+import type { RouterData } from "@/Router/RouterData";
+import type { RouterReturn } from "@/Router/RouterReturn";
+import type { RouterAdapterInterface } from "@/RouterAdapter/RouterAdapterInterface";
 
 type Store = Map<Method, RouterData>;
 
@@ -62,7 +62,7 @@ export class BranchAdapter implements RouterAdapterInterface {
 	private readonly _root: Branch = this.createBranch(this.SLASH, null);
 	private readonly storeFactory: Func<[], Store> = () => new Map();
 
-	find(req: Req): RouterReturn | null {
+	public find(req: Req): RouterReturn | null {
 		const method = req.method.toUpperCase() as Method;
 		const pathname = req.urlObject.pathname;
 
@@ -76,12 +76,12 @@ export class BranchAdapter implements RouterAdapterInterface {
 		return { route, params };
 	}
 
-	add(data: RouterData): void {
+	public add(data: RouterData): void {
 		const store = this.createBranchStore(data.endpoint);
 		store.set(data.method, data);
 	}
 
-	list: Func<[], Array<RouterData>> | undefined = () => {
+	public list: Func<[], Array<RouterData>> | undefined = () => {
 		const routes: Array<RouterData> = [];
 
 		const walk = (branch: Branch) => {

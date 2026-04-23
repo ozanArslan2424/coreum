@@ -1,9 +1,11 @@
 import type { UnknownObject } from "corpus-utils/UnknownObject";
 
-export abstract class ObjectParserAbstract<T> {
+import type { ObjectParserInterface } from "@/Parser/ObjectParserInterface";
+
+export abstract class ObjectParserAbstract<T> implements ObjectParserInterface<T> {
 	// ABSTRACT
 
-	abstract toObject(input: T): UnknownObject;
+	abstract parse(input: T): UnknownObject;
 
 	// PROTECTED
 

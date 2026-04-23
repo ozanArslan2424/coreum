@@ -1,9 +1,10 @@
 import type { EntityDefinition } from "@/Entity/EntityDefinition";
+import type { EntityStoreInterface } from "@/EntityStore/EntityStoreInterface";
 
-export class EntityStore {
+export class EntityStore implements EntityStoreInterface {
 	map = new Map<string, EntityDefinition>();
 
-	add(def: EntityDefinition) {
+	add(def: EntityDefinition): void {
 		this.warnOverride(def.name);
 		this.map.set(def.name, def);
 	}

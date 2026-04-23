@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it } from "bun:test";
 
 import type { Schema, SchemaValidator, ValidationIssues } from "corpus-utils/Schema";
 
-import { issuesToErrorMessage, parseSchema, parseSchemaSync } from "@/Parser/parseSchema";
-
 import { $registryTesting, TC } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { TestModel } from "./utils/TestModel";
@@ -19,10 +17,11 @@ beforeEach(() => {
 	new TestParsingController();
 });
 
+const parser = $registryTesting.schemaParser;
 const parse = (data: unknown, schema: Schema) =>
-	parseSchema("test", data, schema["~standard"].validate);
+	parser.parse("test", data, schema["~standard"].validate);
 
-// Inline sync and async validators for parseSchemaSync tests.
+// Inline sync and async validators for parser.parseSync tests.
 // These mimic the Standard Schema validator shape.
 const syncValidator: SchemaValidator<typeof GOOD> = (input) => {
 	if (input && typeof input === "object" && "hello" in input && (input as any).hello === 1) {
@@ -99,61 +98,61 @@ describe("Parser unit", () => {
 		});
 	});
 
-	describe("parseSchema — no validator", () => {
+	describe("parser.parse — no validator", () => {
 		it("returns data as-is when validator is undefined", () => {
-			expect(parseSchema("test", GOOD, undefined)).resolves.toEqual(GOOD);
+			expect(parser.parse("test", GOOD, undefined)).resolves.toEqual(GOOD);
 		});
 
 		it("returns data as-is when validator is omitted", () => {
-			expect(parseSchema("test", GOOD)).resolves.toEqual(GOOD);
+			expect(parser.parse("test", GOOD)).resolves.toEqual(GOOD);
 		});
 
 		it("preserves reference identity when no validator runs", async () => {
 			const ref = { a: 1 };
-			const result = await parseSchema("test", ref);
+			const result = await parser.parse("test", ref);
 			expect(result).toBe(ref);
 		});
 	});
 
-	describe("parseSchemaSync", () => {
+	describe("parser.parseSync", () => {
 		it("returns data as-is when validator is undefined", () => {
-			expect(parseSchemaSync<typeof GOOD>("test", GOOD)).toEqual(GOOD);
+			expect(parser.parseSync<typeof GOOD>("test", GOOD)).toEqual(GOOD);
 		});
 
 		it("returns validated value for sync validator on good input", () => {
-			expect(parseSchemaSync("test", GOOD, syncValidator)).toEqual(GOOD);
+			expect(parser.parseSync("test", GOOD, syncValidator)).toEqual(GOOD);
 		});
 
 		it("throws Exception for sync validator on bad input", () => {
-			expect(() => parseSchemaSync("test", BAD, syncValidator)).toThrow(TC.Exception);
+			expect(() => parser.parseSync("test", BAD, syncValidator)).toThrow(TC.Exception);
 		});
 
 		it("throws when given an async validator", () => {
-			expect(() => parseSchemaSync("test", GOOD, asyncValidator)).toThrow(
+			expect(() => parser.parseSync("test", GOOD, asyncValidator)).toThrow(
 				"parseSync called with async validator",
 			);
 		});
 
 		it("throws when given a thenable (non-Promise) validator", () => {
-			expect(() => parseSchemaSync("test", GOOD, thenableValidator)).toThrow(
+			expect(() => parser.parseSync("test", GOOD, thenableValidator)).toThrow(
 				"parseSync called with async validator",
 			);
 		});
 	});
 
-	describe("issuesToErrorMessage", () => {
+	describe("parser.issuesToErrorMessage", () => {
 		it("returns an empty string for no issues", () => {
-			expect(issuesToErrorMessage("body", {}, [])).toBe("");
+			expect(parser.issuesToErrorMessage("body", {}, [])).toBe("");
 		});
 
 		it("returns the raw message for issues without a path", () => {
 			const issues: ValidationIssues = [{ message: "invalid root" }];
-			expect(issuesToErrorMessage("body", {}, issues)).toBe("invalid root");
+			expect(parser.issuesToErrorMessage("body", {}, issues)).toBe("invalid root");
 		});
 
 		it("formats string-path issues with the received value", () => {
 			const issues: ValidationIssues = [{ message: "expected number", path: ["hello"] }];
-			expect(issuesToErrorMessage("body", { hello: "oops" }, issues)).toBe(
+			expect(parser.issuesToErrorMessage("body", { hello: "oops" }, issues)).toBe(
 				'in body hello (received "oops"): expected number',
 			);
 		});
@@ -165,31 +164,33 @@ describe("Parser unit", () => {
 					path: [{ key: "hello" } as unknown as string],
 				},
 			];
-			expect(issuesToErrorMessage("body", { hello: 42 }, issues)).toBe(
+			expect(parser.issuesToErrorMessage("body", { hello: 42 }, issues)).toBe(
 				"in body hello (received 42): expected number",
 			);
 		});
 
 		it("joins nested path segments with dots", () => {
 			const issues: ValidationIssues = [{ message: "expected string", path: ["user", "name"] }];
-			expect(issuesToErrorMessage("body", { user: { name: 123 } }, issues)).toBe(
+			expect(parser.issuesToErrorMessage("body", { user: { name: 123 } }, issues)).toBe(
 				"in body user.name (received 123): expected string",
 			);
 		});
 
 		it("omits received value when path does not resolve", () => {
 			const issues: ValidationIssues = [{ message: "missing field", path: ["missing"] }];
-			expect(issuesToErrorMessage("body", {}, issues)).toBe("in body missing: missing field");
+			expect(parser.issuesToErrorMessage("body", {}, issues)).toBe(
+				"in body missing: missing field",
+			);
 		});
 
 		it("omits received value when traversal hits a non-object", () => {
 			const issues: ValidationIssues = [{ message: "bad", path: ["a", "b"] }];
-			expect(issuesToErrorMessage("body", { a: "scalar" }, issues)).toBe("in body a.b: bad");
+			expect(parser.issuesToErrorMessage("body", { a: "scalar" }, issues)).toBe("in body a.b: bad");
 		});
 
 		it("uses the label in the output", () => {
 			const issues: ValidationIssues = [{ message: "expected number", path: ["id"] }];
-			expect(issuesToErrorMessage("params", { id: "x" }, issues)).toBe(
+			expect(parser.issuesToErrorMessage("params", { id: "x" }, issues)).toBe(
 				'in params id (received "x"): expected number',
 			);
 		});
@@ -199,7 +200,7 @@ describe("Parser unit", () => {
 				{ message: "expected number", path: ["a"] },
 				{ message: "expected string", path: ["b"] },
 			];
-			expect(issuesToErrorMessage("body", { a: "x", b: 1 }, issues)).toBe(
+			expect(parser.issuesToErrorMessage("body", { a: "x", b: 1 }, issues)).toBe(
 				'in body a (received "x"): expected number\nin body b (received 1): expected string',
 			);
 		});

@@ -34,14 +34,14 @@ describe("SearchParamsParser", () => {
 
 	describe("toObject", () => {
 		it("handles empty URLSearchParams", () => {
-			expect(parser.toObject(new URLSearchParams())).toEqual({});
+			expect(parser.parse(new URLSearchParams())).toEqual({});
 		});
 
 		it("handles flat fields", () => {
 			const sp = new URLSearchParams();
 			sp.set("title", "hello");
 			sp.set("count", "5");
-			expect(parser.toObject(sp)).toEqual({ title: "hello", count: 5 });
+			expect(parser.parse(sp)).toEqual({ title: "hello", count: 5 });
 		});
 
 		it("handles flat array via repeated keys", () => {
@@ -49,14 +49,14 @@ describe("SearchParamsParser", () => {
 			sp.append("ids", "1");
 			sp.append("ids", "2");
 			sp.append("ids", "3");
-			expect(parser.toObject(sp)).toEqual({ ids: [1, 2, 3] });
+			expect(parser.parse(sp)).toEqual({ ids: [1, 2, 3] });
 		});
 
 		it("handles indexed array", () => {
 			const sp = new URLSearchParams();
 			sp.append("ids[0]", "1");
 			sp.append("ids[1]", "2");
-			expect(parser.toObject(sp)).toEqual({ ids: [1, 2] });
+			expect(parser.parse(sp)).toEqual({ ids: [1, 2] });
 		});
 
 		it("handles array of objects via dot notation", () => {
@@ -65,7 +65,7 @@ describe("SearchParamsParser", () => {
 			sp.append("items[0].qty", "2");
 			sp.append("items[1].name", "bar");
 			sp.append("items[1].qty", "3");
-			expect(parser.toObject(sp)).toEqual({
+			expect(parser.parse(sp)).toEqual({
 				items: [
 					{ name: "foo", qty: 2 },
 					{ name: "bar", qty: 3 },
@@ -77,7 +77,7 @@ describe("SearchParamsParser", () => {
 			const sp = new URLSearchParams();
 			sp.append("items[0][name]", "foo");
 			sp.append("items[0][qty]", "2");
-			expect(parser.toObject(sp)).toEqual({
+			expect(parser.parse(sp)).toEqual({
 				items: [{ name: "foo", qty: 2 }],
 			});
 		});
@@ -85,7 +85,7 @@ describe("SearchParamsParser", () => {
 		it("handles json string value", () => {
 			const sp = new URLSearchParams();
 			sp.set("data", JSON.stringify({ materialId: 3, quantity: 1 }));
-			expect(parser.toObject(sp)).toEqual({
+			expect(parser.parse(sp)).toEqual({
 				data: { materialId: 3, quantity: 1 },
 			});
 		});
@@ -94,7 +94,7 @@ describe("SearchParamsParser", () => {
 			const sp = new URLSearchParams();
 			sp.append("items[0]", JSON.stringify({ materialId: 3, quantity: 1 }));
 			sp.append("items[1]", JSON.stringify({ materialId: 5, quantity: 2 }));
-			expect(parser.toObject(sp)).toEqual({
+			expect(parser.parse(sp)).toEqual({
 				items: [
 					{ materialId: 3, quantity: 1 },
 					{ materialId: 5, quantity: 2 },
@@ -105,7 +105,7 @@ describe("SearchParamsParser", () => {
 		it("handles nested dot notation", () => {
 			const sp = new URLSearchParams();
 			sp.set("a.b.c", "deep");
-			expect(parser.toObject(sp)).toEqual({ a: { b: { c: "deep" } } });
+			expect(parser.parse(sp)).toEqual({ a: { b: { c: "deep" } } });
 		});
 
 		it("handles mixed flat and nested fields", () => {
@@ -116,7 +116,7 @@ describe("SearchParamsParser", () => {
 			sp.append("deletedIds[1]", "2");
 			sp.append("newItems[0].materialId", "3");
 			sp.append("newItems[0].quantity", "1.5");
-			expect(parser.toObject(sp)).toEqual({
+			expect(parser.parse(sp)).toEqual({
 				title: "recipe",
 				isPublic: true,
 				deletedIds: [1, 2],
@@ -130,7 +130,7 @@ describe("SearchParamsParser", () => {
 			const sp = new URLSearchParams();
 			sp.append("a.b", "x");
 			sp.append("a.b", "y");
-			expect(parser.toObject(sp)).toEqual({ a: { b: ["x", "y"] } });
+			expect(parser.parse(sp)).toEqual({ a: { b: ["x", "y"] } });
 		});
 
 		it("merges three+ duplicate nested keys into a single array", () => {
@@ -138,14 +138,14 @@ describe("SearchParamsParser", () => {
 			sp.append("a.b", "x");
 			sp.append("a.b", "y");
 			sp.append("a.b", "z");
-			expect(parser.toObject(sp)).toEqual({ a: { b: ["x", "y", "z"] } });
+			expect(parser.parse(sp)).toEqual({ a: { b: ["x", "y", "z"] } });
 		});
 
 		it("merges duplicate bracket-indexed keys at the same slot", () => {
 			const sp = new URLSearchParams();
 			sp.append("a[0]", "x");
 			sp.append("a[0]", "y");
-			expect(parser.toObject(sp)).toEqual({ a: [["x", "y"]] });
+			expect(parser.parse(sp)).toEqual({ a: [["x", "y"]] });
 		});
 	});
 
@@ -153,7 +153,7 @@ describe("SearchParamsParser", () => {
 		it("does not pollute Object.prototype via __proto__ key", () => {
 			const sp = new URLSearchParams();
 			sp.set("__proto__.polluted", "yes");
-			parser.toObject(sp);
+			parser.parse(sp);
 			// @ts-expect-error intentional probe
 			expect({}.polluted).toBeUndefined();
 		});
@@ -161,7 +161,7 @@ describe("SearchParamsParser", () => {
 		it("does not pollute Object.prototype via nested __proto__ key", () => {
 			const sp = new URLSearchParams();
 			sp.set("a.__proto__.polluted", "yes");
-			parser.toObject(sp);
+			parser.parse(sp);
 			// @ts-expect-error intentional probe
 			expect({}.polluted).toBeUndefined();
 		});
@@ -169,7 +169,7 @@ describe("SearchParamsParser", () => {
 		it("produces null-prototype root object", () => {
 			const sp = new URLSearchParams();
 			sp.set("x", "1");
-			const result = parser.toObject(sp);
+			const result = parser.parse(sp);
 			expect(Object.getPrototypeOf(result)).toBeNull();
 		});
 	});

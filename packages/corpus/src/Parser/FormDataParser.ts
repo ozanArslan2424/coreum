@@ -3,7 +3,7 @@ import type { UnknownObject } from "corpus-utils/UnknownObject";
 import { ObjectParserAbstract } from "@/Parser/ObjectParserAbstract";
 
 export class FormDataParser extends ObjectParserAbstract<FormData> {
-	toObject(formData: FormData): UnknownObject {
+	parse(formData: FormData): UnknownObject {
 		const result = this.newSafeObject();
 
 		formData.forEach((entry, key) => {

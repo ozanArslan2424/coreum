@@ -82,10 +82,10 @@ async function suite(name: string, fn: () => Promise<void>) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // in-memory "db"
-const db = new Map<string, { id: string; name: string; email: string; role: string }>();
+const db = new Map<number, { id: number; name: string; email: string; role: string }>();
 let idCounter = 1;
 
-const idParam = type({ id: "string" });
+const idParam = type({ id: "number" });
 const wildParam = type({ "*": "string" });
 const qSearch = type({ "q?": "string" });
 const bodySchema = type({
@@ -116,7 +116,7 @@ new TC.Route("/users", () => [...db.values()]);
 new TC.Route(
 	{ method: TC.Method.POST, path: "/users" },
 	(c) => {
-		const id = String(idCounter++);
+		const id = idCounter++;
 		const user = {
 			id,
 			name: c.body.name,

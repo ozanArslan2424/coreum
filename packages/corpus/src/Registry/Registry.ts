@@ -1,42 +1,52 @@
-import { logFatal } from "corpus-utils/internalLog";
-
-import type { RouteModel } from "@/BaseRoute/RouteModel";
-import { EntityStore } from "@/Registry/EntityStore";
-import { MiddlewareStore } from "@/Registry/MiddlewareStore";
-import type { Router } from "@/Registry/Router";
-import type { XCors } from "@/XCors/XCors";
-
-type DocEntry = {
-	id: string;
-	endpoint: string;
-	method: string;
-	model: RouteModel<any, any, any, any> | undefined;
-};
+import { EntityStore } from "@/EntityStore/EntityStore";
+import type { EntityStoreInterface } from "@/EntityStore/EntityStoreInterface";
+import { MiddlewareRouter } from "@/MiddlewareRouter/MiddlewareRouter";
+import type { MiddlewareRouterInterface } from "@/MiddlewareRouter/MiddlewareRouterInterface";
+import { BodyParser } from "@/Parser/BodyParser";
+import type { BodyParserInterface } from "@/Parser/BodyParserInterface";
+import { FormDataParser } from "@/Parser/FormDataParser";
+import type { ObjectParserInterface } from "@/Parser/ObjectParserInterface";
+import { SchemaParser } from "@/Parser/SchemaParser";
+import type { SchemaParserInterface } from "@/Parser/SchemaParserInterface";
+import { SearchParamsParser } from "@/Parser/SearchParamsParser";
+import { URLParamsParser } from "@/Parser/URLParamsParser";
+import type { RegistryDocEntry } from "@/Registry/RegistryDocEntry";
+import { Router } from "@/Router/Router";
+import type { RouterInterface } from "@/Router/RouterInterface";
+import { BranchAdapter } from "@/RouterAdapter/BranchAdapter";
+import type { RouterAdapterInterface } from "@/RouterAdapter/RouterAdapterInterface";
+import type { XCorsInterface } from "@/XCors/XCorsInterface";
 
 export class Registry {
-	docs = new Map<string, DocEntry>();
-	cors: XCors | null = null;
-	prefix: string = "";
-	middlewares = new MiddlewareStore();
-	entities = new EntityStore();
+	public adapter!: RouterAdapterInterface;
+	public router!: RouterInterface;
+	public docs!: Map<string, RegistryDocEntry>;
+	public cors!: XCorsInterface | null;
+	public prefix!: string;
+	public middlewares!: MiddlewareRouterInterface;
+	public entities!: EntityStoreInterface;
+	public urlParamsParser!: ObjectParserInterface<Record<string, string>>;
+	public searchParamsParser!: ObjectParserInterface<URLSearchParams>;
+	public formDataParser!: ObjectParserInterface<FormData>;
+	public bodyParser!: BodyParserInterface;
+	public schemaParser!: SchemaParserInterface;
 
-	private _router: Router | null = null;
-	private _initialRouter: Router | null = null;
-	get router(): Router {
-		if (!this._router)
-			logFatal("Router instance missing. Create a Server instance before any routes.");
-		return this._router;
-	}
-	set router(value: Router | null) {
-		this._router = value;
-		this._initialRouter = value;
+	constructor() {
+		this.reset();
 	}
 
-	reset() {
-		this.prefix = "";
-		this._router = this._initialRouter;
+	reset(): void {
+		this.adapter = new BranchAdapter();
+		this.router = new Router(this.adapter);
+		this.docs = new Map();
 		this.cors = null;
-		this.middlewares = new MiddlewareStore();
+		this.prefix = "";
+		this.middlewares = new MiddlewareRouter();
 		this.entities = new EntityStore();
+		this.urlParamsParser = new URLParamsParser();
+		this.searchParamsParser = new SearchParamsParser();
+		this.formDataParser = new FormDataParser();
+		this.bodyParser = new BodyParser(this.formDataParser, this.searchParamsParser);
+		this.schemaParser = new SchemaParser();
 	}
 }
