@@ -29,6 +29,8 @@ interface RouterInterface {
 
 ## Plug & Play (not recommended)
 
+Even though the router is technically replaceable, the CLI capabilities will not be available unless methods are manually copied into the new router.
+
 ```ts
 import { $registry } from "@ozanarslan/corpus";
 $registry.router = new MyRouter();

@@ -1,5 +1,11 @@
 # @ozanarslan/corpus-cli
 
+## 0.5.9
+
+### Patch Changes
+
+- Bugfix: Registry
+
 ## 0.5.8
 
 ### Patch Changes

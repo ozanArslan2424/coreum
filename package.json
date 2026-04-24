@@ -11,6 +11,7 @@
 		"fm": "oxfmt --write",
 		"lint": "oxlint --fix",
 		"knip": "knip",
+		"test:all": "pnpm -r --reporter=append-only test:all",
 		"changeset": "changeset",
 		"version": "changeset version",
 		"release": "changeset publish"

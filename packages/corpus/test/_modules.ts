@@ -4,3 +4,5 @@ export {
 	$registry as $registryTesting,
 	Router as RouterTesting,
 } from "../dist/index";
+
+export * from "../dist/index";

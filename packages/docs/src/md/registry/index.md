@@ -33,11 +33,7 @@ Each of the following fields can be reassigned on `$registry` with a custom impl
 
 ### adapter
 
-Implements `RouterAdapterInterface`. See the [Router docs](/router/index.html) for details.
-
-### router
-
-Implements `RouterInterface`. See the [Router docs](/router/index.html).
+Implements `RouterAdapterInterface`. When the adapter is set, the default router is reset using the new adapter. See the [Router docs](/router/index.html) for details.
 
 ### middlewares
 
@@ -76,6 +72,10 @@ Readonly. Holds the documentation map used by the CLI tool.
 ### entities
 
 Readonly. Holds registered entities, used by the CLI tool.
+
+### router
+
+Technically assignable but default instance depends on the adapter. Implements `RouterInterface`. See the [Router docs](/router/index.html).
 
 ### prefix
 
