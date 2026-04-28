@@ -151,7 +151,7 @@ export class Server implements ServerInterface {
 			const gmwor = await gmw.outbound(ctx);
 			if (gmwor instanceof Res) return gmwor;
 		} catch (err) {
-			ctx.res = await this.handleError(err as Error);
+			ctx.res = await this.handleError(err as Error, ctx);
 		}
 
 		await $registry.cors?.handler(ctx);
@@ -171,7 +171,7 @@ export class Server implements ServerInterface {
 	}
 	defaultOnBeforeClose: Func<[], MaybePromise<void>> | undefined = undefined;
 
-	protected handleError: ErrorHandler = (err) => this.defaultErrorHandler(err);
+	protected handleError: ErrorHandler = (err, c) => this.defaultErrorHandler(err, c);
 	setOnError(handler: ErrorHandler): void {
 		this.handleError = handler;
 	}

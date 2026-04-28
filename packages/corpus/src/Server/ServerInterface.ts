@@ -1,17 +1,17 @@
 import type { Func } from "corpus-utils/Func";
 import type { MaybePromise } from "corpus-utils/MaybePromise";
+import type { OrString } from "corpus-utils/OrString";
 
 import type { RouterData } from "@/Router/RouterData";
 import type { ErrorHandler } from "@/Server/ErrorHandler";
 import type { RequestHandler } from "@/Server/RequestHandler";
-import type { ServerOpenArgs } from "@/Server/ServerOpenArgs";
 
 export interface ServerInterface {
 	get routes(): Array<RouterData>;
 
 	setGlobalPrefix(value: string): void;
 
-	listen(port: ServerOpenArgs["port"], hostname?: ServerOpenArgs["hostname"]): Promise<void>;
+	listen(port: number, hostname?: OrString<"0.0.0.0" | "127.0.0.1" | "localhost">): Promise<void>;
 
 	close(closeActiveConnections?: boolean): Promise<void>;
 

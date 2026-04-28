@@ -1,5 +1,11 @@
 # @ozanarslan/corpus
 
+## 0.5.10
+
+### Patch Changes
+
+- Fix: onError callback takes context as parameter.
+
 ## 0.5.9
 
 ### Patch Changes

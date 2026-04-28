@@ -9,9 +9,9 @@ export function createTestServer(opts?: TC.ServerOptions & { withLogging?: boole
 	const s = new TC.Server(serverOpts);
 
 	if (withLogging === true) {
-		s.setOnError((err) => {
+		s.setOnError((err, c) => {
 			log.error("thrown error", err);
-			return s.defaultErrorHandler(err);
+			return s.defaultErrorHandler(err, c);
 		});
 
 		s.setOnNotFound((req) => {

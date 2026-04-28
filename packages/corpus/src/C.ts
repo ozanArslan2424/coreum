@@ -47,7 +47,7 @@ export * from "./WebSocketRoute/WebSocketRouteAbstract";
 export * from "./WebSocketRoute/WebSocketRouteDefinition";
 
 export * from "./Server/ServerOptions";
-export * from "./Server/ServerOpenArgs";
+export * from "./Server/ServerInterface";
 export * from "./Server/Server";
 
 export * from "./RouterAdapter/BranchAdapter";
