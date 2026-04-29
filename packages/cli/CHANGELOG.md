@@ -1,5 +1,11 @@
 # @ozanarslan/corpus-cli
 
+## 0.5.11
+
+### Patch Changes
+
+- Bugfix: Preflight before global middlewares
+
 ## 0.5.10
 
 ### Patch Changes

@@ -32,9 +32,80 @@ describe("C.Server", () => {
 		expect(data.hello).toBe("world");
 	});
 
+	it("HANDLE - RETURNS RES INSTANCE DIRECTLY WHEN HANDLER RETURNS RES", async () => {
+		const s = createTestServer();
+		new TC.Route("/srv-res-direct", () => {
+			return new TC.Res({ direct: true }, { status: 201 });
+		});
+		const res = await s.handle(req("/srv-res-direct"));
+		expect(res.status).toBe(201);
+		const data = await parseBody<{ direct: boolean }>(res);
+		expect(data.direct).toBe(true);
+	});
+
+	it("HANDLE - WRAPS PLAIN HANDLER RESULT IN RES WITH 200", async () => {
+		const s = createTestServer();
+		new TC.Route("/srv-plain", () => "plain text");
+		const res = await s.handle(req("/srv-plain"));
+		expect(res.status).toBe(200);
+	});
+
+	it("HANDLE - PASSES PARSED PARAMS TO CONTEXT", async () => {
+		const s = createTestServer();
+		new TC.Route<never, never, { id: number }>("/srv-user/:id", (ctx) => ({ id: ctx.params.id }));
+		const res = await s.handle(req("/srv-user/42"));
+		const data = await parseBody<{ id: number }>(res);
+		expect(data.id).toBe(42);
+	});
+
+	it("HANDLE - PASSES SEARCH PARAMS TO CONTEXT", async () => {
+		const s = createTestServer();
+		new TC.Route<never, { q: string }>("/srv-search", (ctx) => ({ q: ctx.search.q }));
+		const res = await s.handle(req("/srv-search?q=hello"));
+		const data = await parseBody<{ q: string }>(res);
+		expect(data.q).toBe("hello");
+	});
+
+	// ─── routes getter ────────────────────────────────────────────
+
+	it("ROUTES - GETTER RETURNS EMPTY ARRAY WHEN NONE REGISTERED", () => {
+		const s = createTestServer();
+		expect(s.routes).toEqual([]);
+	});
+
+	it("ROUTES - GETTER LISTS REGISTERED ROUTES", () => {
+		const s = createTestServer();
+		new TC.Route("/srv-list-1", () => "a");
+		new TC.Route("/srv-list-2", () => "b");
+		expect(s.routes.length).toBe(2);
+	});
+
+	// ─── method routing ───────────────────────────────────────────
+
+	it("METHOD - GET AND POST ON SAME PATH ARE DISTINCT", async () => {
+		const s = createTestServer();
+		new TC.Route("/srv-methods", () => "got");
+		new TC.Route({ method: "POST", path: "/srv-methods" }, () => "posted");
+
+		const getRes = await s.handle(req("/srv-methods", { method: "GET" }));
+		const postRes = await s.handle(req("/srv-methods", { method: "POST" }));
+
+		expect(getRes.status).toBe(200);
+		expect(postRes.status).toBe(200);
+		expect(await getRes.text()).toContain("got");
+		expect(await postRes.text()).toContain("posted");
+	});
+
+	it("METHOD - UNREGISTERED METHOD ON REGISTERED PATH RETURNS 404", async () => {
+		const s = createTestServer();
+		new TC.Route("/srv-only-get", () => "ok");
+		const res = await s.handle(req("/srv-only-get", { method: "DELETE" }));
+		expect(res.status).toBe(404);
+	});
+
 	// ─── preflight ────────────────────────────────────────────────
 
-	it("PREFLIGHT - RETURNS NO_CONTENT", async () => {
+	it("PREFLIGHT - RETURNS NO_CONTENT WITHOUT CORS", async () => {
 		const s = createTestServer();
 		const res = await s.handle(
 			req("/srv-preflight", {
@@ -45,6 +116,168 @@ describe("C.Server", () => {
 		expect(res.status).toBe(TC.Status.NO_CONTENT);
 		const body = await res.text();
 		expect(body).toBe("");
+	});
+
+	it("PREFLIGHT - USES CORS PREFLIGHT HANDLER WHEN CORS IS SET", async () => {
+		const s = createTestServer();
+		new TX.Cors({ allowedOrigins: ["https://example.com"] });
+		const res = await s.handle(
+			req("/srv-preflight-cors", {
+				method: "OPTIONS",
+				headers: {
+					origin: "https://example.com",
+					"Access-Control-Request-Method": "POST",
+				},
+			}),
+		);
+		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");
+		new TX.Cors(undefined);
+	});
+
+	// ─── middleware - global ──────────────────────────────────────
+
+	it("GLOBAL MIDDLEWARE - INBOUND RUNS BEFORE HANDLER", async () => {
+		const s = createTestServer();
+		const order: string[] = [];
+		new TC.Middleware({
+			variant: "inbound",
+			useOn: "*",
+			handler: () => {
+				order.push("gmw-in");
+			},
+		});
+		new TC.Route("/srv-gmw-in", () => {
+			order.push("handler");
+			return "ok";
+		});
+		await s.handle(req("/srv-gmw-in"));
+		expect(order).toEqual(["gmw-in", "handler"]);
+	});
+
+	it("GLOBAL MIDDLEWARE - OUTBOUND RUNS AFTER HANDLER", async () => {
+		const s = createTestServer();
+		const order: string[] = [];
+		new TC.Middleware({
+			variant: "outbound",
+			useOn: "*",
+			handler: () => {
+				order.push("gmw-out");
+			},
+		});
+		new TC.Route("/srv-gmw-out", () => {
+			order.push("handler");
+			return "ok";
+		});
+		await s.handle(req("/srv-gmw-out"));
+		expect(order).toEqual(["handler", "gmw-out"]);
+	});
+
+	it("GLOBAL MIDDLEWARE - INBOUND RES SHORT-CIRCUITS HANDLER", async () => {
+		const s = createTestServer();
+		let handlerCalled = false;
+		new TC.Middleware({
+			variant: "inbound",
+			useOn: "*",
+			handler: () => new TC.Res({ blocked: true }, { status: 401 }),
+		});
+		new TC.Route("/srv-gmw-block", () => {
+			handlerCalled = true;
+			return "ok";
+		});
+		const res = await s.handle(req("/srv-gmw-block"));
+		expect(res.status).toBe(401);
+		expect(handlerCalled).toBe(false);
+	});
+
+	it("GLOBAL MIDDLEWARE - OUTBOUND RES OVERRIDES HANDLER RESULT", async () => {
+		const s = createTestServer();
+		new TC.Middleware({
+			variant: "outbound",
+			useOn: "*",
+			handler: () => new TC.Res({ overridden: true }, { status: 418 }),
+		});
+		new TC.Route("/srv-gmw-override", () => "original");
+		const res = await s.handle(req("/srv-gmw-override"));
+		expect(res.status).toBe(418);
+		const data = await parseBody<{ overridden: boolean }>(res);
+		expect(data.overridden).toBe(true);
+	});
+
+	// ─── middleware - local ───────────────────────────────────────
+
+	it("LOCAL MIDDLEWARE - INBOUND RUNS FOR MATCHING ROUTE", async () => {
+		const s = createTestServer();
+		const order: string[] = [];
+
+		const r = new TC.Route("/srv-lmw", () => {
+			order.push("handler");
+			return "ok";
+		});
+		new TC.Middleware({
+			useOn: r,
+			variant: "inbound",
+			handler: () => {
+				order.push("lmw-in");
+			},
+		});
+		await s.handle(req("/srv-lmw"));
+		expect(order).toEqual(["lmw-in", "handler"]);
+	});
+
+	it("LOCAL MIDDLEWARE - DOES NOT RUN FOR NON-MATCHING ROUTE", async () => {
+		const s = createTestServer();
+		let lmwCalled = false;
+		new TC.Middleware({
+			variant: "inbound",
+			useOn: ["GET /srv-lmw-only"],
+			handler: () => {
+				lmwCalled = true;
+			},
+		});
+		new TC.Route("/srv-lmw-other", () => "ok");
+		await s.handle(req("/srv-lmw-other"));
+		expect(lmwCalled).toBe(false);
+	});
+
+	it("MIDDLEWARE ORDER - GLOBAL IN, LOCAL IN, HANDLER, LOCAL OUT, GLOBAL OUT", async () => {
+		const s = createTestServer();
+		const order: string[] = [];
+		new TC.Middleware({
+			variant: "inbound",
+			useOn: "*",
+			handler: () => {
+				order.push("gmw-in");
+			},
+		});
+		new TC.Middleware({
+			variant: "outbound",
+			useOn: "*",
+			handler: () => {
+				order.push("gmw-out");
+			},
+		});
+
+		const r = new TC.Route("/srv-order", () => {
+			order.push("handler");
+			return "ok";
+		});
+
+		new TC.Middleware({
+			variant: "inbound",
+			useOn: r,
+			handler: () => {
+				order.push("lmw-in");
+			},
+		});
+		new TC.Middleware({
+			variant: "outbound",
+			useOn: r,
+			handler: () => {
+				order.push("lmw-out");
+			},
+		});
+		await s.handle(req("/srv-order"));
+		expect(order).toEqual(["gmw-in", "lmw-in", "handler", "lmw-out", "gmw-out"]);
 	});
 
 	// ─── setOnError ───────────────────────────────────────────────
@@ -85,6 +318,39 @@ describe("C.Server", () => {
 		expect(data.message).toBe("bad input");
 	});
 
+	it("SET ON ERROR - CUSTOM HANDLER RECEIVES ERROR AND CONTEXT", async () => {
+		const s = createTestServer();
+		let receivedErrMessage: string | undefined;
+		let receivedReqUrl: string | undefined;
+		s.setOnError((err, ctx) => {
+			receivedErrMessage = (err as Error).message;
+			receivedReqUrl = ctx.req.url;
+			return new TC.Res({ error: true }, { status: 500 });
+		});
+		new TC.Route("/srv-error-ctx", () => {
+			throw new Error("boom-ctx");
+		});
+		await s.handle(req("/srv-error-ctx"));
+		expect(receivedErrMessage).toBe("boom-ctx");
+		expect(receivedReqUrl).toContain("/srv-error-ctx");
+
+		s.setOnError(s.defaultErrorHandler);
+	});
+
+	it("SET ON ERROR - ERROR THROWN IN MIDDLEWARE IS HANDLED", async () => {
+		const s = createTestServer();
+		new TC.Middleware({
+			useOn: "*",
+			variant: "inbound",
+			handler: () => {
+				throw new Error("middleware boom");
+			},
+		});
+		new TC.Route("/srv-mw-error", () => "never");
+		const res = await s.handle(req("/srv-mw-error"));
+		expect(res.status).toBe(500);
+	});
+
 	// ─── setOnNotFound ────────────────────────────────────────────
 
 	it("SET ON NOT FOUND - CUSTOM HANDLER IS CALLED", async () => {
@@ -115,7 +381,7 @@ describe("C.Server", () => {
 		const s = createTestServer();
 		s.setGlobalPrefix("/api");
 		new TC.Route("/srv-prefixed", () => "prefixed");
-		const res = await s.handle(req("/srv-prefixed"));
+		const res = await s.handle(new Request("http://localhost:4444/api/srv-prefixed"));
 		expect(res.status).toBe(200);
 		s.setGlobalPrefix("");
 	});
@@ -127,6 +393,41 @@ describe("C.Server", () => {
 		const res = await s.handle(new Request("http://localhost:4444/srv-no-prefix"));
 		expect(res.status).toBe(404);
 		s.setGlobalPrefix("");
+	});
+
+	// ─── setOnBeforeListen / setOnBeforeClose ─────────────────────
+
+	it("SET ON BEFORE LISTEN - HOOK RUNS BEFORE SERVER STARTS", async () => {
+		const s = createTestServer();
+		let called = false;
+		s.setOnBeforeListen(() => {
+			called = true;
+		});
+		await s.listen(4482, "localhost");
+		try {
+			expect(called).toBe(true);
+		} finally {
+			await s.close();
+		}
+	});
+
+	it("SET ON BEFORE CLOSE - HOOK RUNS BEFORE SERVER STOPS", async () => {
+		const s = createTestServer();
+		let called = false;
+		s.setOnBeforeClose(() => {
+			called = true;
+		});
+		await s.listen(4483, "localhost");
+		await s.close();
+		expect(called).toBe(true);
+	});
+
+	it("SET ON BEFORE LISTEN - UNDEFINED HOOK IS A NO-OP", async () => {
+		const s = createTestServer();
+		s.setOnBeforeListen(undefined);
+		await s.listen(4484, "localhost");
+		await s.close();
+		// no throw = pass
 	});
 
 	// ─── CORS integration ─────────────────────────────────────────
@@ -157,6 +458,57 @@ describe("C.Server", () => {
 		const res = await s.handle(req("/srv-no-cors", { headers: { origin: "https://example.com" } }));
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBeNull();
 	});
+
+	it("CORS - IS APPLIED TO ERROR RESPONSES", async () => {
+		const s = createTestServer();
+		new TX.Cors({ allowedOrigins: ["https://example.com"] });
+		new TC.Route("/srv-cors-error", () => {
+			throw new Error("boom");
+		});
+		const res = await s.handle(
+			req("/srv-cors-error", { headers: { origin: "https://example.com" } }),
+		);
+		expect(res.status).toBe(500);
+		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");
+		new TX.Cors(undefined);
+	});
+
+	it("CORS - IS APPLIED TO 404 RESPONSES", async () => {
+		const s = createTestServer();
+		new TX.Cors({ allowedOrigins: ["https://example.com"] });
+		const res = await s.handle(
+			req("/srv-cors-404", { headers: { origin: "https://example.com" } }),
+		);
+		expect(res.status).toBe(404);
+		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");
+		new TX.Cors(undefined);
+	});
+
+	// ─── live server (.listen) ────────────────────────────────────
+
+	it("LISTEN - SERVES REAL HTTP REQUESTS", async () => {
+		const s = createTestServer();
+		new TC.Route("/live", () => ({ live: true }));
+		const PORT = 4485;
+		await s.listen(PORT, "localhost");
+		try {
+			const res = await fetch(`http://localhost:${PORT}/live`);
+			expect(res.status).toBe(200);
+			const data = (await res.json()) as { live: boolean };
+			expect(data.live).toBe(true);
+		} finally {
+			await s.close();
+		}
+	});
+
+	it("LISTEN - DOUBLE CLOSE DOES NOT THROW", async () => {
+		const s = createTestServer();
+		await s.listen(4486, "localhost");
+		await s.close();
+		await s.close();
+	});
+
+	// ─── idle timeout ─────────────────────────────────────────────
 
 	it("IDLE TIMEOUT - CLOSES IDLE KEEP-ALIVE CONNECTION", async () => {
 		const s = createTestServer({ idleTimeout: 1 });
@@ -199,18 +551,12 @@ describe("C.Server", () => {
 				socket.once("error", reject);
 			});
 
-			// First request — establishes the keep-alive connection
 			await send(socket, rawRequest("/idle-timeout-test"));
-
-			// Wait well past the idle timeout
 			await Bun.sleep(200);
 
-			// Try to send a second request on the same socket
-			// The server should have closed it by now
 			const closePromise = waitForClose(socket);
 			socket.write(rawRequest("/idle-timeout-test"));
 
-			// Either the socket is already closed or will close immediately
 			await Promise.race([
 				closePromise,
 				Bun.sleep(500).then(() => {

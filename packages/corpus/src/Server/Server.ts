@@ -114,42 +114,44 @@ export class Server implements ServerInterface {
 	): Promise<Res | null> {
 		const ctx = new Context(req);
 
-		const gmw = $registry.middlewares.find("*");
-
 		try {
-			const gmwir = await gmw.inbound(ctx);
-			if (gmwir instanceof Res) return gmwir;
-
-			const match = $registry.router.find(req);
-
-			if (req.isPreflight) {
-				ctx.res = await this.handlePreflight(req);
-			} else if (!match) {
-				ctx.res = await this.handleNotFound(req);
+			if (ctx.req.isPreflight) {
+				ctx.res = await this.handlePreflight(ctx.req);
 			} else {
-				const lmw = $registry.middlewares.find(match.route.id);
+				const gmw = $registry.middlewares.find("*");
 
-				const lmwir = await lmw.inbound(ctx);
-				if (lmwir instanceof Res) return lmwir;
+				const gmwir = await gmw.inbound(ctx);
+				if (gmwir instanceof Res) return gmwir;
 
-				await Context.appendParsedData(ctx, match);
+				const match = $registry.router.find(ctx.req);
 
-				const routeResult = await match.route.handler(ctx);
-
-				if (match.route.variant === RouteVariant.websocket && ctx.req.isWebsocket) {
-					return onUpgrade(routeResult);
-				} else if (routeResult instanceof Res) {
-					ctx.res = routeResult;
+				if (!match) {
+					ctx.res = await this.handleNotFound(ctx.req);
 				} else {
-					ctx.res = new Res(routeResult, ctx.res);
+					const lmw = $registry.middlewares.find(match.route.id);
+
+					const lmwir = await lmw.inbound(ctx);
+					if (lmwir instanceof Res) return lmwir;
+
+					await Context.appendParsedData(ctx, match);
+
+					const routeResult = await match.route.handler(ctx);
+
+					if (match.route.variant === RouteVariant.websocket && ctx.req.isWebsocket) {
+						return onUpgrade(routeResult);
+					} else if (routeResult instanceof Res) {
+						ctx.res = routeResult;
+					} else {
+						ctx.res = new Res(routeResult, ctx.res);
+					}
+
+					const lmwor = await lmw.outbound(ctx);
+					if (lmwor instanceof Res) return lmwor;
 				}
 
-				const lmwor = await lmw.outbound(ctx);
-				if (lmwor instanceof Res) return lmwor;
+				const gmwor = await gmw.outbound(ctx);
+				if (gmwor instanceof Res) return gmwor;
 			}
-
-			const gmwor = await gmw.outbound(ctx);
-			if (gmwor instanceof Res) return gmwor;
 		} catch (err) {
 			ctx.res = await this.handleError(err as Error, ctx);
 		}
