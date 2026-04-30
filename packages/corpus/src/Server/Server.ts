@@ -39,7 +39,7 @@ export class Server implements ServerInterface {
 
 	async listen(
 		port: number,
-		hostname?: OrString<"0.0.0.0" | "127.0.0.1" | "localhost">,
+		hostname: OrString<"0.0.0.0" | "127.0.0.1" | "localhost"> = "0.0.0.0",
 	): Promise<void> {
 		try {
 			process.on("SIGINT", () => this.close());
@@ -70,7 +70,7 @@ export class Server implements ServerInterface {
 
 	private createApp(
 		port: number,
-		hostname?: OrString<"0.0.0.0" | "127.0.0.1" | "localhost">,
+		hostname: OrString<"0.0.0.0" | "127.0.0.1" | "localhost">,
 	): ServerApp {
 		return Bun.serve<WebSocketRoute>({
 			port,

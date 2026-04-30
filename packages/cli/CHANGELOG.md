@@ -1,5 +1,11 @@
 # @ozanarslan/corpus-cli
 
+## 0.5.12
+
+### Patch Changes
+
+- Bugfix: default hostname
+
 ## 0.5.11
 
 ### Patch Changes
