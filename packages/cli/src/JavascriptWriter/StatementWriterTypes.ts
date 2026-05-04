@@ -1,21 +1,24 @@
 import type { OrString } from "corpus-utils/OrString";
 
-import type { BaseWriterTypes as B } from "./BaseWriterTypes";
+import type { BaseWriterTypes as B } from "../BaseWriter/BaseWriterTypes";
+import type { JavascriptWriter } from "./JavascriptWriter";
 
 export namespace StatementWriterTypes {
+	type BodyWriter = B.BodyWriter<JavascriptWriter>;
+
 	export type Condition = OrString<"&&" | "||">;
 
-	export type Else = (finalBody: B.BodyWriter) => void;
+	export type Else = (finalBody: BodyWriter) => void;
 
 	export type ElseIf = (...conditions: Condition[]) => {
-		then(body: B.BodyWriter): {
+		then(body: BodyWriter): {
 			elseif: ElseIf;
 			else: Else;
 		};
 	};
 
 	export type If = {
-		then(body: B.BodyWriter): {
+		then(body: BodyWriter): {
 			elseif: ElseIf;
 			else: Else;
 		};
@@ -25,14 +28,14 @@ export namespace StatementWriterTypes {
 
 	export type SwitchCase = {
 		condition: OrString<"default">;
-		body: B.BodyWriter;
+		body: BodyWriter;
 		break?: boolean;
 	};
 
 	export type TryCatch = {
-		try: B.BodyWriter;
-		catch?: { arg?: string; body: B.BodyWriter };
-		finally?: B.BodyWriter;
+		try: BodyWriter;
+		catch?: { arg?: string; body: BodyWriter };
+		finally?: BodyWriter;
 	};
 
 	type CmmLine = { text: string };
@@ -49,8 +52,6 @@ export namespace StatementWriterTypes {
 
 	type ExpObj = { keys: string[] };
 
-	type ExpType = { keys: string[] };
-
 	type ExpDefault = { keys: string[] };
 
 	type ExpNamed = { name: string; keys: string[] };
@@ -60,19 +61,17 @@ export namespace StatementWriterTypes {
 	type ExpReExpStar = { from: string };
 
 	export type Export =
-		| B.Disco<"obj", ExpObj>
-		| B.Disco<"type", ExpType>
+		| B.Disco<"object", ExpObj>
 		| B.Disco<"default", ExpDefault>
 		| B.Disco<"named", ExpNamed>
 		| B.Disco<"reexport", ExpReExp>
 		| B.Disco<"reexportStar", ExpReExpStar>;
 
-	type ImpAs = { key: string; as?: string; isType?: boolean };
+	type ImpAs = { key: string; as?: string };
 
 	export type Import = {
 		keys?: string[] | ImpAs[];
 		def?: string;
-		isType?: boolean;
 		from: string;
 	};
 

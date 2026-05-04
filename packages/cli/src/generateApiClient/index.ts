@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 
 import { logFatal } from "corpus-utils/internalLog";
 
-import type { Config } from "../Config/Config";
+import type { Config } from "../config";
 import {
 	DIST_API_GENERATOR_FILE,
 	API_GENERATOR_CLASS_NAME,

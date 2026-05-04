@@ -5,12 +5,12 @@ import { parseArgs } from "util";
 import * as p from "@clack/prompts";
 import { logFatal, log } from "corpus-utils/internalLog";
 
-import type { Config, PartialConfig } from "../Config/Config";
+import type { Config, PartialConfig } from "../config";
+import { TypescriptWriter } from "../TypescriptWriter/TypescriptWriter";
 import { ACCEPTED_PACKAGE_MANAGERS } from "../utils/ACCEPTED_PACKAGE_MANAGERS";
 import { ACCEPTED_VALIDATION_LIBS } from "../utils/ACCEPTED_VALIDATION_LIBS";
 import { ACTIONS, type Action } from "../utils/ACTIONS";
 import { registerSilentConsole } from "../utils/registerSilentConsole";
-import { Writer } from "../Writer/Writer";
 
 export class ConfigManager {
 	static getAction(): Action {
@@ -38,6 +38,9 @@ export class ConfigManager {
 			packageManager: "bun",
 			output: "./src/corpus.gen.ts",
 			exportClientAs: "CorpusApi",
+			exportModelsAs: "Models",
+			exportArgsAs: "Args",
+			exportEntitiesAs: "Entities",
 			ignoreGlobalPrefix: false,
 			jsonSchemaOptions: {
 				fallback: (ctx: any) => ctx.base,
@@ -173,89 +176,48 @@ export class ConfigManager {
 			silent: silent as boolean,
 		};
 	}
-	static async getResolvedConfig(): Promise<Config> {
-		const flagC = this.getFlagConfig();
-		const fileC = this.getFileConfig();
-		const defC = this.getDefaultConfig();
 
-		function use<T>(flag: T | null | undefined, file: T | null | undefined, def: T): T {
-			if (flag != null) return flag;
-			if (file != null) return file;
-			return def;
+	static async getResolvedConfig(): Promise<Config> {
+		const flagConfig = this.getFlagConfig();
+		const fileConfig = this.getFileConfig();
+		const defaultConfig = this.getDefaultConfig();
+
+		function pick<K extends keyof Config>(
+			key: K,
+			...sources: (Partial<Config> | null | undefined)[]
+		): Config[K] {
+			for (const src of sources) {
+				const v = src?.[key];
+				if (v != null) return v as Config[K];
+			}
+			return defaultConfig[key];
 		}
 
-		// Merge file config over defaults first so the wizard shows sensible defaults.
-		const mergedDefaults: Config = {
-			silent: use(null, fileC.silent, defC.silent),
-			casing: use(null, fileC.casing, defC.casing),
-			main: use(null, fileC.main, defC.main),
-			packageManager: use(null, fileC.packageManager, defC.packageManager),
-			pkgPath: use(null, fileC.pkgPath, defC.pkgPath),
-			validationLibrary: use(null, fileC.validationLibrary, defC.validationLibrary),
-			exportClientAs: use(null, fileC.exportClientAs, defC.exportClientAs),
-			ignoreGlobalPrefix: use(null, fileC.ignoreGlobalPrefix, defC.ignoreGlobalPrefix),
-			output: use(null, fileC.output, defC.output),
-			jsonSchemaOptions: use(null, fileC.jsonSchemaOptions, defC.jsonSchemaOptions),
-		};
+		const keys = Object.keys(defaultConfig) as (keyof Config)[];
 
-		const hasFlags = !!(
-			flagC.main ??
-			flagC.output ??
-			flagC.pkgPath ??
-			flagC.casing ??
-			flagC.packageManager ??
-			flagC.exportClientAs ??
-			flagC.validationLibrary ??
-			flagC.silent
-		);
+		const mergedDefaults = Object.fromEntries(keys.map((k) => [k, pick(k, fileConfig)])) as Config;
 
-		const promptC: PartialConfig = hasFlags
+		const hasFlags = keys.some((k) => flagConfig[k] != null);
+
+		const promptConfig: PartialConfig = hasFlags
 			? {}
 			: this.configFileExists()
 				? {}
 				: await this.promptConfig(mergedDefaults);
 
-		const config: Config = {
-			silent: use(flagC.silent, promptC.silent, mergedDefaults.silent),
-			casing: use(flagC.casing, promptC.casing, mergedDefaults.casing),
-			main: use(flagC.main, promptC.main, mergedDefaults.main),
-			packageManager: use(
-				flagC.packageManager,
-				promptC.packageManager,
-				mergedDefaults.packageManager,
-			),
-			pkgPath: use(flagC.pkgPath, promptC.pkgPath, mergedDefaults.pkgPath),
-			validationLibrary: use(
-				flagC.validationLibrary,
-				promptC.validationLibrary,
-				mergedDefaults.validationLibrary,
-			),
-			exportClientAs: use(
-				flagC.exportClientAs,
-				promptC.exportClientAs,
-				mergedDefaults.exportClientAs,
-			),
-			ignoreGlobalPrefix: use(
-				flagC.ignoreGlobalPrefix,
-				promptC.ignoreGlobalPrefix,
-				mergedDefaults.ignoreGlobalPrefix,
-			),
-			output: use(flagC.output, promptC.output, mergedDefaults.output),
-			jsonSchemaOptions: use(null, fileC.jsonSchemaOptions, defC.jsonSchemaOptions),
-		};
+		const config = Object.fromEntries(
+			keys.map((k) => [k, pick(k, flagConfig, promptConfig, mergedDefaults)]),
+		) as Config;
 
-		if (config.silent) {
-			registerSilentConsole();
-		}
+		if (config.silent) registerSilentConsole();
 
 		return config;
 	}
-
-	static writeConfigFile(config: Config): void {
+	static async writeConfigFile(config: Config) {
 		if (this.configFileExists()) return;
 
 		const filePath = path.resolve(process.cwd(), "corpus.config.ts");
-		const w = new Writer(filePath);
+		const w = new TypescriptWriter(filePath);
 
 		w.$import({
 			keys: ["defineConfig"],
@@ -271,15 +233,23 @@ export class ConfigManager {
 		w.pair("packageManager", w.str(config.packageManager ?? "bun"));
 		w.pair("casing", w.str(config.casing));
 		w.pair("output", w.str(config.output));
-		w.pair("exportClientAs", config.exportClientAs ? w.str(config.exportClientAs) : "false");
-		w.$comment("Default targets arktype. The `fallback: ctx => ctx.base` strategy silently");
-		w.$comment("drops any unsupported constraint and keeps the rest of the schema intact,");
-		w.$comment("which is the least-surprising behaviour for codegen purposes.");
+		w.pair("exportClientAs", w.str(config.exportClientAs));
+		w.pair("exportModelsAs", w.str(config.exportModelsAs));
+		w.pair("exportArgsAs", w.str(config.exportArgsAs));
+		w.pair("exportEntitiesAs", w.str(config.exportEntitiesAs));
+		w.$comment("The `fallback: ctx => ctx.base` strategy silently drops unsupported constraints");
+		w.$comment(
+			"and keeps the rest of the schema intact, which is the least-surprising behaviour for codegen purposes.",
+		);
+		w.$comment("");
 		w.line("jsonSchemaOptions: {");
 		w.tab(`target: "draft-07",`);
-		w.tab("fallback: (ctx: any) => ctx.base,", 2);
+		w.tab("fallback: (ctx: any) => ctx.base,");
 		w.line("}");
 		w.untab("})");
+
+		await w.format();
+
 		log.info(`Config written to corpus.config.ts`);
 	}
 

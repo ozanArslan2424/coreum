@@ -1,8 +1,8 @@
-import type { Config } from "../Config/Config";
-import { Writer } from "../Writer/Writer";
+import type { Config } from "../config";
+import { TypescriptWriter } from "../TypescriptWriter/TypescriptWriter";
 
 export function writesTypesFile(config: Config, typesFilePath: string) {
-	const w = new Writer(typesFilePath);
+	const w = new TypescriptWriter(typesFilePath);
 
 	w.line(
 		`import "${config.pkgPath}";`,

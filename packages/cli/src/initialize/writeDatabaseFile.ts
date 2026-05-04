@@ -1,9 +1,9 @@
 import type { ImportableInterface } from "../Importable/ImportableInterface";
 import type { ModuleInterface } from "../Module/ModuleInterface";
-import { Writer } from "../Writer/Writer";
+import { TypescriptWriter } from "../TypescriptWriter/TypescriptWriter";
 
 export function writeDatabaseFile(m: ModuleInterface, database: ImportableInterface) {
-	const w = new Writer(database.filePath);
+	const w = new TypescriptWriter(database.filePath);
 
 	w.$import({
 		isType: true,

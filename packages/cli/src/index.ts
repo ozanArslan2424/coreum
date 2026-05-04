@@ -4,7 +4,7 @@ import { initialize } from "./initialize";
 
 const action = ConfigManager.getAction();
 const config = await ConfigManager.getResolvedConfig();
-ConfigManager.writeConfigFile(config);
+await ConfigManager.writeConfigFile(config);
 
 switch (action) {
 	case "api":

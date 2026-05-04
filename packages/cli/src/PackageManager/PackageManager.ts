@@ -3,7 +3,7 @@ import { join } from "path";
 
 import { logFatal } from "corpus-utils/internalLog";
 
-import type { Config } from "../Config/Config";
+import type { Config } from "../config";
 import type { PackageInterface } from "../Package/PackageInterface";
 
 export class PackageManager {

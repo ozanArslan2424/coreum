@@ -1,98 +1,32 @@
-import fs from "node:fs";
-
+import { isSomeArray } from "corpus-utils/isSomeArray";
 import prettier from "prettier";
 
-import type { BaseWriterTypes as B } from "./BaseWriterTypes";
+import { BaseWriter } from "../BaseWriter/BaseWriter";
+import type { BaseWriterTypes as B } from "../BaseWriter/BaseWriterTypes";
 import type { ClassWriterTypes as CWT } from "./ClassWriterTypes";
 import type { FunctionWriterTypes as FWT } from "./FunctionWriterTypes";
-import type { InterfaceWriterTypes as IWT } from "./InterfaceWriterTypes";
 import type { StatementWriterTypes as SWT } from "./StatementWriterTypes";
 import type { VariableWriterTypes as VWT } from "./VariableWriterTypes";
 
-export class Writer {
-	constructor(indentOrFilePath?: number | string) {
-		if (typeof indentOrFilePath === "string") {
-			this.writeToFilePath = indentOrFilePath;
-			fs.writeFileSync(indentOrFilePath, "");
-		} else {
-			this.indent = indentOrFilePath ?? 0;
-		}
+type BodyWriter = B.BodyWriter<JavascriptWriter>;
+
+export class JavascriptWriter extends BaseWriter {
+	async format() {
+		const formatted = await prettier.format(this.read(), {
+			parser: "typescript",
+			useTabs: true,
+			printWidth: 100,
+		});
+		this.finalize(formatted);
 	}
 
-	readonly indent: number = 0;
-	private readonly writeToFilePath?: string;
-
-	private fileLineCount = 0;
-	private O: string[] = [];
-	variables: Set<string> = new Set();
-	interfaces: Set<string> = new Set();
-	tabChar = "\t";
-
-	read(join: string = "\n") {
-		return this.O.join(join);
-	}
-
-	async format(parser: string) {
-		const formatted = await prettier.format(this.read(), { parser });
-		this.O = [];
-		this.O.push(formatted);
-		if (this.writeToFilePath) {
-			fs.writeFileSync(this.writeToFilePath, formatted);
-		}
-		return formatted;
-	}
-
-	raw(...strings: string[]) {
-		this.O.push(...strings);
-		if (this.writeToFilePath) {
-			fs.appendFileSync(this.writeToFilePath, strings.join("\n") + "\n");
-			this.fileLineCount += strings.length;
-		}
-	}
-
-	line(...strings: string[]) {
-		const tabs = new Array(this.indent).fill(this.tabChar).join("");
-		const tabbed = strings.map((str) => `${tabs}${str}`);
-		this.O.push(...tabbed);
-		if (this.writeToFilePath) {
-			fs.appendFileSync(this.writeToFilePath, tabbed.join("\n") + "\n");
-			this.fileLineCount += tabbed.length;
-		}
-	}
-
-	inline(...strings: string[]) {
-		if (this.O.length === 0) this.O.push("");
-		this.O[this.O.length - 1] += strings.join("");
-		if (this.writeToFilePath) {
-			fs.writeFileSync(this.writeToFilePath, this.O.join("\n") + "\n");
-		}
-	}
-
-	pair(k: string, v?: string) {
-		this.line(v ? `${k}: ${v},` : `${k},`);
-	}
-
-	tab(str: string, indent: number = 1) {
-		const tabs = new Array(this.indent + indent).fill(this.tabChar).join("");
-		this.line(`${tabs}${str}`);
-	}
-
-	untab(str: string, indent: number = 1) {
-		const tabs = new Array(Math.max(0, this.indent - indent)).fill(this.tabChar).join("");
-		this.O.push(`${tabs}${str}`);
-		if (this.writeToFilePath) {
-			fs.appendFileSync(this.writeToFilePath, `${tabs}${str}\n`);
-			this.fileLineCount += 1;
-		}
-	}
-
-	writeBody(self: Writer, bodyWriter: B.BodyWriter, addIndent: number = 1) {
-		const w = new Writer(self.indent + addIndent);
+	writeBody(self: JavascriptWriter, bodyWriter: BodyWriter, addIndent: number = 1): void {
+		const w = new JavascriptWriter(self.indent + addIndent);
 		bodyWriter(w);
 		self.raw(w.read());
 	}
 
-	scope(body: B.BodyWriter): B.BodyWriter {
+	scope(body: BodyWriter): BodyWriter {
 		return (w) => {
 			w.inline("{");
 			body(w);
@@ -104,11 +38,23 @@ export class Writer {
 		return `"${s}"`;
 	}
 
+	lit(s: string): string {
+		return `\`${s}\``;
+	}
+
+	tern(cond: string, t: string, f: string) {
+		return `${cond} ? ${t} : ${f}`;
+	}
+
+	pair(k: string, v?: string) {
+		this.line(v ? `${k}: ${v},` : `${k},`);
+	}
+
 	$class(o: CWT.Class) {
 		this.variables.add(o.name);
 
 		this.line(
-			`${o.isExported ? `export ` : ``}${o.isAbstract ? `abstract ` : ``}class ${o.name} ${o.extends ? `extends ${o.extends} ` : ``} ${o.implements ? `implements ${o.implements} ` : ``}{`,
+			`${o.isExported ? `export ` : ``}class ${o.name} ${o.extends ? `extends ${o.extends} ` : ``} {`,
 		);
 
 		if (o.constr) {
@@ -122,7 +68,7 @@ export class Writer {
 
 	$constructor(o: CWT.Constructor) {
 		this.tab(
-			`constructor(${o.args ? o.args.map((a) => `${a.keyword ? `${a.keyword} ` : ``}${a.key}: ${a.type}`).join(", ") : ``}) {`,
+			`constructor(${isSomeArray(o.args) ? o.args.map((a) => `${a.keyword ? `${a.keyword} ` : ``}${a.key}`).join(", ") : ``}) {`,
 		);
 
 		if (!o.superArgs && !o.body) {
@@ -148,27 +94,11 @@ export class Writer {
 		this.inline(
 			o.isAsync ? "async " : "",
 			o.name,
-			o.generics ? `<${o.generics.join(", ")}>` : " ",
-			`(${o.args ? o.args.join(", ") : ""})`,
-			o.type ? `: ${o.type}` : " ",
-			"{",
+			`(${isSomeArray(o.args) ? o.args.join(", ") : ""})`,
+			" {",
 		);
 		this.writeBody(this, o.body);
 		this.line("};");
-		this.line("");
-	}
-
-	$abstractMethod(o: CWT.AbstractMethod) {
-		this.line("abstract ");
-		this.inline(
-			o.keyword ? `${o.keyword} ` : "",
-			o.isAsync ? "async " : "",
-			o.name,
-			o.generics ? ` <${o.generics.join(", ")}>` : " ",
-			`(${o.args ? o.args.join(", ") : ""})`,
-			o.type ? `: ${o.type}` : " ",
-			";",
-		);
 		this.line("");
 	}
 
@@ -176,12 +106,10 @@ export class Writer {
 		this.line(o.keyword ? `${o.keyword} ` : "");
 		this.inline(
 			o.name,
-			o.type ? `: ${o.type}` : "",
 			" = ",
 			o.isAsync ? "async " : "",
-			o.generics ? ` <${o.generics.join(", ")}>` : "",
 			"(",
-			o.args ? o.args.join(", ") : "",
+			isSomeArray(o.args) ? o.args.join(", ") : "",
 			") => {",
 		);
 		this.writeBody(this, o.body);
@@ -194,27 +122,17 @@ export class Writer {
 		if (typeof o.value === "string") {
 			value = o.value;
 		} else {
-			const w = new Writer(this.indent + 1);
+			const w = new JavascriptWriter(this.indent + 1);
 			o.value(w);
 			value = w.read();
 		}
-		this.line(
-			`${o.keyword ? `${o.keyword} ` : ""}${o.name}${o.type ? `:${o.type}` : ``} = ${value};`,
-		);
+		this.line(`${o.keyword ? `${o.keyword} ` : ""}${o.name} = ${value};`);
 	}
 
 	$function(o: FWT.Function) {
 		this.variables.add(o.name);
 		this.line(`${o.isAsync ? `async ` : ``}function `);
-		this.inline(
-			o.name,
-			o.generics ? `<${o.generics.join(", ")}>` : "",
-			"(",
-			o.args ? o.args.join(", ") : "",
-			")",
-			o.type ? `: ${o.type} ` : " ",
-			"{",
-		);
+		this.inline(o.name, "(", isSomeArray(o.args) ? o.args.join(", ") : "", ")", "{");
 		this.writeBody(this, o.body);
 		this.line("};");
 		this.line("");
@@ -225,47 +143,15 @@ export class Writer {
 		this.line(`${o.keyword ?? "const"} `);
 		this.inline(
 			o.name,
-			o.type ? `: ${o.type}` : "",
 			" = ",
 			o.isAsync ? "async " : "",
-			o.generics ? `<${o.generics.join(", ")}>` : "",
 			"(",
-			o.args ? o.args.join(", ") : "",
+			isSomeArray(o.args) ? o.args.join(", ") : "",
 			") => {",
 		);
 		this.writeBody(this, o.body);
 		this.line("};");
 		this.line("");
-	}
-
-	$interface(o: IWT.Interface) {
-		this.interfaces.add(o.name);
-		this.line(`${o.isExported ? "export " : ""}${o.keyword ?? "interface"} `);
-		this.inline(
-			o.name,
-			o.generics ? `<${o.generics.join(", ")}> ` : " ",
-			o.keyword === "type" ? "= {" : "{",
-		);
-		this.writeBody(this, o.body);
-		this.line("}");
-		this.line("");
-	}
-
-	$namespace(o: VWT.Namespace) {
-		this.line(`${o.isExported ? "export " : ""}namespace ${o.name} {`);
-
-		const w = new Writer(this.indent + 1);
-		o.body(w);
-		this.raw(w.read());
-
-		this.line("}");
-		this.line("");
-		const onlyTypes = w.variables.size === 0;
-		if (onlyTypes) {
-			this.interfaces.add(o.name);
-		} else {
-			this.variables.add(o.name);
-		}
 	}
 
 	$if(...conditions: SWT.Condition[]): SWT.If {
@@ -309,7 +195,7 @@ export class Writer {
 		};
 	}
 
-	$for(paran: SWT.ForParan[], body: B.BodyWriter) {
+	$for(paran: SWT.ForParan[], body: BodyWriter) {
 		this.line(`for (${paran.join(" ")}) {`);
 		this.writeBody(this, body);
 		this.line(`}`);
@@ -348,7 +234,7 @@ export class Writer {
 		}
 	}
 
-	$return(body: B.BodyWriter | string): void {
+	$return(body: BodyWriter | string): void {
 		if (typeof body === "string") {
 			this.line(`return${body.length === 0 ? "" : ` ${body}`};`);
 			return;
@@ -388,7 +274,7 @@ export class Writer {
 
 	$import(o: SWT.Import) {
 		this.line("import ");
-		this.inline(o.isType ? "type " : "", o.def ?? "");
+		this.inline(o.def ?? "");
 
 		if (o.keys) {
 			if (o.def) {
@@ -401,9 +287,9 @@ export class Writer {
 				if (typeof k === "string") {
 					this.inline(k);
 				} else if (k.as) {
-					this.inline(k.isType ? "type " : "", k.key, " as ", k.as);
+					this.inline(k.key, " as ", k.as);
 				} else {
-					this.inline(k.isType ? "type " : "", k.key);
+					this.inline(k.key);
 				}
 				if (i !== o.keys.length - 1) {
 					this.inline(", ");
@@ -418,17 +304,14 @@ export class Writer {
 
 	$export(o: SWT.Export): void {
 		switch (o.variant) {
-			case "type":
-				this.line(`export type { ${o.keys.join(", ")} };`);
-				break;
-			case "obj":
+			case "object":
 				this.line(`export { ${o.keys.join(", ")} };`);
 				break;
 			case "named":
 				this.line(`export const ${o.name} = { ${o.keys.join(", ")} };`);
 				break;
 			case "default":
-				this.line(`export default ${o.keys.length > 1 ? `{ ${o.keys.join(", ")} }` : o.keys[0]};`);
+				this.line(`export default { ${o.keys.join(", ")} };`);
 				break;
 			case "reexport":
 				this.line(`export { ${o.keys.join(", ")} } from "${o.from}";`);
@@ -439,11 +322,11 @@ export class Writer {
 		}
 	}
 
-	private resolveValue(value: string | B.BodyWriter) {
+	private resolveValue(value: string | BodyWriter) {
 		if (typeof value === "string") {
 			return value;
 		} else {
-			const w = new Writer(this.indent + 1);
+			const w = new JavascriptWriter(this.indent + 1);
 			value(w);
 			return w.read();
 		}
@@ -451,29 +334,22 @@ export class Writer {
 
 	$const(o: VWT.Const): void {
 		this.variables.add(o.name);
-		this.line(
-			`${o.isExported ? "export " : ""}const ${o.name}${o.type ? `:${o.type}` : ``} = ${this.resolveValue(o.value)};`,
-		);
+		this.line(`${o.isExported ? "export " : ""}const ${o.name} = ${this.resolveValue(o.value)};`);
 	}
 
 	$var(o: VWT.Var): void {
 		this.variables.add(o.name);
-		this.line(
-			`${o.isExported ? "export " : ""}var ${o.name}${o.type ? `:${o.type}` : ``} = ${this.resolveValue(o.value)};`,
-		);
+		this.line(`${o.isExported ? "export " : ""}var ${o.name} = ${this.resolveValue(o.value)};`);
 	}
 
 	$let(o: VWT.Let): void {
 		this.variables.add(o.name);
 		this.line(
-			`${o.isExported ? "export " : ""}let ${o.name}${o.type ? `:${o.type}` : ``} = ${this.resolveValue(o.value)};`,
+			`${o.isExported ? "export " : ""}let ${o.name}${o.value ? ` = ${this.resolveValue(o.value)}` : ``};`,
 		);
 	}
 
-	$type(o: VWT.Type): void {
-		this.interfaces.add(o.name);
-		this.line(
-			`${o.isExported ? "export " : ""}type ${o.name}${o.generics ? `<${o.generics.join(", ")}>` : ""} = ${this.resolveValue(o.value)};`,
-		);
+	$assign(o: VWT.Assign) {
+		this.line(`${o.name} = ${this.resolveValue(o.value)}`);
 	}
 }

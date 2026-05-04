@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { Config } from "../Config/Config";
+import type { Config } from "../config";
 import { Importable } from "../Importable/Importable";
 import { ImportsManager } from "../ImportsManager/ImportsManager";
 import { Module } from "../Module/Module";

@@ -230,9 +230,9 @@ const api = new CorpusApi(BASE_URL);
 	formData.set("role", "editor");
 	formData.set("status", "active");
 
-	const res = await api.orgsOrgIdMembersMemberIdPut({
+	const res = await api.orgsOrgIdMembersMemberIdPut<"formData">({
 		params: { orgId: 1, memberId: 1 },
-		formData,
+		body: formData,
 	});
 	T.expect("orgsOrgIdMembersMemberIdPut has orgId", res).toHaveProperty("orgId", 1);
 	T.expect("orgsOrgIdMembersMemberIdPut has memberId", res).toHaveProperty("memberId", 1);

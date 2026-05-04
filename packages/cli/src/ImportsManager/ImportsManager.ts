@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import type { Config } from "../Config/Config";
+import type { Config } from "../config";
 import { toCamelCase } from "../utils/toCamelCase";
 import { toKebabCase } from "../utils/toKebabCase";
 import { toPascalCase } from "../utils/toPascalCase";

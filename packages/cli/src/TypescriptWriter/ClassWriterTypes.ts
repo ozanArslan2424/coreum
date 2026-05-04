@@ -1,8 +1,11 @@
 import type { OrString } from "corpus-utils/OrString";
 
-import type { BaseWriterTypes as B } from "./BaseWriterTypes";
+import type { BaseWriterTypes as B } from "../BaseWriter/BaseWriterTypes";
+import type { TypescriptWriter } from "./TypescriptWriter";
 
 export namespace ClassWriterTypes {
+	type BodyWriter = B.BodyWriter<TypescriptWriter>;
+
 	type MemberKeyword =
 		| "public"
 		| "protected"
@@ -41,7 +44,7 @@ export namespace ClassWriterTypes {
 	export type Constructor = {
 		args?: { keyword?: MemberKeyword; key: string; type: string }[];
 		superArgs?: string;
-		body?: B.BodyWriter;
+		body?: BodyWriter;
 	};
 
 	export type Class = {
@@ -50,7 +53,7 @@ export namespace ClassWriterTypes {
 		implements?: string;
 		isAbstract?: boolean;
 		name: string;
-		body: B.BodyWriter;
+		body: BodyWriter;
 		generics?: string[];
 		constr?: Constructor;
 	};
@@ -58,17 +61,17 @@ export namespace ClassWriterTypes {
 	type MethodBase = {
 		name: string;
 		keyword?: MethodKeyword;
-		args?: B.Arg[];
+		args?: B.TypedArg[];
 		generics?: string[];
 		isAsync?: boolean;
 		type?: string;
-		body: B.BodyWriter;
+		body: BodyWriter;
 	};
 
 	export type Method = MethodBase;
 
 	export type ArrowMethod = Omit<MethodBase, "args"> & {
-		args?: OrString<B.Arg>[];
+		args?: OrString<B.TypedArg>[];
 	};
 
 	export type AbstractMethod = Omit<MethodBase, "body">;
@@ -76,7 +79,7 @@ export namespace ClassWriterTypes {
 	export type Member = {
 		name: string;
 		type?: string;
-		value: string | B.BodyWriter;
+		value: string | BodyWriter;
 		keyword?: MemberKeyword;
 	};
 }

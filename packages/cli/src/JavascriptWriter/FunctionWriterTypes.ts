@@ -1,14 +1,13 @@
-import type { OrString } from "corpus-utils/OrString";
-
-import type { BaseWriterTypes as B } from "./BaseWriterTypes";
+import type { BaseWriterTypes as B } from "../BaseWriter/BaseWriterTypes";
+import type { JavascriptWriter } from "./JavascriptWriter";
 
 export namespace FunctionWriterTypes {
+	type BodyWriter = B.BodyWriter<JavascriptWriter>;
+
 	type FunctionBase = {
-		args?: B.Arg[];
-		generics?: string[];
+		args?: string[];
 		isAsync?: boolean;
-		type?: string;
-		body: B.BodyWriter;
+		body: BodyWriter;
 	};
 
 	export type Function = FunctionBase & { name: string };
@@ -16,6 +15,6 @@ export namespace FunctionWriterTypes {
 	export type Arrow = Omit<FunctionBase, "args"> & {
 		keyword?: "const" | "let" | "var";
 		name: string;
-		args?: OrString<B.Arg>[];
+		args?: string[];
 	};
 }

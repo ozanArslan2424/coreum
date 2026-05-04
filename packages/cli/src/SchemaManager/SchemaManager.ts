@@ -3,7 +3,7 @@ import type { Type } from "arktype";
 import { compile } from "json-schema-to-typescript";
 import { ZodType } from "zod";
 
-import type { Config } from "../Config/Config";
+import type { Config } from "../config";
 import type { Schema } from "../utils/Schema";
 // TODO:
 // import { toJsonSchema as valibotToJsonSchema } from "@valibot/to-json-schema";

@@ -1,7 +1,7 @@
-import type { Config } from "../Config/Config";
+import type { Config } from "../config";
 import type { ImportableInterface } from "../Importable/ImportableInterface";
 import type { ModuleInterface } from "../Module/ModuleInterface";
-import { Writer } from "../Writer/Writer";
+import { TypescriptWriter } from "../TypescriptWriter/TypescriptWriter";
 
 export function writeMainFile(
 	config: Config,
@@ -9,7 +9,7 @@ export function writeMainFile(
 	database: ImportableInterface,
 	modules: ModuleInterface[],
 ) {
-	const w = new Writer(mainFilePath);
+	const w = new TypescriptWriter(mainFilePath);
 
 	w.$import({ keys: ["C", "X"], from: config.pkgPath });
 	w.$import({ keys: [database.name], from: database.import(mainFilePath) });

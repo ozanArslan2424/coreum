@@ -1,9 +1,9 @@
-import type { Config } from "../Config/Config";
+import type { Config } from "../config";
 import type { ModuleInterface } from "../Module/ModuleInterface";
-import { Writer } from "../Writer/Writer";
+import { TypescriptWriter } from "../TypescriptWriter/TypescriptWriter";
 
 export function writeServiceFile(c: Config, m: ModuleInterface) {
-	const w = new Writer(m.service.filePath);
+	const w = new TypescriptWriter(m.service.filePath);
 	w.$import({ keys: ["C"], from: c.pkgPath });
 	w.$import({
 		isType: true,

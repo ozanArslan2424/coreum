@@ -1,3 +1,4 @@
+import { C } from "@ozanarslan/corpus";
 import { z } from "zod";
 
 export function getZodSchemas() {
@@ -21,16 +22,23 @@ export function getZodSchemas() {
 		}),
 	});
 	const UserSearch = Pagination.and(z.object({ role: Role.optional(), status: Status.optional() }));
-	const UserResponse = z
-		.object({
-			id: z.number(),
-			name: z.string(),
-			age: z.number(),
-			role: Role,
-			status: Status,
-			tags: z.array(z.string()),
-		})
-		.and(Timestamp);
+
+	const User = C.Entity({
+		name: "User",
+		schema: z
+			.object({
+				id: z.number(),
+				name: z.string(),
+				age: z.number(),
+				role: Role,
+				status: Status,
+				tags: z.array(z.string()),
+			})
+			.and(Timestamp),
+	});
+
+	const UserResponse = User.schema;
+
 	const PostBody = z.object({
 		title: z.string(),
 		content: z.string(),

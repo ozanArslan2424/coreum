@@ -1,9 +1,9 @@
-import type { Config } from "../Config/Config";
+import type { Config } from "../config";
 import type { ModuleInterface } from "../Module/ModuleInterface";
-import { Writer } from "../Writer/Writer";
+import { TypescriptWriter } from "../TypescriptWriter/TypescriptWriter";
 
 export function writeModelFile(c: Config, m: ModuleInterface): string {
-	const w = new Writer(m.model.filePath);
+	const w = new TypescriptWriter(m.model.filePath);
 
 	if (!c.validationLibrary) {
 		w.$comment({ variant: "line", text: "No validation library detected." });

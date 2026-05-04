@@ -7,6 +7,9 @@ export default defineConfig({
 	casing: "pascal",
 	output: "./test/other/generated.ts",
 	exportClientAs: "CorpusApi",
+	exportModelsAs: "Models",
+	exportArgsAs: "Args",
+	exportEntitiesAs: "Entities",
 	// Default targets arktype. The `fallback: ctx => ctx.base` strategy silently
 	// drops any unsupported constraint and keeps the rest of the schema intact,
 	// which is the least-surprising behaviour for codegen purposes.
