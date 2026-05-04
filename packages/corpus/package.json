@@ -8,7 +8,7 @@
 		"bun serve",
 		"simple"
 	],
-	"homepage": "https://corpus-production.up.railway.app/",
+	"homepage": "https://corpus-docs.fly.dev/",
 	"bugs": {
 		"url": "https://github.com/ozanArslan2424/corpus.git/issues"
 	},

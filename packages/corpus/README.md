@@ -3,7 +3,7 @@
 A simple typescript backend framework package to use for personal projects or simple crud applications.
 This package is by no means a replacement for full fledged backend frameworks commonly used in production.
 
-[Documentation](https://corpus-production.up.railway.app/)
+[Documentation](https://corpus-docs.fly.dev/)
 
 ## Quick Start
 
@@ -173,5 +173,5 @@ Very much inspired from the core ideas behind [Elysia](https://github.com/elysia
 - [x] Reduce dist size
 - [x] Support additional response body types (ArrayBuffer, Blob, FormData, etc.) in the custom Response object.
 - [x] Support WebSocket
-- [x] [Documentation](https://corpus-production.up.railway.app/)
+- [x] [Documentation](https://corpus-docs.fly.dev/)
 - [ ] Better static routing.

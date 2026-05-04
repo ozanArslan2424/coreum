@@ -13,7 +13,7 @@ This repository contains the source for the Corpus ecosystem.
 
 A simple TypeScript backend framework for personal projects and simple CRUD applications. Not a replacement for full-fledged production frameworks.
 
-[Documentation](https://corpus-production.up.railway.app/)
+[Documentation](https://corpus-docs.fly.dev/)
 
 ## Getting Started
 
