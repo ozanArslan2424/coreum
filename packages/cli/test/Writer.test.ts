@@ -3,7 +3,7 @@ import { unlinkSync, readFileSync, writeFileSync } from "node:fs";
 
 import { TypescriptWriter } from "../src/TypescriptWriter/TypescriptWriter";
 
-describe("Writer core", () => {
+describe("TypescriptWriter core", () => {
 	it("write joins with newline by default", () => {
 		const w = new TypescriptWriter();
 		w.line("a", "b");
@@ -664,7 +664,7 @@ describe("$interface", () => {
 	});
 });
 
-describe("nested Writers", () => {
+describe("nested TypescriptWriters", () => {
 	it("nested indent is correct", () => {
 		const w = new TypescriptWriter(0);
 		w.$function({

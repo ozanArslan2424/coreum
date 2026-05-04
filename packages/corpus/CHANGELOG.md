@@ -1,5 +1,11 @@
 # @ozanarslan/corpus
 
+## 0.5.13
+
+### Patch Changes
+
+- CLI Writer changes
+
 ## 0.5.12
 
 ### Patch Changes

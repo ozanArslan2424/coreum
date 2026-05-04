@@ -311,7 +311,9 @@ export class JavascriptWriter extends BaseWriter {
 				this.line(`export const ${o.name} = { ${o.keys.join(", ")} };`);
 				break;
 			case "default":
-				this.line(`export default { ${o.keys.join(", ")} };`);
+				this.line(
+					`export default ${o.keys.length === 1 ? `${o.keys[0]}` : `{ ${o.keys.join(", ")} }`};`,
+				);
 				break;
 			case "reexport":
 				this.line(`export { ${o.keys.join(", ")} } from "${o.from}";`);
