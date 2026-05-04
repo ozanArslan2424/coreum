@@ -12,11 +12,14 @@ export async function compile(outDir: string) {
 	const mdh = new MdHelper(htmlh);
 	const fh = new FileHelper(outDir);
 
-	async function getSharedHtml(name: string) {
+	async function getSharedHtml(name: string, templateEntries?: Record<string, string>) {
 		const file = new X.File(fh.addr("html", `${name}.html`));
 
 		let content = await file.text();
 		content = await minifier.scriptTags(content);
+		if (templateEntries) {
+			content = htmlh.hydrate(content, templateEntries);
+		}
 		return content;
 	}
 
@@ -90,7 +93,7 @@ export async function compile(outDir: string) {
 
 	const parts = await Promise.all([
 		getSharedHtml("layout"),
-		getSharedHtml("header"),
+		getSharedHtml("header", { brand: "@ozanarslan/corpus" }),
 		getSharedHtml("sidebar"),
 	]);
 	await Promise.all([

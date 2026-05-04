@@ -34,9 +34,9 @@ export class HtmlHelper {
 		});
 	}
 
-	hydrate(target: string, entries: Record<string, string>) {
+	hydrate(target: string, templateEntries: Record<string, string>) {
 		let result = target;
-		for (const [key, content] of Object.entries(entries)) {
+		for (const [key, content] of Object.entries(templateEntries)) {
 			const regex = new RegExp(`<!--\\s*INSERT\\s*==\\s*${key}\\s*-->`);
 			result = result.replace(regex, content);
 		}
