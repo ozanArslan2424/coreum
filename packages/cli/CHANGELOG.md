@@ -1,5 +1,11 @@
 # @ozanarslan/corpus-cli
 
+## 0.5.14
+
+### Patch Changes
+
+- Docs moved to fly.io
+
 ## 0.5.13
 
 ### Patch Changes
