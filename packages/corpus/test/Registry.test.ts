@@ -147,7 +147,7 @@ describe("Registry - swapped fields are honored by the server", () => {
 				corsCalls++;
 			},
 			getPreflightHandler: () => () => new TC.Res(null, { status: 204 }),
-		} as typeof $registryTesting.cors extends infer T ? T : never; // cast to XCorsInterface
+		} as typeof $registryTesting.cors extends infer T ? T : never; // cast to CorsInterface
 
 		new TC.Route("/cors-route", (c) => {
 			c.data = "ok";

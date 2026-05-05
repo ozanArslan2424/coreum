@@ -129,7 +129,7 @@ server.setGlobalPrefix("/api");
 // Cors headers are applied globally if you set them this way also
 // any request with Access-Control-Request-Method header and OPTIONS
 // method is handled as a preflight request.
-new X.Cors({})
+new C.Cors({})
 
 const db = new DatabaseClient();
 server.setOnBeforeListen(() => db.connect());

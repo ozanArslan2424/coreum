@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import net from "node:net";
 
-import { TC, TX, $registryTesting } from "./_modules";
+import { TC, $registryTesting } from "./_modules";
 import { createTestServer } from "./utils/createTestServer";
 import { parseBody } from "./utils/parse";
 import { req } from "./utils/req";
@@ -120,7 +120,7 @@ describe("C.Server", () => {
 
 	it("PREFLIGHT - USES CORS PREFLIGHT HANDLER WHEN CORS IS SET", async () => {
 		const s = createTestServer();
-		new TX.Cors({ allowedOrigins: ["https://example.com"] });
+		new TC.Cors({ allowedOrigins: ["https://example.com"] });
 		const res = await s.handle(
 			req("/srv-preflight-cors", {
 				method: "OPTIONS",
@@ -131,7 +131,7 @@ describe("C.Server", () => {
 			}),
 		);
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");
-		new TX.Cors(undefined);
+		new TC.Cors(undefined);
 	});
 
 	// ─── middleware - global ──────────────────────────────────────
@@ -434,22 +434,22 @@ describe("C.Server", () => {
 
 	it("CORS - SETS ORIGIN HEADER ON ALLOWED ORIGIN", async () => {
 		const s = createTestServer();
-		new TX.Cors({ allowedOrigins: ["https://example.com"] });
+		new TC.Cors({ allowedOrigins: ["https://example.com"] });
 		new TC.Route("/srv-cors", () => "ok");
 		const res = await s.handle(req("/srv-cors", { headers: { origin: "https://example.com" } }));
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");
-		new TX.Cors(undefined);
+		new TC.Cors(undefined);
 	});
 
 	it("CORS - DOES NOT SET ORIGIN HEADER ON DISALLOWED ORIGIN", async () => {
 		const s = createTestServer();
-		new TX.Cors({ allowedOrigins: ["https://example.com"] });
+		new TC.Cors({ allowedOrigins: ["https://example.com"] });
 		new TC.Route("/srv-cors-blocked", () => "ok");
 		const res = await s.handle(
 			req("/srv-cors-blocked", { headers: { origin: "https://evil.com" } }),
 		);
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBeNull();
-		new TX.Cors(undefined);
+		new TC.Cors(undefined);
 	});
 
 	it("CORS - IS NOT APPLIED WHEN NOT SET", async () => {
@@ -461,7 +461,7 @@ describe("C.Server", () => {
 
 	it("CORS - IS APPLIED TO ERROR RESPONSES", async () => {
 		const s = createTestServer();
-		new TX.Cors({ allowedOrigins: ["https://example.com"] });
+		new TC.Cors({ allowedOrigins: ["https://example.com"] });
 		new TC.Route("/srv-cors-error", () => {
 			throw new Error("boom");
 		});
@@ -470,18 +470,18 @@ describe("C.Server", () => {
 		);
 		expect(res.status).toBe(500);
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");
-		new TX.Cors(undefined);
+		new TC.Cors(undefined);
 	});
 
 	it("CORS - IS APPLIED TO 404 RESPONSES", async () => {
 		const s = createTestServer();
-		new TX.Cors({ allowedOrigins: ["https://example.com"] });
+		new TC.Cors({ allowedOrigins: ["https://example.com"] });
 		const res = await s.handle(
 			req("/srv-cors-404", { headers: { origin: "https://example.com" } }),
 		);
 		expect(res.status).toBe(404);
 		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");
-		new TX.Cors(undefined);
+		new TC.Cors(undefined);
 	});
 
 	// ─── live server (.listen) ────────────────────────────────────

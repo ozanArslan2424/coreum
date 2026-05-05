@@ -1,6 +1,8 @@
-# XCors
+# Cors
 
-The XCors class provides a simple outbound middleware for setting CORS (Cross-Origin Resource Sharing) headers on responses. It automatically registers to the global router on instantiation. See [MDN: Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for detailed CORS concepts.
+The Cors class provides a simple outbound middleware for setting CORS (Cross-Origin Resource Sharing) headers on responses. It automatically registers to the global registry on instantiation. Can be swapped out, see [Registry Customization](/registry.html).
+
+See [MDN: Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for detailed CORS concepts.
 
 <section class="table-of-contents">
 
@@ -17,9 +19,9 @@ The XCors class provides a simple outbound middleware for setting CORS (Cross-Or
 ### Basic CORS setup
 
 ```ts
-import { X } from "@ozanarslan/corpus";
+import { C } from "@ozanarslan/corpus";
 
-new X.Cors({
+new C.Cors({
 	allowedOrigins: ["https://example.com", "https://app.example.com"],
 	allowedMethods: ["GET", "POST", "PUT", "DELETE"],
 	allowedHeaders: ["Content-Type", "Authorization"],
@@ -29,7 +31,7 @@ new X.Cors({
 ### With credentials and exposed headers
 
 ```ts
-new X.Cors({
+new C.Cors({
 	allowedOrigins: ["https://trusted.com"],
 	credentials: true,
 	exposedHeaders: ["X-Request-Id", "X-Rate-Limit"],
@@ -55,13 +57,13 @@ CORS configuration options. Pass `undefined` for permissive defaults (wildcard o
 
 ## Preflight Handling
 
-XCors exposes a `getPreflightHandler()` method that returns a request handler suitable for `server.handlePreflight`. This handles `OPTIONS` preflight requests with the same origin logic as the outbound middleware, and additionally sets the `Access-Control-Max-Age` header.
+Cors exposes a `getPreflightHandler()` method that returns a request handler suitable for `server.handlePreflight`. This handles `OPTIONS` preflight requests with the same origin logic as the outbound middleware, and additionally sets the `Access-Control-Max-Age` header.
 
 ```ts
-import { C, X } from "@ozanarslan/corpus";
+import { C } from "@ozanarslan/corpus";
 
 const server = new C.Server();
-const cors = new X.Cors({ allowedOrigins: ["https://example.com"] });
+const cors = new C.Cors({ allowedOrigins: ["https://example.com"] });
 
 // handled internally:
 // protected handlePreflight: RequestHandler = async (req) => {

@@ -1,6 +1,6 @@
 import type { CHeaderKey } from "@/CHeaders/CHeaderKey";
 
-export type XCorsOptions = {
+export type CorsOptions = {
 	/** Which origins are allowed to access the resource. Use ["*"] for any origin, or specific domains. */
 	allowedOrigins?: string[];
 

@@ -12,6 +12,9 @@ export type { CHeadersInit as HeadersInit } from "./CHeaders/CHeadersInit";
 
 export * from "./Exception/Exception";
 
+export * from "./Cors/CorsOptions";
+export * from "./Cors/Cors";
+
 export * from "./Middleware/MiddlewareHandler";
 export * from "./Middleware/MiddlewareUseOn";
 export * from "./Middleware/MiddlewareOptions";

@@ -6,27 +6,12 @@ The X modules provide optional utilities and extensions for common web applicati
 
 ##### Contents
 
-1. [X.Cors](#xcors)
-2. [X.RateLimiter](#xratelimiter)
-3. [X.File](#xfile)
+1. [X.RateLimiter](#xratelimiter)
+2. [X.File](#xfile)
+3. [X.Config](#xconfig)
 4. [X.InferModel](#xinfermodel)
 
 </section>
-
-## X.Cors
-
-Simple CORS header management. Automatically registers as outbound global middleware.
-Provides a preflight handler for `OPTIONS` requests. See [XCors](/xcors.html) for full configuration.
-
-```ts
-import { X } from "@ozanarslan/corpus";
-
-new X.Cors({
-	allowedOrigins: ["https://app.example.com"],
-	allowedMethods: ["GET", "POST"],
-	credentials: true,
-});
-```
 
 ## X.RateLimiter
 
@@ -58,6 +43,23 @@ if (await file.exists()) {
 
 See [XFile](/xfile.html) for streaming and full API.
 
+## X.Config
+
+Typed environment variable access with parsing, fallbacks, and fail-fast validation.
+
+```ts
+import { X } from "@ozanarslan/corpus";
+
+const port = X.Config.get("PORT", { parser: Number, fallback: 3000 });
+const dbUrl = X.Config.require("DATABASE_URL");
+
+if (X.Config.isProd) {
+	// Production-only logic
+}
+```
+
+See [XConfig](/xconfig.html) for the full API including `has`, `set`, and environment checks.
+
 ## X.InferModel
 
 Helper type for inferring all schemas from a single object containing multiple RouteModels. Useful when you prefer to colocate all your route schemas in one place.
@@ -65,13 +67,13 @@ Helper type for inferring all schemas from a single object containing multiple R
 ```ts
 import { C, X } from "@ozanarslan/corpus";
 
+// You can also use a regular object.
 class UserModel {
-	static entity = z.object({
+	static readonly entity = z.object({
 		id: z.number(),
 		name: z.string(),
 	});
-
-	static create = {
+	static readonly create = {
 		body: z.object({ name: z.string() }),
 		response: this.entity,
 	};
@@ -82,7 +84,3 @@ type M = X.InferModel<typeof UserModel>;
 ```
 
 See [Model](/model.html) for more on route validation and type inference.
-
-```
-
-```

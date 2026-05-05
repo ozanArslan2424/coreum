@@ -1,3 +1,4 @@
+import type { CorsInterface } from "@/Cors/CorsInterface";
 import type { EntityStoreInterface } from "@/EntityStore/EntityStoreInterface";
 import type { MiddlewareRouterInterface } from "@/MiddlewareRouter/MiddlewareRouterInterface";
 import type { BodyParserInterface } from "@/Parser/BodyParserInterface";
@@ -6,13 +7,12 @@ import type { SchemaParserInterface } from "@/Parser/SchemaParserInterface";
 import type { RegistryDocEntry } from "@/Registry/RegistryDocEntry";
 import type { RouterInterface } from "@/Router/RouterInterface";
 import type { RouterAdapterInterface } from "@/RouterAdapter/RouterAdapterInterface";
-import type { XCorsInterface } from "@/XCors/XCorsInterface";
 
 export interface RegistryInterface {
 	adapter: RouterAdapterInterface;
 	router: RouterInterface;
 	docs: Map<string, RegistryDocEntry>;
-	cors: XCorsInterface | null;
+	cors: CorsInterface | null;
 	prefix: string;
 	middlewares: MiddlewareRouterInterface;
 	entities: EntityStoreInterface;

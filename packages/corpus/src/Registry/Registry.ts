@@ -1,3 +1,4 @@
+import type { CorsInterface } from "@/Cors/CorsInterface";
 import { EntityStore } from "@/EntityStore/EntityStore";
 import type { EntityStoreInterface } from "@/EntityStore/EntityStoreInterface";
 import { MiddlewareRouter } from "@/MiddlewareRouter/MiddlewareRouter";
@@ -16,7 +17,6 @@ import { Router } from "@/Router/Router";
 import type { RouterInterface } from "@/Router/RouterInterface";
 import { BranchAdapter } from "@/RouterAdapter/BranchAdapter";
 import type { RouterAdapterInterface } from "@/RouterAdapter/RouterAdapterInterface";
-import type { XCorsInterface } from "@/XCors/XCorsInterface";
 
 export class Registry implements RegistryInterface {
 	constructor() {
@@ -47,11 +47,11 @@ export class Registry implements RegistryInterface {
 		this.router = new Router(value);
 	}
 
-	private _cors!: XCorsInterface | null;
-	public get cors(): XCorsInterface | null {
+	private _cors!: CorsInterface | null;
+	public get cors(): CorsInterface | null {
 		return this._cors;
 	}
-	public set cors(value: XCorsInterface | null) {
+	public set cors(value: CorsInterface | null) {
 		this._cors = value;
 	}
 

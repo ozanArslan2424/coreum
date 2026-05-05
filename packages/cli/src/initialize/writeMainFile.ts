@@ -47,7 +47,7 @@ export function writeMainFile(
 
 	w.line(
 		`new X.RateLimiter();`,
-		`new X.Cors({`,
+		`new C.Cors({`,
 		`	allowedOrigins: [X.Config.get("CLIENT_URL")],`,
 		`	allowedMethods: ["GET", "POST"],`,
 		`	allowedHeaders: ["Content-Type", "Authorization"],`,

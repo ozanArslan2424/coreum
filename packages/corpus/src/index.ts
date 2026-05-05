@@ -12,7 +12,7 @@ export * from "./Parser/ObjectParserInterface";
 export * from "./Parser/SchemaParserInterface";
 export * from "./Router/RouterInterface";
 export * from "./RouterAdapter/RouterAdapterInterface";
-export * from "./XCors/XCorsInterface";
+export * from "./Cors/CorsInterface";
 export * from "./Registry/RegistryInterface";
 
 export type * from "./types.d.ts";

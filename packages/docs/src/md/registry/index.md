@@ -1,6 +1,6 @@
 # Registry
 
-The `Registry` class is NOT part of the public Corpus API. It is the global container that holds every runtime dependency Corpus uses — the router, adapter, middleware router, entity store, parsers, [XCors](/xcors.html), and the global prefix. The registry is _plug & play_, so you can swap any of its fields with your own implementation as long as you satisfy the corresponding interface.
+The `Registry` class is NOT part of the public Corpus API. It is the global container that holds every runtime dependency Corpus uses — the router, adapter, middleware router, entity store, parsers, [Cors](/Cors.html), and the global prefix. The registry is _plug & play_, so you can swap any of its fields with your own implementation as long as you satisfy the corresponding interface.
 
 The registry instance can be accessed through `$registry`. Note that `$registry` itself cannot be reassigned — only its fields can be swapped.
 
@@ -41,7 +41,7 @@ Implements `MiddlewareRouterInterface`. Responsible for storing middleware handl
 
 ### cors
 
-Either `null` or an instance of `XCorsInterface`. Controls CORS handling and preflight responses.
+Either `null` or an instance of `CorsInterface`. Controls CORS handling and preflight responses.
 
 ### urlParamsParser
 
@@ -109,7 +109,7 @@ interface MiddlewareRouterInterface {
 	find(routeId: string): MiddlewareStoreReturn;
 }
 
-interface XCorsInterface extends MiddlewareInterface {
+interface CorsInterface extends MiddlewareInterface {
 	/** Preflight handler for OPTIONS requests. */
 	getPreflightHandler(): RequestHandler;
 }

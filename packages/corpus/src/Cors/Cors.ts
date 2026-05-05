@@ -2,6 +2,8 @@ import { boolToString } from "corpus-utils/boolToString";
 import { isSomeArray } from "corpus-utils/isSomeArray";
 
 import { CommonHeaders } from "@/CommonHeaders/CommonHeaders";
+import type { CorsInterface } from "@/Cors/CorsInterface";
+import type { CorsOptions } from "@/Cors/CorsOptions";
 import { $registry } from "@/index";
 import type { MiddlewareHandler } from "@/Middleware/MiddlewareHandler";
 import type { MiddlewareUseOn } from "@/Middleware/MiddlewareUseOn";
@@ -9,15 +11,13 @@ import { MiddlewareVariant } from "@/Middleware/MiddlewareVariant";
 import { Res } from "@/Res/Res";
 import type { RequestHandler } from "@/Server/RequestHandler";
 import { Status } from "@/Status/Status";
-import type { XCorsInterface } from "@/XCors/XCorsInterface";
-import type { XCorsOptions } from "@/XCors/XCorsOptions";
 
 /**
  * Simple cors helper to set CORS headers. Also provides a preflight handler for the Server.
  * Extend and override to change business logic and keep registration.
  * */
-export class XCors implements XCorsInterface {
-	constructor(protected readonly opts: XCorsOptions | undefined) {
+export class Cors implements CorsInterface {
+	constructor(protected readonly opts: CorsOptions | undefined) {
 		this.register();
 	}
 
