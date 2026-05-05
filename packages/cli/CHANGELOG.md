@@ -1,5 +1,11 @@
 # @ozanarslan/corpus-cli
 
+## 0.5.15
+
+### Patch Changes
+
+- Moved XCors to C modules
+
 ## 0.5.14
 
 ### Patch Changes
