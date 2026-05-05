@@ -3,6 +3,7 @@ import { strSplit } from "corpus-utils/strSplit";
 import { CHeaders } from "@/CHeaders/CHeaders";
 import { CommonHeaders } from "@/CommonHeaders/CommonHeaders";
 import { Cookies } from "@/Cookies/Cookies";
+import type { CookiesInterface } from "@/Cookies/CookiesInterface";
 import { Method } from "@/Method/Method";
 import type { ReqInfo } from "@/Req/ReqInfo";
 import type { ReqInit } from "@/Req/ReqInit";
@@ -23,7 +24,7 @@ export class Req extends Request {
 
 	override readonly headers: CHeaders;
 	readonly urlObject: URL;
-	readonly cookies: Cookies;
+	readonly cookies: CookiesInterface;
 
 	get isPreflight(): boolean {
 		return (
@@ -37,7 +38,7 @@ export class Req extends Request {
 		return isUpgrade && isWebsocket;
 	}
 
-	private resolveCookies(): Cookies {
+	private resolveCookies(): CookiesInterface {
 		const jar = new Cookies();
 
 		const cookieHeader = this.headers.get(CommonHeaders.Cookie);

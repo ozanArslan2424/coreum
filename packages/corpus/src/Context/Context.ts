@@ -1,5 +1,5 @@
 import type { CHeaders } from "@/CHeaders/CHeaders";
-import type { Cookies } from "@/Cookies/Cookies";
+import type { CookiesInterface } from "@/Cookies/CookiesInterface";
 import { $registry } from "@/index";
 import type { Req } from "@/Req/Req";
 import { Res } from "@/Res/Res";
@@ -8,22 +8,22 @@ import type { ContextDataInterface } from "@/types.d.ts";
 
 /**
  * The context object used in Route "callback" parameter.
- * Takes 4 generics:
- * R = The return type
+ * Takes 4 optional generics:
  * B = Request body
  * S = Request URL search params
  * P = Request URL params
- * The types are resolved using Route "model" parameter.
+ * R = The return type
  *
  * Contains:
- * req = {@link HTTPRequest} instance
- * url = Request {@link URL} object
- * headers = Request {@link HTTPHeaders}
- * cookies = Request {@link Cookies}
+ * req = Req instance (readonly)
+ * res = Res instance
+ * url = Request URL object
+ * headers = Request Headers
+ * cookies = Request Cookies
  * body = Parsed Request body
  * search = Parsed Request URL search params
  * params = Parsed Request URL params
- * res = To set the {@link HTTPResponse} data
+ * data = Data object shared with middlewares
  * */
 
 export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
@@ -39,7 +39,7 @@ export class Context<B = unknown, S = unknown, P = unknown, R = unknown> {
 	res: Res<R>;
 	url: URL;
 	headers: CHeaders;
-	cookies: Cookies;
+	cookies: CookiesInterface;
 	body: B = Object.create(null);
 	search: S = Object.create(null);
 	params: P = Object.create(null);

@@ -4,6 +4,7 @@ import { isPrimitive } from "corpus-utils/isPrimitive";
 import { CHeaders } from "@/CHeaders/CHeaders";
 import { CommonHeaders } from "@/CommonHeaders/CommonHeaders";
 import { Cookies } from "@/Cookies/Cookies";
+import type { CookiesInterface } from "@/Cookies/CookiesInterface";
 import { Exception } from "@/Exception/Exception";
 import type { NdjsonSource } from "@/Res/NdjsonSource";
 import type { ResBody } from "@/Res/ResBody";
@@ -55,7 +56,7 @@ export class Res<R = unknown> {
 	headers: CHeaders;
 	status: Status;
 	statusText: string;
-	cookies: Cookies;
+	cookies: CookiesInterface;
 
 	get response(): Response {
 		const setCookieHeaders = this.cookies.toSetCookieHeaders();
@@ -71,6 +72,83 @@ export class Res<R = unknown> {
 			statusText: this.statusText,
 			headers: this.headers,
 		});
+	}
+
+	private resolveCookies(): CookiesInterface {
+		return new Cookies(this.init?.cookies);
+	}
+
+	private resolveHeaders(): CHeaders {
+		return new CHeaders(this.init?.headers);
+	}
+
+	private resolveStatus(): Status {
+		if (this.init?.status) return this.init.status;
+		if (this.headers.has(CommonHeaders.Location)) {
+			return Status.FOUND;
+		}
+		return Status.OK;
+	}
+
+	private setContentType(value: string): void {
+		if (
+			!this.headers.has(CommonHeaders.ContentType) ||
+			this.headers.get(CommonHeaders.ContentType) === "text/plain"
+		) {
+			this.headers.set(CommonHeaders.ContentType, value);
+		}
+	}
+
+	// order important here
+	private resolveBody(): BodyInit {
+		if (isNil(this.data)) {
+			this.setContentType("text/plain");
+			return "";
+		}
+
+		if (isPrimitive(this.data)) {
+			this.setContentType("text/plain");
+			return String(this.data);
+		}
+
+		if (this.data instanceof ArrayBuffer) {
+			this.setContentType("application/octet-stream");
+			return this.data;
+		}
+
+		if (this.data instanceof Blob) {
+			if (this.data.type) this.setContentType(this.data.type);
+			return this.data;
+		}
+
+		if (this.data instanceof FormData) {
+			this.setContentType("multipart/form-data");
+			return this.data;
+		}
+
+		if (this.data instanceof URLSearchParams) {
+			this.setContentType("application/x-www-form-urlencoded");
+			return this.data;
+		}
+
+		if (this.data instanceof ReadableStream) {
+			return this.data;
+		}
+
+		if (this.data instanceof Date) {
+			this.setContentType("text/plain");
+			return this.data.toISOString();
+		}
+
+		if (Array.isArray(this.data) || typeof this.data === "object") {
+			this.setContentType("application/json");
+			return JSON.stringify(this.data);
+		}
+
+		// Handle other objects (custom classes, etc.)
+		this.setContentType("text/plain");
+		// oxlint-disable-next-line typescript/no-base-to-string
+		return String(this.data);
 	}
 
 	static redirect(url: string | URL, init?: ResInit): Res {
@@ -164,9 +242,9 @@ export class Res<R = unknown> {
 		fileOrPath: XFile | string,
 		disposition: "attachment" | "inline" = "attachment",
 		init?: Omit<ResInit, "status">,
-	): Promise<Res<ReadableStream>> {
+	): Promise<Res<ReadableStream<Uint8Array>>> {
 		const file = await this.resolveFile(fileOrPath, init);
-		const stream = file.stream();
+		const stream = await file.stream();
 		const res = new Res(stream, { ...init, status: Status.OK });
 		res.headers.setMany({
 			[CommonHeaders.ContentType]: file.mimeType,
@@ -215,84 +293,5 @@ export class Res<R = unknown> {
 				cleanup?.();
 			},
 		});
-	}
-
-	private resolveCookies(): Cookies {
-		return this.init?.cookies instanceof Cookies
-			? this.init.cookies
-			: new Cookies(this.init?.cookies);
-	}
-
-	private resolveHeaders(): CHeaders {
-		return new CHeaders(this.init?.headers);
-	}
-
-	private resolveStatus(): Status {
-		if (this.init?.status) return this.init.status;
-		if (this.headers.has(CommonHeaders.Location)) {
-			return Status.FOUND;
-		}
-		return Status.OK;
-	}
-
-	private setContentType(value: string): void {
-		if (
-			!this.headers.has(CommonHeaders.ContentType) ||
-			this.headers.get(CommonHeaders.ContentType) === "text/plain"
-		) {
-			this.headers.set(CommonHeaders.ContentType, value);
-		}
-	}
-
-	// order important here
-	private resolveBody(): BodyInit {
-		if (isNil(this.data)) {
-			this.setContentType("text/plain");
-			return "";
-		}
-
-		if (isPrimitive(this.data)) {
-			this.setContentType("text/plain");
-			return String(this.data);
-		}
-
-		if (this.data instanceof ArrayBuffer) {
-			this.setContentType("application/octet-stream");
-			return this.data;
-		}
-
-		if (this.data instanceof Blob) {
-			if (this.data.type) this.setContentType(this.data.type);
-			return this.data;
-		}
-
-		if (this.data instanceof FormData) {
-			this.setContentType("multipart/form-data");
-			return this.data;
-		}
-
-		if (this.data instanceof URLSearchParams) {
-			this.setContentType("application/x-www-form-urlencoded");
-			return this.data;
-		}
-
-		if (this.data instanceof ReadableStream) {
-			return this.data;
-		}
-
-		if (this.data instanceof Date) {
-			this.setContentType("text/plain");
-			return this.data.toISOString();
-		}
-
-		if (Array.isArray(this.data) || typeof this.data === "object") {
-			this.setContentType("application/json");
-			return JSON.stringify(this.data);
-		}
-
-		// Handle other objects (custom classes, etc.)
-		this.setContentType("text/plain");
-		// oxlint-disable-next-line typescript/no-base-to-string
-		return String(this.data);
 	}
 }
