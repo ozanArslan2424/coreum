@@ -1,23 +1,29 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+
 import { XFileAbstract } from "@/XFile/XFileAbstract";
-import type { XFileInterface } from "@/XFile/XFileInterface";
 
-export class XFile extends XFileAbstract implements XFileInterface {
-	constructor(...args: ConstructorParameters<typeof XFileAbstract>) {
-		super(...args);
-		this.file = Bun.file(args[0]);
-	}
-
-	file: Bun.BunFile;
-
+export class XFile extends XFileAbstract {
 	async exists(): Promise<boolean> {
-		return this.file.exists();
+		return fs.exists(this.path);
 	}
 
-	async text(): Promise<string> {
-		return this.file.text();
+	async text(encoding: BufferEncoding = "utf8"): Promise<string> {
+		return fs.readFile(this.path, { encoding });
 	}
 
-	stream(): ReadableStream {
-		return this.file.stream();
+	async stream(): Promise<ReadableStream<Uint8Array>> {
+		const buffer = await fs.readFile(this.path);
+		return new Blob([buffer], { type: this.mimeType }).stream();
+	}
+
+	async write(data: string | ArrayBuffer | Uint8Array): Promise<void> {
+		await fs.mkdir(path.dirname(this.path), { recursive: true });
+		const payload = data instanceof ArrayBuffer ? new Uint8Array(data) : data;
+		await fs.writeFile(this.path, payload);
+	}
+
+	async unlink(): Promise<void> {
+		await fs.unlink(this.path);
 	}
 }

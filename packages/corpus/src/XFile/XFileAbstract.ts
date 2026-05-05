@@ -1,33 +1,60 @@
-import type { XFileInterface } from "@/XFile/XFileInterface";
-
-export abstract class XFileAbstract implements XFileInterface {
+export abstract class XFileAbstract {
 	constructor(
+		/** The path of the file. */
 		readonly path: string,
-		private readonly fallbackExtension?: string,
+		/** Fallback extension for extension-less files, defaults to "txt" */
+		private readonly fallbackExtension: string = "txt",
 	) {}
 
+	private readonly SLASH = "/";
+	private readonly DOT = ".";
+	private readonly EMPTY = "";
+	private readonly concat = (...parts: string[]) => parts.join(this.EMPTY);
+
+	/**
+	 * Reads the file content and returns it as a string.
+	 * @param encoding defaults to "utf8"
+	 */
 	abstract text(): Promise<string>;
-	abstract stream(): ReadableStream;
+
+	/** Opens a readable stream to the file's content. */
+	abstract stream(): Promise<ReadableStream<Uint8Array>>;
+
+	/** Checks if the file exists in the file system. */
 	abstract exists(): Promise<boolean>;
 
+	/** Writes to the file, directories are created recursively. */
+	abstract write(data: string | ArrayBuffer): Promise<void>;
+
+	/** Deletes the file. */
+	abstract unlink(): Promise<void>;
+
+	/** The name of the file without the extension. */
 	get name(): string {
-		return (this.path.split("/").pop() ?? this.path).replace(`.${this.extension}`, "");
+		const last = this.path.split(this.SLASH).pop() ?? this.path;
+		return last.replace(this.concat(this.DOT, this.extension), this.EMPTY);
 	}
 
+	/** The file extension (e.g., "html", "md"), excluding the leading dot. */
 	get extension(): string {
-		return this.path.split(".").pop() ?? this.fallbackExtension ?? "txt";
+		const last = this.path.split(this.SLASH).pop() ?? this.EMPTY;
+		if (!last.includes(this.DOT)) return this.fallbackExtension;
+		return last.split(this.DOT).pop() ?? this.fallbackExtension;
 	}
 
+	/** The full name of the file, including the extension. */
 	get fullname(): string {
-		return `${this.name}.${this.extension}`;
+		return this.concat(this.name, this.DOT, this.extension);
 	}
 
+	/** Gets the parent directory names as an array, ordered from the immediate parent up to the root. */
 	get parentDirs(): string[] {
-		const segments = this.path.split("/");
-		segments.pop();
-		return segments.filter((segment) => segment.length > 0).reverse();
+		const parts = this.path.split(this.SLASH);
+		parts.pop();
+		return parts.filter((seg) => seg.length > 0).reverse();
 	}
 
+	/** The standard MIME type associated with the file's extension. */
 	get mimeType(): string {
 		const mimeTypes: Record<string, string> = {
 			html: "text/html",
